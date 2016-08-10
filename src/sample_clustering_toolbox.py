@@ -8,20 +8,10 @@ Created on Mon Aug  8 16:08:25 2016
 """
 import os
 import time
-#import argparse
 import numpy as np
-#import numpy.linalg as LA
-#from numpy import maximum
-
 import pandas as pd
-#import scipy.sparse as spar
-#from scipy import stats
-#from sklearn.preprocessing import normalize
-#from sklearn.cluster import KMeans
-#import yaml
 import matplotlib.pyplot as plt
-
-import knpackage.toolbox as keg
+import knpackage.toolbox as kn
 
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
@@ -29,16 +19,16 @@ def run_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
-    spreadsheet_df = keg.get_spreadsheet_df(run_parameters)
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
     spreadsheet_mat = spreadsheet_df.as_matrix()
-    spreadsheet_mat = keg.get_quantile_norm_matrix(spreadsheet_mat)
+    spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
-    h_mat = keg.perform_nmf(spreadsheet_mat, run_parameters)
+    h_mat = kn.perform_nmf(spreadsheet_mat, run_parameters)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     sample_perm = np.arange(0, spreadsheet_mat.shape[1])
-    linkage_matrix = keg.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = keg.perform_kmeans(linkage_matrix, int(run_parameters['k']))
+    linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
+    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters['k']))
 
     sample_names = spreadsheet_df.columns
     save_final_samples_clustering(sample_names, labels, run_parameters)
@@ -56,27 +46,27 @@ def run_cc_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
-    tmp_dir = 'tmp_cc_nmf'    
-    run_parameters["tmp_directory"] = keg.create_dir(
+    tmp_dir = 'tmp_cc_nmf'
+    run_parameters["tmp_directory"] = kn.create_dir(
         run_parameters["run_directory"], tmp_dir)
-    
-    spreadsheet_df = keg.get_spreadsheet_df(run_parameters)
+
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
     spreadsheet_mat = spreadsheet_df.as_matrix()
-    spreadsheet_mat = keg.get_quantile_norm_matrix(spreadsheet_mat)
+    spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
     find_and_save_nmf_clusters(spreadsheet_mat, run_parameters)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
     consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    labels = keg.perform_kmeans(consensus_matrix, int(run_parameters['k']))
+    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['k']))
 
     sample_names = spreadsheet_df.columns
-    save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters)
+    save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
-    keg.remove_dir(run_parameters["tmp_directory"])
-    
+    kn.remove_dir(run_parameters["tmp_directory"])
+
     if int(run_parameters['display_clusters']) != 0:
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
 
@@ -88,35 +78,36 @@ def run_net_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
-    spreadsheet_df = keg.get_spreadsheet_df(run_parameters)
-    network_df = keg.get_network_df(run_parameters['network_file_name'])
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
+    network_df = kn.get_network_df(run_parameters['network_file_name'])
 
-    node_1_names, node_2_names = keg.extract_network_node_names(network_df)
-    unique_gene_names = keg.find_unique_node_names(node_1_names, node_2_names)
-    genes_lookup_table = keg.create_node_names_dict(unique_gene_names)
+    node_1_names, node_2_names = kn.extract_network_node_names(network_df)
+    unique_gene_names = kn.find_unique_node_names(node_1_names, node_2_names)
+    genes_lookup_table = kn.create_node_names_dict(unique_gene_names)
 
-    network_df = keg.map_node_names_to_index(network_df, genes_lookup_table, 'node_1')
-    network_df = keg.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_1')
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
 
-    network_df = keg.symmetrize_df(network_df)
-    network_mat = keg.convert_network_df_to_sparse(network_df, len(unique_gene_names), len(unique_gene_names))
+    network_df = kn.symmetrize_df(network_df)
+    network_mat = kn.convert_network_df_to_sparse(
+        network_df, len(unique_gene_names), len(unique_gene_names))
 
-    network_mat = keg.normalize_mat_by_diagonal(network_mat)
-    lap_diag, lap_pos = keg.form_network_laplacian_matrix(network_mat)
+    network_mat = kn.normalize_mat_by_diagonal(network_mat)
+    lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
-    spreadsheet_df = keg.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
+    spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
 
-    sample_smooth, iterations = keg.smooth_matrix_with_rwr(
+    sample_smooth, iterations = kn.smooth_matrix_with_rwr(
         spreadsheet_mat, network_mat, run_parameters)
-    sample_quantile_norm = keg.get_quantile_norm_matrix(sample_smooth)
-    h_mat = keg.perform_net_nmf(sample_quantile_norm, lap_pos, lap_diag, run_parameters)
+    sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
+    h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_pos, lap_diag, run_parameters)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     sample_perm = np.arange(0, spreadsheet_mat.shape[1])
-    linkage_matrix = keg.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = keg.perform_kmeans(linkage_matrix, int(run_parameters["k"]))
+    linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
+    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters["k"]))
 
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
@@ -133,27 +124,28 @@ def run_cc_net_nmf(run_parameters):
         run_parameters: parameter set dictionary.
     """
     tmp_dir = 'tmp_cc_net_nmf'
-    run_parameters["tmp_directory"] = keg.create_dir(
-        run_parameters["run_directory"], tmp_dir)    
-    
-    spreadsheet_df = keg.get_spreadsheet_df(run_parameters)
-    network_df = keg.get_network_df(run_parameters['network_file_name'])
+    run_parameters["tmp_directory"] = kn.create_dir(
+        run_parameters["run_directory"], tmp_dir)
 
-    node_1_names, node_2_names = keg.extract_network_node_names(network_df)
-    unique_gene_names = keg.find_unique_node_names(node_1_names, node_2_names)
-    genes_lookup_table = keg.create_node_names_dict(unique_gene_names)
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
+    network_df = kn.get_network_df(run_parameters['network_file_name'])
 
-    network_df = keg.map_node_names_to_index(network_df, genes_lookup_table, 'node_1')
-    network_df = keg.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
+    node_1_names, node_2_names = kn.extract_network_node_names(network_df)
+    unique_gene_names = kn.find_unique_node_names(node_1_names, node_2_names)
+    genes_lookup_table = kn.create_node_names_dict(unique_gene_names)
 
-    network_df = keg.symmetrize_df(network_df)
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_1')
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
+
+    network_df = kn.symmetrize_df(network_df)
     #network_mat = convert_df_to_sparse(network_df, len(unique_gene_names))
-    network_mat = keg.convert_network_df_to_sparse(network_df, len(unique_gene_names), len(unique_gene_names))
+    network_mat = kn.convert_network_df_to_sparse(
+        network_df, len(unique_gene_names), len(unique_gene_names))
 
-    network_mat = keg.normalize_mat_by_diagonal(network_mat)
-    lap_diag, lap_pos = keg.form_network_laplacian_matrix(network_mat)
+    network_mat = kn.normalize_mat_by_diagonal(network_mat)
+    lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
-    spreadsheet_df = keg.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
+    spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
 
@@ -162,18 +154,18 @@ def run_cc_net_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
     consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    labels = keg.perform_kmeans(consensus_matrix, int(run_parameters['k']))
+    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['k']))
 
-    save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters)
+    save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    
-    keg.remove_dir(run_parameters["tmp_directory"])
+
+    kn.remove_dir(run_parameters["tmp_directory"])
 
     if int(run_parameters['display_clusters']) != 0:
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
 
     return
-    
+
 def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
@@ -185,19 +177,19 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
         run_parameters: dictionay of run-time parameters.
     """
     for sample in range(0, int(run_parameters["number_of_bootstraps"])):
-        sample_random, sample_permutation = keg.sample_a_matrix(
+        sample_random, sample_permutation = kn.sample_a_matrix(
             spreadsheet_mat, np.float64(run_parameters["percent_sample"]))
         sample_smooth, iterations = \
-        keg.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
+        kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
 
         if int(run_parameters['verbose']) != 0:
             print("{} of {}: iterations = {}".format(
                 sample + 1, run_parameters["number_of_bootstraps"], iterations))
 
-        sample_quantile_norm = keg.get_quantile_norm_matrix(sample_smooth)
-        h_mat = keg.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
+        sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
+        h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
-        save_a_samples_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
+        save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
     return
 
@@ -210,18 +202,18 @@ def find_and_save_nmf_clusters(spreadsheet_mat, run_parameters):
         run_parameters: dictionay of run-time parameters.
     """
     for sample in range(0, int(run_parameters["number_of_bootstraps"])):
-        sample_random, sample_permutation = keg.sample_a_matrix(
+        sample_random, sample_permutation = kn.sample_a_matrix(
             spreadsheet_mat, np.float64(run_parameters["percent_sample"]))
 
-        h_mat = keg.perform_nmf(sample_random, run_parameters)
-        save_a_samples_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
+        h_mat = kn.perform_nmf(sample_random, run_parameters)
+        save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
         if int(run_parameters['verbose']) != 0:
             print('nmf {} of {}'.format(
                 sample + 1, run_parameters["number_of_bootstraps"]))
 
     return
-    
+
 def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
     """ compute the consensus matrix from the indicator and linkage matrix inputs
         formed by the bootstrap "temp_*" files.
@@ -256,7 +248,7 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
         if tmp_f[0:6] == 'temp_p':
             pname = os.path.join(tmp_dir, tmp_f)
             sample_permutation = np.load(pname)
-            indicator_matrix = keg.update_indicator_matrix(sample_permutation, indicator_matrix)
+            indicator_matrix = kn.update_indicator_matrix(sample_permutation, indicator_matrix)
 
     return indicator_matrix
 
@@ -278,11 +270,11 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
             sample_permutation = np.load(pname)
             hname = os.path.join(tmp_dir, tmp_f[0:5] + 'h' + tmp_f[6:len(tmp_f)])
             h_mat = np.load(hname)
-            linkage_matrix = keg.update_linkage_matrix(h_mat, sample_permutation, linkage_matrix)
+            linkage_matrix = kn.update_linkage_matrix(h_mat, sample_permutation, linkage_matrix)
 
     return linkage_matrix
 
-def save_a_samples_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, sequence_number):
+def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, sequence_number):
     """ save one h_matrix and one permutation in temorary files with sequence_number appended names.
 
     Args:
@@ -293,17 +285,17 @@ def save_a_samples_clustering_to_tmp(h_matrix, sample_permutation, run_parameter
     """
     tmp_dir = run_parameters["tmp_directory"]
     time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
-    
-    hname = os.path.join(tmp_dir, 'temp_h'+time_stamp)    
+
+    hname = os.path.join(tmp_dir, 'temp_h'+time_stamp)
     pname = os.path.join(tmp_dir, 'temp_p'+time_stamp)
-    
-    cluster_id = np.argmax(h_matrix, 0)    
+
+    cluster_id = np.argmax(h_matrix, 0)
     cluster_id.dump(hname)
     sample_permutation.dump(pname)
-    
+
 
     return
-    
+
 def form_consensus_matrix_graphic(consensus_matrix, k=3):
     ''' use K-means to reorder the consensus matrix for graphic display.
 
@@ -315,12 +307,12 @@ def form_consensus_matrix_graphic(consensus_matrix, k=3):
         cc_cm: consensus_matrix with rows and columns in K-means sort order.
     '''
     cc_cm = consensus_matrix.copy()
-    labels = keg.perform_kmeans(consensus_matrix, k)
+    labels = kn.perform_kmeans(consensus_matrix, k)
     sorted_labels = np.argsort(labels)
     cc_cm = cc_cm[sorted_labels[:, None], sorted_labels]
 
     return cc_cm
-    
+
 def display_clusters(consensus_matrix):
     ''' graphic display the consensus matrix.
 
@@ -341,7 +333,7 @@ def display_clusters(consensus_matrix):
 
     return
 
-def save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters):
+def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters):
     """ write the consensus matrix as a dataframe with sample_names column lablels
         and cluster labels as row labels.
 
@@ -379,7 +371,7 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     df_tmp.to_csv(file_name, sep='\t', header=None)
 
     return
-    
+
 def timestamp_filename(name_base, name_extension, run_parameters=None):
     """ insert a time stamp into the filename_ before .extension.
 
