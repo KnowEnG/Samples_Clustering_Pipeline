@@ -18,7 +18,7 @@ import pandas as pd
 #from scipy import stats
 #from sklearn.preprocessing import normalize
 #from sklearn.cluster import KMeans
-import yaml
+#import yaml
 import matplotlib.pyplot as plt
 
 import knpackage.toolbox as keg
@@ -94,7 +94,7 @@ def run_net_nmf(run_parameters):
     network_df = keg.symmetrize_df(network_df)
     network_mat = keg.convert_network_df_to_sparse(network_df, len(unique_gene_names), len(unique_gene_names))
 
-    network_mat = keg.normalized_matrix(network_mat)
+    network_mat = keg.normalize_mat_by_diagonal(network_mat)
     lap_diag, lap_pos = keg.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = keg.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
@@ -139,7 +139,7 @@ def run_cc_net_nmf(run_parameters):
     #network_mat = convert_df_to_sparse(network_df, len(unique_gene_names))
     network_mat = keg.convert_network_df_to_sparse(network_df, len(unique_gene_names), len(unique_gene_names))
 
-    network_mat = keg.normalized_matrix(network_mat)
+    network_mat = keg.normalize_mat_by_diagonal(network_mat)
     lap_diag, lap_pos = keg.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = keg.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
@@ -220,13 +220,13 @@ def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
     Returns:
         consensus_matrix: (sum of linkage matrices) / (sum of indicator matrices).
     """
-    indicator_matrix = form_indicator_matrix(run_parameters, indicator_matrix)
-    linkage_matrix = form_linkage_matrix(run_parameters, linkage_matrix)
+    indicator_matrix = get_indicator_matrix(run_parameters, indicator_matrix)
+    linkage_matrix = get_linkage_matrix(run_parameters, linkage_matrix)
     consensus_matrix = linkage_matrix / np.maximum(indicator_matrix, 1)
 
     return consensus_matrix
 
-def form_indicator_matrix(run_parameters, indicator_matrix):
+def get_indicator_matrix(run_parameters, indicator_matrix):
     """ read bootstrap temp_p* files and compute the indicator_matrix.
 
     Args:
@@ -246,7 +246,7 @@ def form_indicator_matrix(run_parameters, indicator_matrix):
 
     return indicator_matrix
 
-def form_linkage_matrix(run_parameters, linkage_matrix):
+def get_linkage_matrix(run_parameters, linkage_matrix):
     """ read bootstrap temp_h* and temp_p* files, compute and add the linkage_matrix.
 
     Args:
@@ -279,11 +279,14 @@ def save_temporary_cluster(h_matrix, sample_permutation, run_parameters, sequenc
     """
     tmp_dir = run_parameters["tmp_directory"]
     time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
-    hname = os.path.join(tmp_dir, 'temp_h'+time_stamp)
-    cluster_id = np.argmax(h_matrix, 0)
-    cluster_id.dump(hname)
+    
+    hname = os.path.join(tmp_dir, 'temp_h'+time_stamp)    
     pname = os.path.join(tmp_dir, 'temp_p'+time_stamp)
+    
+    cluster_id = np.argmax(h_matrix, 0)    
+    cluster_id.dump(hname)
     sample_permutation.dump(pname)
+    
 
     return
     
@@ -399,105 +402,3 @@ def timestamp_filename(name_base, name_extension, run_parameters=None):
     time_stamped_file_name = name_base + '_' + nstr + '.' + name_extension
 
     return time_stamped_file_name
-    
-def echo_input(network_mat, spreadsheet_mat, run_parameters):
-    ''' command line display data: network and spreadsheet matrices and run parameters.
-
-    Args:
-         network_mat: gene-gene network matrix.
-         spreadsheet_mat: genes x samples user spreadsheet data matrix.
-         run_parameters: run parameters dictionary.
-    '''
-    net_rows = network_mat.shape[0]
-    net_cols = network_mat.shape[1]
-    usr_rows = spreadsheet_mat.shape[0]
-    usr_cols = spreadsheet_mat.shape[1]
-    print('\nMethod: {}'.format(run_parameters['method']))
-    date_frm = "Local: %a, %d %b %Y %H:%M:%S"
-    print('Data Loaded:\t{}'.format(time.strftime(date_frm, time.localtime())))
-    print('\nnetwork_file_name: {}'.format(run_parameters['network_file_name']))
-    print('network    matrix {} x {}'.format(net_rows, net_cols))
-    print('\nsamples_file_name: {}'.format(run_parameters['samples_file_name']))
-    print('spread sheet matrix {} x {}\n'.format(usr_rows, usr_cols))
-    print('\nAll run parameters as received:\n')
-    display_run_parameters(run_parameters)
-
-    return
-
-def display_run_parameters(run_parameters):
-    """ command line display the run parameters dictionary.
-
-    Args:
-        run_parameters: dictionary of run parameters.
-    """
-    for fielap_dag_n in run_parameters:
-        print('{} : {}'.format(fielap_dag_n, run_parameters[fielap_dag_n]))
-    print('\n')
-
-    return
-
-def generate_run_file(run_parameters=None, file_name='run_file'):
-    """ write a parameter set dictionary to a text file for editing.
-
-    Args:
-        file_name: file name (will be written as plain text).
-    """
-    if run_parameters is None:
-        run_parameters = {
-            "method":"cc_net_cluster_nmf",
-            "k":4,
-            "number_of_bootstraps":5,
-            "percent_sample":0.8,
-            "restart_probability":0.7,
-            "number_of_iteriations_in_rwr":100,
-            "it_max":2000,
-            "h_clust_eq_limit":200,
-            "obj_fcn_chk_freq":50,
-            "restart_tolerance":1e-4,
-            'lmbda':1400,
-            "network_file_name":"network_file_name",
-            "samples_file_name":"samples_file_name",
-            "tmp_directory":"tmp",
-            "results_directory":"results",
-            "use_now_name":1,
-            "verbose":1,
-            "display_clusters":1}
-
-    with open(file_name, 'w') as yaml_file:
-        yaml_file.write(yaml.dump(run_parameters, default_flow_style=False))
-
-    return
-
-def compare_cluster_labels(x_file_name, y_file_name):
-    """ compare .tsv files to see if the same names are in the same clusters
-    """
-    x_df = pd.read_csv(x_file_name, header=None, names=None, delimiter='\t', usecols=[0, 1])
-    x_df.columns = ['x_ID', 'x_cluster_n']
-    x_df = x_df.sort_values('x_ID', ascending=0)
-    y_df = pd.read_csv(y_file_name, header=None, names=None, delimiter='\t', usecols=[0, 1])
-    y_df.columns = ['y_ID', 'y_cluster_n']
-    y_df = y_df.sort_values('y_ID', ascending=0)
-    frames = [x_df, y_df]
-    comp_df = pd.concat(frames, axis=1)
-    x_lbl_arr = np.array(comp_df['x_cluster_n'])
-    c_max = x_lbl_arr.max()
-    c_min = x_lbl_arr.min()
-    
-    for cn in range(c_min, c_max + 1):
-        tmp = comp_df.loc[(comp_df['x_cluster_n'] == cn)]
-        n_tot = tmp.shape[0]
-        n = most_common_n(tmp['y_cluster_n'])
-        n_not = sum(tmp['y_cluster_n'] != n)
-        print('cn={}, n={}\t{} of {} agree, {} disagree'.format(cn, n, n_tot - n_not, n_tot, n_not))
-
-    return comp_df
-
-def most_common_n(n_arr):
-    n_arr = np.array(n_arr)
-    mx = max(n_arr)
-    mn = min(n_arr)
-    nc = mn
-    for t in range(mn, mx+1):
-        if sum(n_arr == t) > sum(n_arr == nc):
-            nc = t
-    return nc
