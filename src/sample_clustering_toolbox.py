@@ -41,7 +41,7 @@ def run_nmf(run_parameters):
     labels = keg.perform_kmeans(linkage_matrix, int(run_parameters['k']))
 
     sample_names = spreadsheet_df.columns
-    save_clusters(sample_names, labels, run_parameters)
+    save_final_samples_clustering(sample_names, labels, run_parameters)
 
     if int(run_parameters['display_clusters']) != 0:
         con_mat_image = form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['k']))
@@ -111,7 +111,7 @@ def run_net_nmf(run_parameters):
     linkage_matrix = keg.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
     labels = keg.perform_kmeans(linkage_matrix, int(run_parameters["k"]))
 
-    save_clusters(sample_names, labels, run_parameters)
+    save_final_samples_clustering(sample_names, labels, run_parameters)
 
     if int(run_parameters['display_clusters']) != 0:
         display_clusters(form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['k'])))
@@ -337,7 +337,7 @@ def save_consensus_cluster_result(consensus_matrix, sample_names, labels, run_pa
         run_parameters: dictionary with "results_directory" key.
     """
     write_consensus_matrix(consensus_matrix, sample_names, labels, run_parameters)
-    save_clusters(sample_names, labels, run_parameters)
+    save_final_samples_clustering(sample_names, labels, run_parameters)
 
     return
 
@@ -361,7 +361,7 @@ def write_consensus_matrix(consensus_matrix, sample_names, labels, run_parameter
 
     return
 
-def save_clusters(sample_names, labels, run_parameters):
+def save_final_samples_clustering(sample_names, labels, run_parameters):
     """ wtite .tsv file that assings a cluster number label to the sample_names.
 
     Args:
