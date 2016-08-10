@@ -56,6 +56,10 @@ def run_cc_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
+    tmp_dir = 'tmp_cc_nmf'    
+    run_parameters["tmp_directory"] = keg.create_dir(
+        run_parameters["run_directory"], tmp_dir)
+    
     spreadsheet_df = keg.get_spreadsheet_df(run_parameters)
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = keg.get_quantile_norm_matrix(spreadsheet_mat)
@@ -71,6 +75,8 @@ def run_cc_nmf(run_parameters):
     save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
+    keg.remove_dir(run_parameters["tmp_directory"])
+    
     if int(run_parameters['display_clusters']) != 0:
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
 
@@ -126,6 +132,10 @@ def run_cc_net_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
+    tmp_dir = 'tmp_cc_net_nmf'
+    run_parameters["tmp_directory"] = keg.create_dir(
+        run_parameters["run_directory"], tmp_dir)    
+    
     spreadsheet_df = keg.get_spreadsheet_df(run_parameters)
     network_df = keg.get_network_df(run_parameters['network_file_name'])
 
@@ -156,6 +166,8 @@ def run_cc_net_nmf(run_parameters):
 
     save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
+    
+    keg.remove_dir(run_parameters["tmp_directory"])
 
     if int(run_parameters['display_clusters']) != 0:
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
