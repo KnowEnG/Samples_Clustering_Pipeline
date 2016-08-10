@@ -68,7 +68,8 @@ def run_cc_nmf(run_parameters):
     labels = keg.perform_kmeans(consensus_matrix, int(run_parameters['k']))
 
     sample_names = spreadsheet_df.columns
-    save_consensus_cluster_result(consensus_matrix, sample_names, labels, run_parameters)
+    save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters)
+    save_final_samples_clustering(sample_names, labels, run_parameters)
 
     if int(run_parameters['display_clusters']) != 0:
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
@@ -153,7 +154,8 @@ def run_cc_net_nmf(run_parameters):
     consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
     labels = keg.perform_kmeans(consensus_matrix, int(run_parameters['k']))
 
-    save_consensus_cluster_result(consensus_matrix, sample_names, labels, run_parameters)
+    save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters)
+    save_final_samples_clustering(sample_names, labels, run_parameters)
 
     if int(run_parameters['display_clusters']) != 0:
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
@@ -183,7 +185,7 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
         sample_quantile_norm = keg.get_quantile_norm_matrix(sample_smooth)
         h_mat = keg.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
-        save_temporary_cluster(h_mat, sample_permutation, run_parameters, sample)
+        save_a_samples_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
     return
 
@@ -200,7 +202,7 @@ def find_and_save_nmf_clusters(spreadsheet_mat, run_parameters):
             spreadsheet_mat, np.float64(run_parameters["percent_sample"]))
 
         h_mat = keg.perform_nmf(sample_random, run_parameters)
-        save_temporary_cluster(h_mat, sample_permutation, run_parameters, sample)
+        save_a_samples_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
         if int(run_parameters['verbose']) != 0:
             print('nmf {} of {}'.format(
@@ -268,7 +270,7 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
 
     return linkage_matrix
 
-def save_temporary_cluster(h_matrix, sample_permutation, run_parameters, sequence_number):
+def save_a_samples_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, sequence_number):
     """ save one h_matrix and one permutation in temorary files with sequence_number appended names.
 
     Args:
@@ -326,22 +328,8 @@ def display_clusters(consensus_matrix):
     plt.show()
 
     return
-    
-def save_consensus_cluster_result(consensus_matrix, sample_names, labels, run_parameters):
-    """ write the results of network based nmf consensus clustering to output files.
 
-    Args:
-        consensus_matrix: sample_names x labels - symmetric consensus matrix.
-        sample_names: spreadsheet column names.
-        labels: cluster assignments for column names (or consensus matrix).
-        run_parameters: dictionary with "results_directory" key.
-    """
-    write_consensus_matrix(consensus_matrix, sample_names, labels, run_parameters)
-    save_final_samples_clustering(sample_names, labels, run_parameters)
-
-    return
-
-def write_consensus_matrix(consensus_matrix, sample_names, labels, run_parameters):
+def save_consensus_samples_clustering(consensus_matrix, sample_names, labels, run_parameters):
     """ write the consensus matrix as a dataframe with sample_names column lablels
         and cluster labels as row labels.
 
