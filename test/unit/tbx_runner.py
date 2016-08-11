@@ -21,6 +21,6 @@ myrunner = unittest.TextTestRunner()
 myResult = myrunner.run(test_suite)
 
 #                               method B
-mySuit = tkeg.suite()
-runner = unittest.TextTestRunner()
-myResult2 = runner.run(mySuit)
+# mySuit = tkeg.suite()
+# runner = unittest.TextTestRunner()
+# myResult2 = runner.run(mySuit)
