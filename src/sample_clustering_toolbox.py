@@ -92,7 +92,7 @@ def run_net_nmf(run_parameters):
     network_mat = kn.convert_network_df_to_sparse(
         network_df, len(unique_gene_names), len(unique_gene_names))
 
-    network_mat = kn.normalize_mat_by_diagonal(network_mat)
+    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
     lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
@@ -142,7 +142,7 @@ def run_cc_net_nmf(run_parameters):
     network_mat = kn.convert_network_df_to_sparse(
         network_df, len(unique_gene_names), len(unique_gene_names))
 
-    network_mat = kn.normalize_mat_by_diagonal(network_mat)
+    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
     lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
@@ -366,8 +366,8 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
             run_parameters["results_directory"], timestamp_filename('labels_data', 'tsv'))
     else:
         file_name = os.path.join(run_parameters["results_directory"], 'labels_data.tsv')
-
-    df_tmp = pd.DataFrame(data=labels, index=sample_names)
+    df_tmp = kn.create_df_with_sample_labels(sample_names, labels)
+    #df_tmp = pd.DataFrame(data=labels, index=sample_names)
     df_tmp.to_csv(file_name, sep='\t', header=None)
 
     return
