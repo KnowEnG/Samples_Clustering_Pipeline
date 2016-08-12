@@ -198,21 +198,14 @@ class toolbox_test(unittest.TestCase):
         self.assertEqual(len(tstr), n_default_chars, msg='string return size unexpected')
         self.assertNotEqual(tstr, tstr2)
         
-        
+    def test_create_timestamped_filename(self):
+        n_default_chars = 27
+        name_base = 'honky_tonk'
+        tsfn = kn.create_timestamped_filename(name_base)
+        self.assertEqual(name_base, tsfn[0:10], msg='prefix name exception')
+        self.assertEqual(len(tsfn), n_default_chars, msg='filename size exception')
+       
     """
-def get_timestamp(stamp_units=1e6):
-    get a time stamp string - current time as integer string.
-
-    Args:
-        stamp_units: inverse of time resolution 1e6 returns microseconds.
-
-    Returns:
-        timestamp_string: a string of integer digits.
-
-    timestamp_string = np.str_(int(time.time() * np.maximum(stamp_units, 1)))
-
-    return timestamp_string
-
 def create_timestamped_filename(name_base='t', stamp_units=1e6):
     append a filename with a timestamp string.
 
