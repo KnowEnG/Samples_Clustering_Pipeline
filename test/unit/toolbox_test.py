@@ -2,35 +2,38 @@
 """     lanier4@illinois.edu    """
 
 import unittest
+import os
 import numpy as np
 #import numpy.linalg as LA
 import scipy.sparse as spar
+import scipy.stats as stats
 
 # file version to test
-import knpackage.toolbox as keg
+import knpackage.toolbox as kn
 
 class toolbox_test(unittest.TestCase):
     
     def get_run_parameters(self):
-        run_parameters = {'k':3,'number_of_iteriations_in_rwr':100,
-                          'obj_fcn_chk_freq':50,
-                          'it_max':10000,
-                          'h_clust_eq_limit':100,
-                          'restart_tolerance':0.0001,
-                          'lmbda':1400,
-                          'percent_sample':0.8,
-                          'number_of_bootstraps':3,
-                          'display_clusters':1,
-                          'restart_probability':0.7,
-                          'verbose':1,
-                          'use_now_name':1000000}
+        run_parameters = {'test_directory':'/Users/lanier4/BigDataTank/unit_test_development',
+                            'k':3,'number_of_iteriations_in_rwr':100,
+                            'obj_fcn_chk_freq':50,
+                            'it_max':10000,
+                            'h_clust_eq_limit':100,
+                            'restart_tolerance':0.0001,
+                            'lmbda':1400,
+                            'percent_sample':0.8,
+                            'number_of_bootstraps':3,
+                            'display_clusters':1,
+                            'restart_probability':0.7,
+                            'verbose':1,
+                            'use_now_name':1000000}
 
         return run_parameters
     
     def test_get_quantile_norm_matrix(self):
         a = np.array([[7.0, 5.0],[3.0, 1.0],[1.0,7.0]])
         aQN = np.array([[7.0, 4.0],[4.0,1.0],[1.0,7.0]])
-        qn1 = keg.get_quantile_norm_matrix(a)
+        qn1 = kn.get_quantile_norm_matrix(a)
         
         self.assertEqual(sum(sum(qn1 != aQN)), 0, 'Quantile Norm 1 Not Equal')
         
@@ -48,7 +51,7 @@ class toolbox_test(unittest.TestCase):
         # A = (np.eye(2) + np.ones((2,2))) / 3
         
         F_exact = np.ones((2, 2)) * 0.5
-        F_calculated, steps = keg.smooth_matrix_with_rwr(F0, A, run_parameters)
+        F_calculated, steps = kn.smooth_matrix_with_rwr(F0, A, run_parameters)
         self.assertEqual(steps, EXPECTED_STEPS)
         
         T = (np.abs(F_exact - F_calculated))
@@ -69,7 +72,7 @@ class toolbox_test(unittest.TestCase):
         A = (np.eye(2) + np.ones((2,2))) / 3
         
         F_exact = np.ones((2, 2)) * 0.5
-        F_calculated, steps = keg.smooth_matrix_with_rwr(F0, A, run_parameters)
+        F_calculated, steps = kn.smooth_matrix_with_rwr(F0, A, run_parameters)
         self.assertEqual(steps, EXPECTED_STEPS)
         
         T = (np.abs(F_exact - F_calculated))
@@ -90,89 +93,141 @@ class toolbox_test(unittest.TestCase):
         A = (np.eye(2) + np.ones((2,2))) / 3
         
         F_exact = np.array([0.5, 0.5])
-        F_calculated, steps = keg.smooth_matrix_with_rwr(F0, A, run_parameters)
-        self.assertEqual(steps, EXPECTED_STEPS)
-        
+        F_calculated, steps = kn.smooth_matrix_with_rwr(F0, A, run_parameters)
+        self.assertEqual(steps, EXPECTED_STEPS, msg='minor difference')
         T = (np.abs(F_exact - F_calculated))
-        
         self.assertAlmostEqual(T.sum(), 0)
         
-    def test_normalize_mat_by_diagonal(self):
-        # assert that a test matrix will be "normalized" s.t. the sum of the rows
-        # or columns will nearly equal one
-        pass
+    def test_normalize_sparse_mat_by_diagonal(self):
+        """ assert that a test matrix will be "normalized" s.t. the sum of the rows
+            or columns will nearly equal one
+        """
+        A = np.random.rand(500,500)
+        B = kn.normalize_sparse_mat_by_diagonal(spar.csr_matrix(A))
+        B = B.todense()
+        B2 = B**2
+        B2 = np.sqrt(B2.sum())
+        geo_mean = float(stats.gmean(B.sum(axis=1)))
+        self.assertAlmostEqual(geo_mean, 1, delta=0.1)
+        geo_mean = float(stats.gmean(B.T.sum(axis=1)))
+        self.assertAlmostEqual(geo_mean, 1, delta=0.1)
         
     def test_form_network_laplacian_matrix(self):
-        pass
-    """ 
-def normalize_mat_by_diagonal(network_mat):
-    square root of inverse of diagonal D (D * network_mat * D) normaization.
+        """ assert that the laplacian matrix returned sums to zero in both rows
+            and columns
+        """
+        THRESHOLD = 0.8
+        A  = np.random.rand(10,10)
+        A[A < THRESHOLD] = 0
+        A = A + A.T
+        Ld, Lk = kn.form_network_laplacian_matrix(A)
+        L = Ld - Lk
+        L = L.todense()
+        L0 = L.sum(axis=0)
+        self.assertFalse(L0.any(), msg='Laplacian row sum not equal 0')
+        L1 = L.sum(axis=1)
+        self.assertFalse(L1.any(), msg='Laplacian col sum not equal 0')
+        Ld, Lk = kn.form_network_laplacian_matrix(spar.csr_matrix(A))
+        L = Ld - Lk
+        L = L.todense()
+        L0 = L.sum(axis=0)
+        self.assertFalse(L0.any(), msg='Laplacian row sum not equal 0')
+        L1 = L.sum(axis=1)
+        self.assertFalse(L1.any(), msg='Laplacian col sum not equal 0')
+        
+    def test_sample_a_matrix(self):
+        """ assert that the random sample is of the propper size, the
+            permutation points to the correct columns and that the number of 
+            rows set to zero is correct.
+        """
+        n_test_rows = 11
+        n_test_cols = 5
+        pct_smpl = 0.6
+        n_zero_rows = int(np.round(n_test_rows * (1 - pct_smpl)))
+        n_smpl_cols = int(np.round(n_test_cols * pct_smpl))
+        epsilon_sum = max(n_test_rows, n_test_cols) * 1e-15
+        A = np.random.rand(n_test_rows, n_test_cols) + epsilon_sum
+        B, P = kn.sample_a_matrix(A, pct_smpl)
+        self.assertEqual(B.shape[1], P.size, msg='permutation size not equal columns')
+        self.assertEqual(P.size, n_smpl_cols, msg='number of sample columns exception')
+        perm_err_sum = 0
+        n_zero_err_sum = 0
+        B_col = 0
+        for A_col in P:
+            n_zeros = (np.int_(B[:, B_col] == 0)).sum()
+            if n_zeros != n_zero_rows:
+                n_zero_err_sum += 1
+            C = A[:, A_col] - B[:, B_col]
+            C[B[:, B_col] == 0] = 0
+            B_col += 1
+            if C.sum() > epsilon_sum:
+                perm_err_sum += 1
+        
+        self.assertEqual(n_zero_err_sum, 0, msg='number of zero columns exception')
+        self.assertEqual(perm_err_sum, 0, msg='permutation index exception')
+
+    def test_create_dir_AND_remove_dir(self):
+        """ assert that the functions work togeather to create and remove a directory
+            even when files have been added
+        """
+        dir_name = 'tmp_test'
+        run_parameters = self.get_run_parameters()
+        dir_path = run_parameters['test_directory']
+        ndr = kn.create_dir(dir_path, dir_name)
+        self.assertTrue(os.path.exists(ndr), msg='create_dir function exception')
+        A = np.random.rand(10,10)
+        time_stamp = '123456789'
+        a_name = os.path.join(ndr, 'temp_test' + time_stamp)
+        A.dump(a_name)
+        A_back = np.load(a_name)
+        A_diff = A - A_back
+        A_diff = A_diff.sum()
+        self.assertEqual(A_diff, 0, msg='write / read directory exception')
+        kn.remove_dir(ndr)
+        self.assertFalse(os.path.exists(ndr), msg='remove_dir function exception')
+        
+    """
+def get_timestamp(stamp_units=1e6):
+    get a time stamp string - current time as integer string.
 
     Args:
-        network_mat: symmetric matrix.
+        stamp_units: inverse of time resolution 1e6 returns microseconds.
 
     Returns:
-        network_mat: renomralized such that the sum of any row or col is about 1.
+        timestamp_string: a string of integer digits.
 
-    row_sm = np.array(network_mat.sum(axis=0))
-    row_sm = 1.0 / row_sm
-    row_sm = np.sqrt(row_sm)
-    r_c = np.arange(0, network_mat.shape[0])
-    diag_mat = spar.csr_matrix((row_sm[0, :], (r_c, r_c)), shape=(network_mat.shape))
-    network_mat = diag_mat.dot(network_mat)
-    network_mat = network_mat.dot(diag_mat)
+    timestamp_string = np.str_(int(time.time() * np.maximum(stamp_units, 1)))
 
-    return network_mat
+    return timestamp_string
 
-def form_network_laplacian_matrix(network_mat):
-    Laplacian matrix components for use in network based stratification.
+def create_timestamped_filename(name_base='t', stamp_units=1e6):
+    append a filename with a timestamp string.
 
     Args:
-        network_mat: symmetric matrix.
+        name_base: the file name - a prefix to the time stamp string.
+        stamp_units: time resolution; 1e6 for microseconds, 1e3 milliseconds.
 
     Returns:
-        diagonal_laplacian: diagonal of the laplacian matrix.
-        laplacian: locations in the laplacian matrix.
+        time_stamped_file_name: name_base_123456 (some long number)
 
-    laplacian = spar.lil_matrix(network_mat.copy())
-    laplacian.setdiag(0)
-    laplacian[laplacian != 0] = 1
-    diag_length = laplacian.shape[0]
-    rowsum = np.array(laplacian.sum(axis=0))
-    diag_arr = np.arange(0, diag_length)
-    diagonal_laplacian = spar.csr_matrix((rowsum[0, :], (diag_arr, diag_arr)),
-                                         shape=(network_mat.shape))
-    laplacian = laplacian.tocsr()
+    time_stamped_file_name = name_base + '_' + get_timestamp(stamp_units)
 
-    return diagonal_laplacian, laplacian
-    
-def sample_a_matrix(spreadsheet_mat, percent_sample):
-    percent_sample x percent_sample random sample, from spreadsheet_mat.
+    return time_stamped_file_name
+
+def append_run_parameters_dict(run_parameters, key_name, value_str):
+    add a key-value pair to the run parameters dictionary.
 
     Args:
-        spreadsheet_mat: gene x sample spread sheet as matrix.
-        percent_sample: decimal fraction (slang-percent) - [0 : 1].
+        run_parameters: dictionary to append.
+        key_name: key name to add or overwrite.
+        value_str: value to insert in run_parameters[key_name].
 
     Returns:
-        sample_random: A specified precentage sample of the spread sheet.
-        sample_permutation: the array that correponds to columns sample.
+        run_parameters: dictionary with new (or overwritten) key value pair.
 
-    features_size = int(np.round(spreadsheet_mat.shape[0] * (1-percent_sample)))
-    features_permutation = np.random.permutation(spreadsheet_mat.shape[0])
-    features_permutation = features_permutation[0:features_size].T
+    run_parameters[key_name] = value_str
 
-    patients_size = int(np.round(spreadsheet_mat.shape[1] * percent_sample))
-    sample_permutation = np.random.permutation(spreadsheet_mat.shape[1])
-    sample_permutation = sample_permutation[0:patients_size]
-
-    sample_random = spreadsheet_mat[:, sample_permutation]
-    sample_random[features_permutation[:, None], :] = 0
-
-    positive_col_set = sum(sample_random) > 0
-    sample_random = sample_random[:, positive_col_set]
-    sample_permutation = sample_permutation[positive_col_set]
-
-    return sample_random, sample_permutation
+    return run_parameters    
     
 def update_h_coordinate_matrix(w_matrix, x_matrix):
     nonnegative right factor matrix for perform_net_nmf function s.t. X ~ W.H.
@@ -358,80 +413,6 @@ def perform_kmeans(consensus_matrix, k=3):
     labels = cluster_handle.fit_predict(consensus_matrix)
 
     return labels
-    
-def get_timestamp(stamp_units=1e6):
-    get a time stamp string - current time as integer string.
-
-    Args:
-        stamp_units: inverse of time resolution 1e6 returns microseconds.
-
-    Returns:
-        timestamp_string: a string of integer digits.
-
-    timestamp_string = np.str_(int(time.time() * np.maximum(stamp_units, 1)))
-
-    return timestamp_string
-
-def create_timestamped_filename(name_base='t', stamp_units=1e6):
-    append a filename with a timestamp string.
-
-    Args:
-        name_base: the file name - a prefix to the time stamp string.
-        stamp_units: time resolution; 1e6 for microseconds, 1e3 milliseconds.
-
-    Returns:
-        time_stamped_file_name: name_base_123456 (some long number)
-
-    time_stamped_file_name = name_base + '_' + get_timestamp(stamp_units)
-
-    return time_stamped_file_name
-
-def append_run_parameters_dict(run_parameters, key_name, value_str):
-    add a key-value pair to the run parameters dictionary.
-
-    Args:
-        run_parameters: dictionary to append.
-        key_name: key name to add or overwrite.
-        value_str: value to insert in run_parameters[key_name].
-
-    Returns:
-        run_parameters: dictionary with new (or overwritten) key value pair.
-
-    run_parameters[key_name] = value_str
-
-    return run_parameters
-
-def create_dir(dir_path, dir_name, timestamp=None):
-    create a "dir_name" with time stamp directory
-
-    Args:
-        dir_name: an existing directory such as the run directory.
-        timestamp: optional - if not input a microsecond stamp will be added.
-    Returns:
-        new_dir_name:
-
-    if timestamp is None:
-        timestamp = get_timestamp()
-
-    new_dir_name = os.path.join(dir_path, dir_name + timestamp)
-    os.mkdir(new_dir_name)
-
-    return new_dir_name
-
-def remove_dir(dir_name):
-    remove directory and all the files it contains.
-
-    Args:
-        dir_name: name of a directory with no sub-directories.
-
-    dir_list = os.listdir(dir_name)
-    if len(dir_list) > 0:
-        for file_name in dir_list:
-            os.remove(os.path.join(dir_name, file_name))
-
-    os.rmdir(dir_name)
-
-    return
     """
         
 
@@ -448,7 +429,7 @@ def suite():
                                         >> Preferred Method for using unit test
 import unittest
 import TestKEGmodule as tkeg
-mySuit = tkeg.suite()
+mySuit = tkn.suite()
 runner = unittest.TextTestRunner()
 myResult = runner.run(mySuit)
 
