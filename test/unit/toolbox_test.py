@@ -199,42 +199,28 @@ class toolbox_test(unittest.TestCase):
         self.assertNotEqual(tstr, tstr2)
         
     def test_create_timestamped_filename(self):
+        """ assert that the beginning char string remains unchanged and that the 
+            size of the returned string is as expected
+        """
         n_default_chars = 27
         name_base = 'honky_tonk'
         tsfn = kn.create_timestamped_filename(name_base)
         self.assertEqual(name_base, tsfn[0:10], msg='prefix name exception')
         self.assertEqual(len(tsfn), n_default_chars, msg='filename size exception')
        
-    """
-def create_timestamped_filename(name_base='t', stamp_units=1e6):
-    append a filename with a timestamp string.
-
-    Args:
-        name_base: the file name - a prefix to the time stamp string.
-        stamp_units: time resolution; 1e6 for microseconds, 1e3 milliseconds.
-
-    Returns:
-        time_stamped_file_name: name_base_123456 (some long number)
-
-    time_stamped_file_name = name_base + '_' + get_timestamp(stamp_units)
-
-    return time_stamped_file_name
-
-def append_run_parameters_dict(run_parameters, key_name, value_str):
-    add a key-value pair to the run parameters dictionary.
-
-    Args:
-        run_parameters: dictionary to append.
-        key_name: key name to add or overwrite.
-        value_str: value to insert in run_parameters[key_name].
-
-    Returns:
-        run_parameters: dictionary with new (or overwritten) key value pair.
-
-    run_parameters[key_name] = value_str
-
-    return run_parameters    
+    def test_append_run_parameters_dict(self):
+        """ assert that key value pairs are inserted and are retrevable from the run
+            parameters dictionary
+        """
+        run_parameters = self.get_run_parameters()
+        run_parameters = kn.append_run_parameters_dict(run_parameters, 'pi_test', np.pi)
+        run_parameters = kn.append_run_parameters_dict(run_parameters, 'tea_test', 'tea')
+        
+        self.assertEqual(run_parameters['pi_test'], np.pi, msg='float value exception')
+        self.assertEqual(run_parameters['tea_test'], 'tea', msg='string value exception')
+        
     
+    """
 def update_h_coordinate_matrix(w_matrix, x_matrix):
     nonnegative right factor matrix for perform_net_nmf function s.t. X ~ W.H.
 
