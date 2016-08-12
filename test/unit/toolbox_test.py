@@ -237,49 +237,55 @@ class toolbox_test(unittest.TestCase):
         self.assertEqual(A.sum(), running_sum, msg='sum of elements exception')
         
     def test_update_linkage_matrix(self):
-        pass
+        """ create a consensus matrix by sampling a synthesized set of clusters
+            assert that the clustering is equivalent
+        """
+        n_samples = 11
+        n_clusters = 3
+        cluster_set = np.int_(np.ones(n_samples))
+        for r in range(0, n_samples):
+            cluster_set[r] = int(np.random.randint(n_clusters))
+
+        n_repeats = 33
+        n_test_perm = 5
+        n_test_rows = n_samples
+        I = np.zeros((n_test_rows, n_test_rows))
+        M = np.zeros((n_test_rows, n_test_rows))
+
+        for r in range(0, n_repeats):
+            f_perm = np.random.permutation(n_test_rows)
+            f_perm = f_perm[0:n_test_perm]
+            cluster_p = cluster_set[f_perm]
+            I = kn.update_indicator_matrix(f_perm, I)
+            M = kn.update_linkage_matrix(cluster_p, f_perm, M)
+    
+        CC = M / np.maximum(I, 1e-15)
+
+        for s in range(0,n_clusters):
+            s_dex = cluster_set == s
+            c_c = CC[s_dex, :]
+            c_c = c_c[:, s_dex]
+            n_check = c_c - 1
+            self.assertEqual(n_check.sum(), 0, msg='cluster grouping exception')
+            
+        #label_set = kn.perform_kmeans(CC, n_clusters)
     
     """
-def update_linkage_matrix(encode_mat, sample_perm, linkage_matrix):
-    update the connectivity matrix by summing the un-permuted linkages.
-    encode_mat: (permuted) nonnegative right factor matrix (H) - encoded linkage.
-    Args:
-        encode_mat: encoding of linkage either as an h_matrix or argmax(h_matrix)
-
-        sample_perm: the sample permutaion of the h_matrix.
-        linkage_matrix: connectivity matrix.
-
-    Returns:
-        linkage_matrix: connectivity matrix summed with the de-permuted linkage.
-
-    if encode_mat.ndim == 1:
-        num_clusters = max(encode_mat) + 1
-        cluster_id = encode_mat
-    else:
-        num_clusters = encode_mat.shape[0]
-        cluster_id = np.argmax(encode_mat, 0)
-
-    for cluster in range(0, num_clusters):
-        slice_id = sample_perm[cluster_id == cluster]
-        linkage_matrix[slice_id[:, None], slice_id] += 1
-
-    return linkage_matrix
-
-def update_indicator_matrix(sample_perm, indicator_matrix):
-    update the indicator matrix by summing the un-permutation.
+def perform_kmeans(consensus_matrix, k=3):
+    determine cluster assignments for consensus matrix using K-means.
 
     Args:
-        sample_perm: permutaion of the sample (h_matrix).
-        indicator_matrix: indicator matrix.
+        consensus_matrix: connectivity / indicator matrix.
+        k: clusters estimate.
 
     Returns:
-        indicator_matrix: indicator matrix incremented at sample_perm locations.
+        lablels: ordered cluster assignments for consensus_matrix (samples).
 
-    indicator_matrix[sample_perm[:, None], sample_perm] += 1
+    cluster_handle = KMeans(k, random_state=10)
+    labels = cluster_handle.fit_predict(consensus_matrix)
 
-    return indicator_matrix
+    return labels    
     
-
 def update_h_coordinate_matrix(w_matrix, x_matrix):
     nonnegative right factor matrix for perform_net_nmf function s.t. X ~ W.H.
 
@@ -410,21 +416,6 @@ def perform_nmf(x_matrix, run_parameters):
         h_matrix = update_h_coordinate_matrix(w_matrix, x_matrix)
 
     return h_matrix
-
-def perform_kmeans(consensus_matrix, k=3):
-    determine cluster assignments for consensus matrix using K-means.
-
-    Args:
-        consensus_matrix: connectivity / indicator matrix.
-        k: clusters estimate.
-
-    Returns:
-        lablels: ordered cluster assignments for consensus_matrix (samples).
-
-    cluster_handle = KMeans(k, random_state=10)
-    labels = cluster_handle.fit_predict(consensus_matrix)
-
-    return labels
     """
         
 
