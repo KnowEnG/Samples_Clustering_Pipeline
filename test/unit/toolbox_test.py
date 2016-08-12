@@ -219,8 +219,67 @@ class toolbox_test(unittest.TestCase):
         self.assertEqual(run_parameters['pi_test'], np.pi, msg='float value exception')
         self.assertEqual(run_parameters['tea_test'], 'tea', msg='string value exception')
         
+    def test_update_indicator_matrix(self):
+        """ assert that the indicator matrix is not loosing any digits
+            Note: correctness test considered as part of linkage matrix test
+        """
+        n_repeats = 10
+        n_test_perm = 11
+        n_test_rows = 77
+        A = np.zeros((n_test_rows, n_test_rows))
+        running_sum = 0
+        for r in range(0, n_repeats):
+            running_sum += n_test_perm**2
+            f_perm = np.random.permutation(n_test_rows)
+            f_perm = f_perm[0:n_test_perm]
+            A = kn.update_indicator_matrix(f_perm, A)
+            
+        self.assertEqual(A.sum(), running_sum, msg='sum of elements exception')
+        
+    def test_update_linkage_matrix(self):
+        pass
     
     """
+def update_linkage_matrix(encode_mat, sample_perm, linkage_matrix):
+    update the connectivity matrix by summing the un-permuted linkages.
+    encode_mat: (permuted) nonnegative right factor matrix (H) - encoded linkage.
+    Args:
+        encode_mat: encoding of linkage either as an h_matrix or argmax(h_matrix)
+
+        sample_perm: the sample permutaion of the h_matrix.
+        linkage_matrix: connectivity matrix.
+
+    Returns:
+        linkage_matrix: connectivity matrix summed with the de-permuted linkage.
+
+    if encode_mat.ndim == 1:
+        num_clusters = max(encode_mat) + 1
+        cluster_id = encode_mat
+    else:
+        num_clusters = encode_mat.shape[0]
+        cluster_id = np.argmax(encode_mat, 0)
+
+    for cluster in range(0, num_clusters):
+        slice_id = sample_perm[cluster_id == cluster]
+        linkage_matrix[slice_id[:, None], slice_id] += 1
+
+    return linkage_matrix
+
+def update_indicator_matrix(sample_perm, indicator_matrix):
+    update the indicator matrix by summing the un-permutation.
+
+    Args:
+        sample_perm: permutaion of the sample (h_matrix).
+        indicator_matrix: indicator matrix.
+
+    Returns:
+        indicator_matrix: indicator matrix incremented at sample_perm locations.
+
+    indicator_matrix[sample_perm[:, None], sample_perm] += 1
+
+    return indicator_matrix
+    
+
 def update_h_coordinate_matrix(w_matrix, x_matrix):
     nonnegative right factor matrix for perform_net_nmf function s.t. X ~ W.H.
 
@@ -351,45 +410,6 @@ def perform_nmf(x_matrix, run_parameters):
         h_matrix = update_h_coordinate_matrix(w_matrix, x_matrix)
 
     return h_matrix
-
-def update_linkage_matrix(encode_mat, sample_perm, linkage_matrix):
-    update the connectivity matrix by summing the un-permuted linkages.
-    encode_mat: (permuted) nonnegative right factor matrix (H) - encoded linkage.
-    Args:
-        encode_mat: encoding of linkage either as an h_matrix or argmax(h_matrix)
-
-        sample_perm: the sample permutaion of the h_matrix.
-        linkage_matrix: connectivity matrix.
-
-    Returns:
-        linkage_matrix: connectivity matrix summed with the de-permuted linkage.
-
-    if encode_mat.ndim == 1:
-        num_clusters = max(encode_mat) + 1
-        cluster_id = encode_mat
-    else:
-        num_clusters = encode_mat.shape[0]
-        cluster_id = np.argmax(encode_mat, 0)
-
-    for cluster in range(0, num_clusters):
-        slice_id = sample_perm[cluster_id == cluster]
-        linkage_matrix[slice_id[:, None], slice_id] += 1
-
-    return linkage_matrix
-
-def update_indicator_matrix(sample_perm, indicator_matrix):
-    update the indicator matrix by summing the un-permutation.
-
-    Args:
-        sample_perm: permutaion of the sample (h_matrix).
-        indicator_matrix: indicator matrix.
-
-    Returns:
-        indicator_matrix: indicator matrix incremented at sample_perm locations.
-
-    indicator_matrix[sample_perm[:, None], sample_perm] += 1
-
-    return indicator_matrix
 
 def perform_kmeans(consensus_matrix, k=3):
     determine cluster assignments for consensus matrix using K-means.
