@@ -284,7 +284,7 @@ class toolbox_test(unittest.TestCase):
         hwx = kn.update_h_coordinate_matrix(W, X)
         dh = (np.abs(H - hwx)).sum()
         self.assertAlmostEqual(dh, 0, msg='h matrix mangled exception')
-    
+
     """
 def perform_kmeans(consensus_matrix, k=3):
     determine cluster assignments for consensus matrix using K-means.
@@ -299,59 +299,8 @@ def perform_kmeans(consensus_matrix, k=3):
     cluster_handle = KMeans(k, random_state=10)
     labels = cluster_handle.fit_predict(consensus_matrix)
 
-    return labels    
-    
-def update_h_coordinate_matrix(w_matrix, x_matrix):
-    nonnegative right factor matrix for perform_net_nmf function s.t. X ~ W.H.
+    return labels
 
-    Args:
-        w_matrix: the positive left factor (W) of the perform_net_nmf function.
-        x_matrix: the postive matrix (X) to be decomposed.
-
-    Returns:
-        h_matrix: nonnegative right factor (H) matrix.
-
-    wtw = np.dot(w_matrix.T, w_matrix)
-    number_of_clusters = wtw.shape[0]
-    wtx = np.dot(w_matrix.T, x_matrix)
-    colix = np.arange(0, x_matrix.shape[1])
-    rowix = np.arange(0, w_matrix.shape[1])
-    h_matrix = np.dot(LA.pinv(wtw), wtx)
-    h_pos = h_matrix > 0
-    h_matrix[~h_pos] = 0
-    col_log_arr = sum(h_pos == 0) > 0
-    col_list = colix[col_log_arr]
-    for cluster in range(0, number_of_clusters):
-        if col_list.size > 0:
-            w_ette = wtx[:, col_list]
-            m_rows = w_ette.shape[0]
-            n_cols = w_ette.shape[1]
-            mcode_uniq_col_ix = np.arange(0, n_cols)
-            h_ette = np.zeros((m_rows, n_cols))
-            h_pos_ette = h_pos[:, col_list]
-            mcoding = np.dot(2**(np.arange(0, m_rows)), np.int_(h_pos_ette))
-            mcode_uniq = np.unique(mcoding)
-            for u_n in mcode_uniq:
-                ixidx = mcoding == u_n
-                c_pat = mcode_uniq_col_ix[ixidx]
-                if c_pat.size > 0:
-                    r_pat = rowix[h_pos_ette[:, c_pat[0]]]
-                    atmp = wtw[r_pat[:, None], r_pat]
-                    btmp = w_ette[r_pat[:, None], c_pat]
-                    atmptatmp = np.dot(atmp.T, atmp)
-                    atmptatmp = LA.pinv(atmptatmp)
-                    atmptbtmp = np.dot(atmp.T, btmp)
-                    h_ette[r_pat[:, None], c_pat] = np.dot(atmptatmp, atmptbtmp)
-                    h_matrix[:, col_list] = h_ette
-            h_pos = h_matrix > 0
-            h_matrix[~h_pos] = 0
-            col_log_arr = sum(h_pos == 0) > 0
-            col_list = colix[col_log_arr]
-        else:
-            break
-
-    return h_matrix
-    
 def perform_net_nmf(x_matrix, lap_val, lap_dag, run_parameters):
     perform network based nonnegative matrix factorization, minimize:
         ||X-WH|| + lambda.tr(W'.L.W), with W, H positive.
