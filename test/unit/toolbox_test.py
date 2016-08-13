@@ -14,7 +14,7 @@ import knpackage.toolbox as kn
 class toolbox_test(unittest.TestCase):
     
     def get_run_parameters(self):
-        run_parameters = {'test_directory':'/Users/lanier4/BigDataTank/unit_test_development',
+        run_parameters = {'test_directory':'/Users/del/AllCodeBigData/KnowEnG_tbx_test/testTank',
                             'k':3,'number_of_iteriations_in_rwr':100,
                             'obj_fcn_chk_freq':50,
                             'it_max':10000,
@@ -269,6 +269,21 @@ class toolbox_test(unittest.TestCase):
             self.assertEqual(n_check.sum(), 0, msg='cluster grouping exception')
             
         #label_set = kn.perform_kmeans(CC, n_clusters)
+    
+    def test_perform_kmeans(self):
+        pass
+    
+    def test_update_h_coordinate_matrix(self):
+        #epsi_lo = 1e15
+        k = 3
+        rows = 25
+        cols = 6
+        W = np.random.rand(rows, k)
+        H = np.random.rand(k, cols)
+        X = W.dot(H)
+        hwx = kn.update_h_coordinate_matrix(W, X)
+        dh = (np.abs(H - hwx)).sum()
+        self.assertAlmostEqual(dh, 0, msg='h matrix mangled exception')
     
     """
 def perform_kmeans(consensus_matrix, k=3):
