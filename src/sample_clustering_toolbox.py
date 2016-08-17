@@ -13,6 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import knpackage.toolbox as kn
 
+
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
 
@@ -38,6 +39,7 @@ def run_nmf(run_parameters):
         display_clusters(con_mat_image)
 
     return
+
 
 def run_cc_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization with
@@ -71,6 +73,7 @@ def run_cc_nmf(run_parameters):
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
 
     return
+
 
 def run_net_nmf(run_parameters):
     """ wrapper: call sequence to perform network based stratification and write results.
@@ -116,6 +119,7 @@ def run_net_nmf(run_parameters):
 
     return
 
+
 def run_cc_net_nmf(run_parameters):
     """ wrapper: call sequence to perform network based stratification with consensus clustering
         and write results.
@@ -138,7 +142,7 @@ def run_cc_net_nmf(run_parameters):
     network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
 
     network_df = kn.symmetrize_df(network_df)
-    #network_mat = convert_df_to_sparse(network_df, len(unique_gene_names))
+    # network_mat = convert_df_to_sparse(network_df, len(unique_gene_names))
     network_mat = kn.convert_network_df_to_sparse(
         network_df, len(unique_gene_names), len(unique_gene_names))
 
@@ -166,6 +170,7 @@ def run_cc_net_nmf(run_parameters):
 
     return
 
+
 def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
@@ -173,14 +178,15 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
     Args:
         network_mat: genes x genes symmetric matrix.
         spreadsheet_mat: genes x samples matrix.
-        lap_dag, lap_val: laplacian matrix components; L = lap_dag - lap_val.
+        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
+        lap_val: laplacian matrix component, L = lap_dag - lap_val.
         run_parameters: dictionay of run-time parameters.
     """
     for sample in range(0, int(run_parameters["number_of_bootstraps"])):
         sample_random, sample_permutation = kn.sample_a_matrix(
             spreadsheet_mat, np.float64(run_parameters["percent_sample"]))
         sample_smooth, iterations = \
-        kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
+            kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
 
         if int(run_parameters['verbose']) != 0:
             print("{} of {}: iterations = {}".format(
@@ -192,6 +198,7 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
         save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
     return
+
 
 def find_and_save_nmf_clusters(spreadsheet_mat, run_parameters):
     """ central loop: compute components for the consensus matrix by
@@ -214,6 +221,7 @@ def find_and_save_nmf_clusters(spreadsheet_mat, run_parameters):
 
     return
 
+
 def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
     """ compute the consensus matrix from the indicator and linkage matrix inputs
         formed by the bootstrap "temp_*" files.
@@ -231,6 +239,7 @@ def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
     consensus_matrix = linkage_matrix / np.maximum(indicator_matrix, 1)
 
     return consensus_matrix
+
 
 def get_indicator_matrix(run_parameters, indicator_matrix):
     """ read bootstrap temp_p* files and compute the indicator_matrix.
@@ -251,6 +260,7 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
             indicator_matrix = kn.update_indicator_matrix(sample_permutation, indicator_matrix)
 
     return indicator_matrix
+
 
 def get_linkage_matrix(run_parameters, linkage_matrix):
     """ read bootstrap temp_h* and temp_p* files, compute and add the linkage_matrix.
@@ -274,6 +284,7 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
 
     return linkage_matrix
 
+
 def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, sequence_number):
     """ save one h_matrix and one permutation in temorary files with sequence_number appended names.
 
@@ -286,18 +297,18 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
     tmp_dir = run_parameters["tmp_directory"]
     time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
 
-    hname = os.path.join(tmp_dir, 'temp_h'+time_stamp)
-    pname = os.path.join(tmp_dir, 'temp_p'+time_stamp)
+    hname = os.path.join(tmp_dir, 'temp_h' + time_stamp)
+    pname = os.path.join(tmp_dir, 'temp_p' + time_stamp)
 
     cluster_id = np.argmax(h_matrix, 0)
     cluster_id.dump(hname)
     sample_permutation.dump(pname)
 
-
     return
 
+
 def form_consensus_matrix_graphic(consensus_matrix, k=3):
-    ''' use K-means to reorder the consensus matrix for graphic display.
+    """ use K-means to reorder the consensus matrix for graphic display.
 
     Args:
         consensus_matrix: calculated consensus matrix in samples x samples order.
@@ -305,7 +316,7 @@ def form_consensus_matrix_graphic(consensus_matrix, k=3):
 
     Returns:
         cc_cm: consensus_matrix with rows and columns in K-means sort order.
-    '''
+    """
     cc_cm = consensus_matrix.copy()
     labels = kn.perform_kmeans(consensus_matrix, k)
     sorted_labels = np.argsort(labels)
@@ -313,12 +324,13 @@ def form_consensus_matrix_graphic(consensus_matrix, k=3):
 
     return cc_cm
 
+
 def display_clusters(consensus_matrix):
-    ''' graphic display the consensus matrix.
+    """ graphic display the consensus matrix.
 
     Args:
          consenus matrix: usually a smallish square matrix.
-    '''
+    """
     methods = [None, 'none', 'nearest', 'bilinear', 'bicubic', 'spline16',
                'spline36', 'hanning', 'hamming', 'hermite', 'kaiser', 'quadric',
                'catrom', 'gaussian', 'bessel', 'mitchell', 'sinc', 'lanczos']
@@ -332,6 +344,7 @@ def display_clusters(consensus_matrix):
     plt.show()
 
     return
+
 
 def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters):
     """ write the consensus matrix as a dataframe with sample_names column lablels
@@ -353,6 +366,7 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
 
     return
 
+
 def save_final_samples_clustering(sample_names, labels, run_parameters):
     """ wtite .tsv file that assings a cluster number label to the sample_names.
 
@@ -367,10 +381,11 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     else:
         file_name = os.path.join(run_parameters["results_directory"], 'labels_data.tsv')
     df_tmp = kn.create_df_with_sample_labels(sample_names, labels)
-    #df_tmp = pd.DataFrame(data=labels, index=sample_names)
+    # df_tmp = pd.DataFrame(data=labels, index=sample_names)
     df_tmp.to_csv(file_name, sep='\t', header=None)
 
     return
+
 
 def timestamp_filename(name_base, name_extension, run_parameters=None):
     """ insert a time stamp into the filename_ before .extension.
