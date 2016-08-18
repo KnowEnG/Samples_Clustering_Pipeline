@@ -5,17 +5,14 @@ Created on WEd Aug  17 2016
 @author: del
 @author: The Gene Sets Characterization dev team
 """
-import sys
-sample_clustering_directory = '/Users/lanier4/PycharmProjects/Sample_Clustering_Pipeline/src'
-sys.path.extend(sample_clustering_directory)
 
 import unittest
-import knpackage.toolbox as kn
+#import knpackage.toolbox as kn
 import sample_clustering_toolbox as skn
-import os
-import numpy as np
-import scipy.sparse as spar
-import scipy.stats as stats
+#import os
+#import numpy as np
+#import scipy.sparse as spar
+#import scipy.stats as stats
 
 class sample_clustering_toolbox_test(unittest.TestCase):
     def get_run_parameters(self):
@@ -36,6 +33,8 @@ class sample_clustering_toolbox_test(unittest.TestCase):
         return run_parameters
 
     def test_timestamp_filename(self):
+        """ test sample_clustering_toolbox function timestamp_filename input switch
+        """
         run_parameters = self.get_run_parameters()
         run_parameters['use_now_name'] = 1
         name_base = 'base_name'
@@ -49,20 +48,3 @@ def suite():
     test_suite.addTest(unittest.makeSuite(sample_clustering_toolbox_test))
 
     return test_suite
-
-
-'''# Next two lines for using this file w/o test Suite   << NOT recommended
-#if __name__=='__main__':
-#    unittest.main()
-
-                                        >> Preferred Method for using unit test
-import unittest
-import TestKEGmodule as tkeg
-mySuit = tkn.suite()
-runner = unittest.TextTestRunner()
-myResult = runner.run(mySuit)
-
-OR
-mySuit2 = unittest.TestLoader().loadTestsFromTestCase(TestKEGmodule)
-
-'''
