@@ -5,7 +5,13 @@ Created on WEd Aug  17 2016
 @author: del
 @author: The Gene Sets Characterization dev team
 """
+import sys
+sample_clustering_directory = '/Users/lanier4/PycharmProjects/Sample_Clustering_Pipeline/src'
+sys.path.extend(sample_clustering_directory)
+
 import unittest
+import knpackage.toolbox as kn
+import sample_clustering_toolbox as skn
 import os
 import numpy as np
 import scipy.sparse as spar
@@ -28,6 +34,15 @@ class sample_clustering_toolbox_test(unittest.TestCase):
                           'use_now_name': 1000000}
 
         return run_parameters
+
+    def test_timestamp_filename(self):
+        run_parameters = self.get_run_parameters()
+        run_parameters['use_now_name'] = 1
+        name_base = 'base_name'
+        name_extension = 'ext_name'
+        f_name = skn.timestamp_filename(name_base, name_extension, run_parameters)
+        f_nameII = skn.timestamp_filename(name_base, name_extension)
+        self.assertNotEqual(f_name, f_nameII, msg='{} != {}'.format(f_name, f_nameII))
 
 def suite():
     test_suite = unittest.TestSuite()
