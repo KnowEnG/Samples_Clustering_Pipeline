@@ -301,8 +301,10 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
     pname = os.path.join(tmp_dir, 'temp_p' + time_stamp)
 
     cluster_id = np.argmax(h_matrix, 0)
-    cluster_id.dump(hname)
-    sample_permutation.dump(pname)
+    with open(hname, 'wb') as fh0:
+        cluster_id.dump(fh0)
+    with open(pname, 'wb') as fh1:
+        sample_permutation.dump(fh1)
 
     return
 
