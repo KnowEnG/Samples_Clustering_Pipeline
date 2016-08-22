@@ -26,7 +26,7 @@ method4: cc_net_cluster_nmf
 from knpackage.toolbox import get_run_parameters
 from sample_clustering_toolbox import run_cc_net_nmf
 
-run_directory = '/Users/del/AllCodeBigData/KnowEnG_tbx_test'
+run_directory = '/Users/lanier4/BigDataTank/nbs_run'
 run_file =  'cc_net_cluster_nmf_run_file.yml'
 run_parameters = get_run_parameters(run_directory, run_file)
 run_parameters['display_clusters'] = 0
