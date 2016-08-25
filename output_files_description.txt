@@ -1,8 +1,0 @@
-All four makefile targets in the Samples Clustering Pipeline create a tab separated key value file with the .tsv extension.
-The first column (key) is the list of column names (sample names, or gene-set names) from the spreadsheet.
-The second column is the cluster label assignment for each sample name.
-
-The two makefile targets with _cc_ in the target name also save the consensus matrix as a (pandas dataframe) spreadsheet.
-The row labels are the column names (sample names, or gene-set names) from the spreadsheet.
-The consensus matrix data is symmetric and column labels are the (not unique) cluster assignments.
-The consensus matrix data is normaize between 0 and 1 and may be usefull as an indicator of cluster assignment confidence.
