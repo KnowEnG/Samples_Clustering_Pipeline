@@ -1,4 +1,0 @@
-The input spreadsheet data is required to be in tab separated values format with 
-features as rows (ensembl gene names as the first column) and samples as colmuns. 
-The first row will be taken as the sample names.
-The file will be opened as a pandas dataframe.
