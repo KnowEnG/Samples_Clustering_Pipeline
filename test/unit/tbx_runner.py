@@ -10,19 +10,13 @@ commandLine>> run KnowEnG_UnitTestsRunner.py
 
 lanier4@illinois.edu
 """
-sample_clustering_unit_test_directory = '/Users/del/Sample_Clustering_Pipeline/test/uint'
+sample_clustering_unit_test_directory = '/Users/lanier4/PycharmProjects/Samples_Clustering_Pipeline/test/unit'
 import unittest
 import sys
 sys.path.extend(sample_clustering_unit_test_directory)
-import toolbox_test as tkeg
-
-#                               method A
-test_suite = unittest.TestSuite()
-test_suite.addTest(unittest.makeSuite(tkeg.toolbox_test))
-myrunner = unittest.TextTestRunner()
-myResult = myrunner.run(test_suite)
+import test_sample_clustering_toolbox as tkeg
 
 #                               method B
-# mySuit = tkeg.suite()
-# runner = unittest.TextTestRunner()
-# myResult2 = runner.run(mySuit)
+mySuit = tkeg.suite()
+runner = unittest.TextTestRunner()
+myResult2 = runner.run(mySuit)
