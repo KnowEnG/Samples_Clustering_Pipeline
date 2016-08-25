@@ -5,16 +5,42 @@ Created on WEd Aug  17 2016
 @author: del
 @author: The Gene Sets Characterization dev team
 """
-
+import knpackage.toolbox as kn
 import unittest
 import numpy as np
 #import scipy.sparse as spar
 #import scipy.stats as stats
-
+import os
 import sys
 sample_clustering_unit_test_directory = '/Users/lanier4/PycharmProjects/Samples_Clustering_Pipeline/src'
 sys.path.extend(sample_clustering_unit_test_directory)
 import sample_clustering_toolbox as sctbx
+
+
+def get_nmf_sample_data(nrows, ncols, k):
+    """ get synthetic data for nmf
+
+    Args:
+        nrows: number of features
+        ncols: number of samples
+        k: H matrix inner dimension
+
+    Returns:
+        X: spreadsheet
+        H: clusters
+    """
+    W = np.random.rand(nrows, k)
+    H0 = np.random.rand(k, ncols)
+
+    C = np.argmax(H0, axis=0)
+    H = np.zeros(H0.shape)
+    for row in range(0, max(C) + 1):
+        rowdex = C == row
+        H[row, rowdex] = 1
+
+    X = W.dot(H)
+
+    return X, H
 
 def synthesize_random_network(network_dim, n_nodes):
     """ symmetric random adjacency matrix from random set of nodes
@@ -98,8 +124,9 @@ def sets_a_eq_b(a, b):
 
 class sample_clustering_toolbox_test(unittest.TestCase):
     def get_run_parameters(self):
-        run_parameters = {'test_directory': '/Users/lanier4/BigDataTank/nbs_run',
-                          'k': 3, 'number_of_iteriations_in_rwr': 100,
+        run_parameters = {'test_directory': '/Users/del/AllCodeBigData/KnowEnG_tbx_test',
+                          'k': 3,
+                          'number_of_iteriations_in_rwr': 100,
                           'obj_fcn_chk_freq': 50,
                           'it_max': 10000,
                           'h_clust_eq_limit': 100,
@@ -114,16 +141,40 @@ class sample_clustering_toolbox_test(unittest.TestCase):
 
         return run_parameters
 
+    def test_run_nmf(self):
+        run_parameters = self.get_run_parameters()
+        name_base = 'tmp_spreadsheet'
+        name_extension = 'df'
+        tmp_file_name = sctbx.timestamp_filename(name_base, name_extension, run_parameters)
+        tmp_file_name = os.path.join(run_parameters['test_directory'], tmp_file_name )
+        run_parameters['samples_file_name'] = tmp_file_name
+        # generate test data:
+        nrows = 90;             ncols = 30
+        X, H = get_nmf_sample_data(nrows, ncols, run_parameters['k'])
+
+        # write test data to temp files:
+        X_df = pd.DataFrame(X, index=None, columns=None)
+        kn.save_df(X_df, data_directory, ss_fn)
+        # update run_parameters file names:
+
+        run_parameters['display_clusters'] = 0
+        run_parameters["use_now_name"] = 0
+        sctbx.run_nmf(run_parameters)
+        file_name = os.path.join(run_parameters["results_directory"], 'labels_data.tsv')
+        self.assertTrue(os.path.exists(file_name), msg='nmf - labels_data.tsv:  dne')
+
     def test_timestamp_filename(self):
         """ test sample_clustering_toolbox function timestamp_filename input switch
         """
-        run_parameters = self.get_run_parameters()
+        run_parameters = get_run_parameters()
         run_parameters['use_now_name'] = 1
         name_base = 'base_name'
         name_extension = 'ext_name'
         f_name = sctbx.timestamp_filename(name_base, name_extension, run_parameters)
         f_nameII = sctbx.timestamp_filename(name_base, name_extension)
         self.assertNotEqual(f_name, f_nameII, msg='{} != {}'.format(f_name, f_nameII))
+
+
 
 
 def suite():
