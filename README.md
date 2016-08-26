@@ -12,7 +12,7 @@ One can select one of four clustering options that are based non-negative matrix
 | Clustering with network regularization           | network-based nmf                    | net_nmf        |
 | Consensus Clustering with network regularization | bootstrapping with network-based nmf | cc_net_nmf     |
 
-## How to run with provided data
+## How to run this pipeline with provided data
 ###1. Get Access to KnowEnG-Research Repo:
 Email omarsobh@illinois.edu infrastructure team (IST) lead to:
 
