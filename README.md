@@ -13,11 +13,10 @@ One can select one of four clustering options that are based non-negative matrix
 | Consensus Clustering with network regularization | bootstrapping with network-based nmf | cc_net_nmf     |
 
 ## How to run it
-###1. Get Access to KnowEnG-Research repo:
+###1. Get Access to KnowEnG-Research Repo:
 Send email to 
 
-###2. Get a copy of the Samples_Clustering_Pipeline code, data
-__Run__ the following command to get Samples_Clustering_Pipeline repo
+###2. Clone the Samples_Clustering_Pipeline Repo
 ```
  git clone https://github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git
 ```
