@@ -1,6 +1,6 @@
 # Samples Clustering Pipeline 
 This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, samples clustering pipeline. 
-The pipeline clusters samples in a user submitted spreadsheet (with samples as columns and genes as rows). 
+This pipeline clusters samples in a user submitted spreadsheet (with samples as columns and genes as rows). 
 
 One can select one of four clustering options that are based non-negative matrix factorization (nmf):
 
