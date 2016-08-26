@@ -14,7 +14,9 @@ One can select one of four clustering options that are based non-negative matrix
 
 ## How to run it
 ###1. Get Access to KnowEnG-Research Repo:
-Send email to 
+Email omarsobh@illinois.edu infrastructure team (IST) lead to:
+
+1. __Access__ KnowEnG-Research github repo
 
 ###2. Clone the Samples_Clustering_Pipeline Repo
 ```
