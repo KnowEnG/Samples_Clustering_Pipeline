@@ -77,9 +77,9 @@ cd Samples_Clustering_Pipeline
  mkdir results_directory_name
  ```
  
-* Create run_paramerters file (yaml format) 
+* Create run_paramerters file (yml format) 
 
-  filename.yaml
+  filename.yml
 
 * Make sure the directories of the input data in `cluster_nmf_run_file.yml` are correct
  
