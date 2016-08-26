@@ -1,4 +1,4 @@
-# About: Samples Clustering Pipeline 
+# Samples Clustering Pipeline 
 This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, samples clustering pipeline. 
 This pipeline clusters samples in a user submitted spreadsheet (with samples as columns and genes as rows). 
 
