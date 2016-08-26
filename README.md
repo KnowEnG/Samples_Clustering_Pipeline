@@ -52,14 +52,14 @@ cd Samples_Clustering_Pipeline
 
 ###6. Use one of the following "make" commands to select and run a clustering option:
 
-  * Clustering
- ``` make run_nmf  ```
-  * Consensus Clustering
-``` make run_cc_nmf ```
-  * Clustering with network regularization
- ```  make run_cc_nmf ``
-  * Consensus Clustering with network regularization
- ``` make run_cc_net_nmf ```
+
+| **Options**                                      | **Make Command**                     | 
+| ------------------------------------------------ | -------------------------------------| 
+| Clustering                                       | ``` make run_nmf  ```|
+| Consensus Clustering                             | ``` make run_cc_nmf ```              | 
+| Clustering with network regularization           |```  make run_cc_nmf ```                   | 
+| Consensus Clustering with network regularization |``` make run_cc_net_nmf ``` |
+
  
 ###6. Run methods seperately
 
