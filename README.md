@@ -42,8 +42,10 @@ cd Samples_Clustering_Pipeline
  
   * Run the pipeline you desire
  ```
-  make run_fisher
-  make run_drawer
+make run_nmf
+make run_net_nmf
+make run_cc_nmf
+make run_cc_net_nmf
  ```
  
   * Clean the running environment and revert the local repository to original state after you finish your tests and analysis
