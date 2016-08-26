@@ -45,23 +45,32 @@ cd Samples_Clustering_Pipeline
 ```
 
  
-###5. Use the following make command that creates a local directory "run_dir" and places all the parameters files
-  * Prepare input data and running directories. 
+###5. Use the following "make" command to create a local directory "run_dir" and places all the parameters files in it.
  ```
   make run_env
  ```
- 
-  * Run the pipeline you desire
+
+###6. Use one of the following "make" command to select and run a clustering option:
+
+  * Clustering
  ```
 make run_nmf
-make run_net_nmf
-make run_cc_nmf
-make run_cc_net_nmf
  ```
  
-  * Clean the running environment and revert the local repository to original state after you finish your tests and analysis
+  * Consensus Clustering
  ```
-  make final_clean 
+make run_cc_nmf
+ ```
+ 
+   * Clustering with network regularization
+ ```
+make run_cc_nmf
+ ```
+ 
+ 
+  * Consensus Clustering with network regularization
+ ```
+make run_cc_net_nmf
  ```
  
 
