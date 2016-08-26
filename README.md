@@ -1,14 +1,14 @@
-# GeneSet_Characterization_Pipeline
+# Samples_Clustering_Pipeline
 This pipeline selects one of three methods to **rank** a user supplied gene set **against** a KnowEnG gene sets collection
 
 ## Steps to run pipelines
 ###1. Setup github access:
 __Access__ KnowEnG-Research github repo
 
-###2. Get a copy of the GeneSet_Characterization_Pipeline code, data
-__Run__ the following command to get GeneSet_Characterization_Pipeline repo
+###2. Get a copy of the Samples_Clustering_Pipeline code, data
+__Run__ the following command to get Samples_Clustering_Pipeline repo
 ```
- git clone https://github.com/KnowEnG-Research/GeneSet_Characterization_Pipeline.git
+ git clone https://github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git
 ```
  
 ###3. Configure your environment to have the following packages
@@ -30,22 +30,11 @@ __Run__ the following command to get GeneSet_Characterization_Pipeline repo
 ###4. start in the pipeline repo home directory
 
 ```
-cd GeneSet_Characterization_Pipeline
+cd Samples_Clustering_Pipeline
 ```
 
-###5. Prepare 'User Provided Gene Set Spreadsheet' and KnowEnG gene set collections
-1. Default user dataset and KnowEnG gene set collections include the following files in __input_data__:
-
-Network Name|Size| Col1  | Col2 | Col3| Col4| Description |
-| --------------------------------| ------- | -------- | ------- | ------ | ------------ | -------------------------------------- |
-STRING_experimental_gene_gene.gz| 25448| Gene  | Gene | Weight | Network Name | Significant protein interaction dataset|
-kegg_pathway_property_gene.gz| 3148460 | Property | Gene | Weight | Property Name| Pathway propery dataset |
  
-User Spreadsheet Name| Format  | Header | Index | Description |
-| ---------------------------------------- | ------- | ------------------- | ----- | ----------------- |
-| ProGENI_rwr20_STExp_GDSC_500.rname.gxc.gz| binary  | User gene set names | Gene  | User spread sheet |
- 
-###6. Run makefile targets
+###5. Run makefile targets
   * Prepare input data and running directories. 
  ```
   make preparation
@@ -63,9 +52,9 @@ User Spreadsheet Name| Format  | Header | Index | Description |
  ```
  
 
-###7. Run methods seperately
+###6. Run methods seperately
 
-* Create your own run directory outside GeneSet_Characterization_Pipeline repo
+* Create your own run directory outside Samples_Clustering_Pipeline repo
  ```
  mkdir run_dir
  ```
@@ -78,50 +67,29 @@ User Spreadsheet Name| Format  | Header | Index | Description |
  
 ####Make sure you are in the run_dir directory.
 
-### Fisher
-1. Copy `fisher_run_file.yml` into run_dir
+### non-negative matrix factorization (nmf)
+1. Copy `cluster_nmf_run_file.yml` into run_dir
   ```
-  cp ../GeneSet_Characterization_Pipeline/test/benchmarks/fisher_run_file.yml fisher_run_file.yml
+  cp ../Samples_Clustering_Pipeline/test/benchmarks/cluster_nmf_run_file.yml cluster_nmf_run_file.yml
   ```
   
-2. Make sure the directories of the input data in `fisher_run_file.yml` are correct
+2. Make sure the directories of the input data in `cluster_nmf_run_file.yml` are correct
   
   pg_network_file_name:
   ```
-  /../GeneSet_Characterization_Pipeline/input_data/kegg_pathway_property_gene
+  /../Samples_Clustering_Pipeline/input_data/final_clean_4col.edge
   ```
   samples_file_name:
   ```
-  /../GeneSet_Characterization_Pipeline/input_data/ProGENI_rwr20_STExp_GDSC_500.rname.gxc
+  /../Samples_Clustering_Pipeline/input_data/final_clean_full_matrix.df
   ```
   
-3. Run fisher exact test
+3. Run nmf
   ```
-  PYTHONPATH='../GeneSet_Characterization_Pipeline/src' python3 ../GeneSet_Characterization_Pipeline/src/geneset_characterization.py -run_directory ./ -run_file fisher_run_file.yml
-  ```
+  export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
   
-4. Output files are saved in results directory
-  Generate `fisher_droplist.txt` and `fisher_result` file with timestamp. Add the running time into `fisher_run_file.yml`
-
-### DRaWR 
-1. Copy `DRaWR_run_file.yml` into run_dir
-  ```
-    cp ../GeneSet_Characterization_Pipeline/test/benchmarks/DRaWR_run_file.yml DRaWR_run_file.yml
-  ```
-  
-2. Make sure the directories of the input data in `DRaWR_run_file.yml` are correct
-  ```
-  pg_network_file_name: /../GeneSet_Characterization_Pipeline/input_data/kegg_pathway_property_gene
-  samples_file_name: /../GeneSet_Characterization_Pipeline/input_data/ProGENI_rwr20_STExp_GDSC_500.rname.gxc
-  gg_network_file_name: /../GeneSet_Characterization_Pipeline/input_data/STRING_experimental_gene_gene
-  ```
-  
-3. Run DRaWR
-  ```
-  PYTHONPATH='../GeneSet_Characterization_Pipeline/src' python3 ../GeneSet_Characterization_Pipeline/src/geneset_characterization.py -run_directory ./ -run_file DRaWR_run_file.yml
+  python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file cluster_nmf_run_file.yml
   ```
   
 4. Output files are saved in results directory
-  Generate `DRaWR_droplist.txt` and `DRaWR_result` file with timestamp. Add the running time into `DRaWR_run_file.yml`
-
-### Net_One
+  Generate `labels_data.tsv` file with timestamp.
