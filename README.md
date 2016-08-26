@@ -77,7 +77,9 @@ cd Samples_Clustering_Pipeline
  mkdir results_directory_name
  ```
  
-* Create run_paramerters file (yaml format)
+* Create run_paramerters file (yaml format) 
+
+  filename.yaml
 
 * Make sure the directories of the input data in `cluster_nmf_run_file.yml` are correct
  
@@ -85,7 +87,7 @@ cd Samples_Clustering_Pipeline
 
 ```
   export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
-    python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file cluster_nmf_run_file.yml
+  python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file file_name.yml
   ```
   
 * Output files are saved in results directory
