@@ -45,10 +45,10 @@ cd Samples_Clustering_Pipeline
 ```
 
  
-###5. Run makefile targets
+###5. Use the following make command that creates a local directory "run_dir" and places all the parameters files
   * Prepare input data and running directories. 
  ```
-  make preparation
+  make run_env
  ```
  
   * Run the pipeline you desire
