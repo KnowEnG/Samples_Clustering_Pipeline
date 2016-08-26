@@ -5,7 +5,7 @@ This pipeline clusters samples in a user submitted spreadsheet (with samples as 
 One can select one of four clustering options that are based non-negative matrix factorization (nmf):
 
 
-| **Options**                                      | **method**                           | **parameters** |
+| **Options**                                      | **Method**                           | **Parameters** |
 | ------------------------------------------------ | -------------------------------------| -------------- |
 | Clustering                                       | nmf                                  | nmf            |
 | Consensus Clustering                             | bootstrapping with nmf               | cc_nmf         |
