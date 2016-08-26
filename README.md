@@ -65,7 +65,7 @@ cd Samples_Clustering_Pipeline
 ###6. Setup your run environment
 
 * Create a  run directory
-*
+
  ```
  mkdir run_directory_name
  ```
