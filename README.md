@@ -5,12 +5,12 @@ The pipeline clusters samples in a user submitted spreadsheet (with samples as c
 One can select one of four clustering options that are based non-negative matrix factorization (nmf):
 
 
-| **Options**                                      | **method**                                | **parameters** |
-| ------------------------------------------------ | ----------------------------------------- | -------------- |
-| Clustering                                       | uses nmf                                  | nmf            |
-| Consensus Clustering                             | uses bootstrapping with nmf               | cc_nmf         |
-| Clustering with network regularization           | uses network-based nmf                    | net_nmf        |
-| Consensus Clustering with network regularization | uses bootstrapping with network-based nmf | cc_net_nmf     |
+| **Options**                                      | **method**                           | **parameters** |
+| ------------------------------------------------ | -------------------------------------| -------------- |
+| Clustering                                       | nmf                                  | nmf            |
+| Consensus Clustering                             | bootstrapping with nmf               | cc_nmf         |
+| Clustering with network regularization           | network-based nmf                    | net_nmf        |
+| Consensus Clustering with network regularization | bootstrapping with network-based nmf | cc_net_nmf     |
 
 ## Steps to run pipelines
 ###1. Setup github access:
