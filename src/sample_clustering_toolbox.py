@@ -20,7 +20,7 @@ def run_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
-    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
@@ -29,13 +29,13 @@ def run_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     sample_perm = np.arange(0, spreadsheet_mat.shape[1])
     linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters['k']))
+    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters['number_of_clusters']))
 
     sample_names = spreadsheet_df.columns
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
     if int(run_parameters['display_clusters']) != 0:
-        con_mat_image = form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['k']))
+        con_mat_image = form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['number_of_clusters']))
         display_clusters(con_mat_image)
 
     return
@@ -52,7 +52,7 @@ def run_cc_nmf(run_parameters):
     run_parameters["tmp_directory"] = kn.create_dir(
         run_parameters["run_directory"], tmp_dir)
 
-    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
@@ -61,7 +61,7 @@ def run_cc_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
     consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['k']))
+    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['number_of_clusters']))
 
     sample_names = spreadsheet_df.columns
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
@@ -70,7 +70,7 @@ def run_cc_nmf(run_parameters):
     kn.remove_dir(run_parameters["tmp_directory"])
 
     if int(run_parameters['display_clusters']) != 0:
-        display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
+        display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['number_of_clusters'])))
 
     return
 
@@ -81,8 +81,8 @@ def run_net_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
-    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
-    network_df = kn.get_network_df(run_parameters['network_file_name'])
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
+    network_df = kn.get_network_df(run_parameters['gg_network_name_full_path'])
 
     node_1_names, node_2_names = kn.extract_network_node_names(network_df)
     unique_gene_names = kn.find_unique_node_names(node_1_names, node_2_names)
@@ -110,12 +110,12 @@ def run_net_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     sample_perm = np.arange(0, spreadsheet_mat.shape[1])
     linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters["k"]))
+    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters["number_of_clusters"]))
 
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
     if int(run_parameters['display_clusters']) != 0:
-        display_clusters(form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['k'])))
+        display_clusters(form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['number_of_clusters'])))
 
     return
 
@@ -131,8 +131,8 @@ def run_cc_net_nmf(run_parameters):
     run_parameters["tmp_directory"] = kn.create_dir(
         run_parameters["run_directory"], tmp_dir)
 
-    spreadsheet_df = kn.get_spreadsheet_df(run_parameters)
-    network_df = kn.get_network_df(run_parameters['network_file_name'])
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
+    network_df = kn.get_network_df(run_parameters['gg_network_name_full_path'])
 
     node_1_names, node_2_names = kn.extract_network_node_names(network_df)
     unique_gene_names = kn.find_unique_node_names(node_1_names, node_2_names)
@@ -158,7 +158,7 @@ def run_cc_net_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
     consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['k']))
+    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['number_of_clusters']))
 
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
@@ -166,7 +166,7 @@ def run_cc_net_nmf(run_parameters):
     kn.remove_dir(run_parameters["tmp_directory"])
 
     if int(run_parameters['display_clusters']) != 0:
-        display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['k'])))
+        display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['number_of_clusters'])))
 
     return
 
@@ -295,7 +295,8 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
         sequence_number: temporary file name suffix.
     """
     tmp_dir = run_parameters["tmp_directory"]
-    time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
+    #time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
+    time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
 
     hname = os.path.join(tmp_dir, 'temp_h' + time_stamp)
     pname = os.path.join(tmp_dir, 'temp_p' + time_stamp)
@@ -358,11 +359,7 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         labels: cluster numbers for row names.
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
     """
-    if int(run_parameters["use_now_name"]) != 0:
-        file_name = os.path.join(
-            run_parameters["results_directory"], timestamp_filename('consensus_data', 'df'))
-    else:
-        file_name = os.path.join(run_parameters["results_directory"], 'consensus_data.df')
+    file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('consensus_data', 'df'))
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
     out_df.to_csv(file_name, sep='\t')
 
@@ -377,37 +374,8 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         labels: cluster number assignments.
         run_parameters: write path (run_parameters["results_directory"]).
     """
-    if int(run_parameters["use_now_name"]) != 0:
-        file_name = os.path.join(
-            run_parameters["results_directory"], timestamp_filename('labels_data', 'tsv'))
-    else:
-        file_name = os.path.join(run_parameters["results_directory"], 'labels_data.tsv')
+    file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
     df_tmp = kn.create_df_with_sample_labels(sample_names, labels)
-    # df_tmp = pd.DataFrame(data=labels, index=sample_names)
     df_tmp.to_csv(file_name, sep='\t', header=None)
 
     return
-
-
-def timestamp_filename(name_base, name_extension, run_parameters=None):
-    """ insert a time stamp into the filename_ before .extension.
-
-    Args:
-        name_base: file name first part - may include directory path.
-        name_extension: file extension without a period.
-        run_parameters: run_parameters['use_now_name'] (between 1 and 1,000,000)
-
-    Returns:
-        time_stamped_file_name: concatenation of time-stamp between inputs.
-    """
-    dt_max = 1e6
-    dt_min = 1
-    if run_parameters is None:
-        nstr = time.strftime("%a_%d_%b_%Y_%H_%M_%S", time.localtime())
-    else:
-        time_step = min(max(int(run_parameters['use_now_name']), dt_min), dt_max)
-        nstr = np.str_(int(time.time() * time_step))
-
-    time_stamped_file_name = name_base + '_' + nstr + '.' + name_extension
-
-    return time_stamped_file_name
