@@ -23,9 +23,8 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  git clone https://github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git
 ```
  
-###3. Configure your environment to have the following packages
+###3. Configure your environment (Mac OS or Linux) to have the following packages
   ```
- System: ubuntu:14.04
  apt-get install -y python3-pip
  apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
  pip3 install -I numpy==1.11.1
