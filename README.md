@@ -1,5 +1,15 @@
-# Samples_Clustering_Pipeline 
-This is the KnowEnG group
+# Samples Clustering Pipeline 
+This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, samples clustering pipeline. 
+The pipeline clusters a user submitted spreadsheet with samples as columns and genes as rows. 
+There are four clustering options all based on non-negative matrix factorization (nmf):
+
+
+| **Options**                                      | **method**                                | **parameters** |
+| ------------------------------------------------ | ----------------------------------------- | -------------- |
+| Clustering                                       | uses nmf                                  | nmf            |
+| Consensus Clustering                             | uses bootstrapping with nmf               | cc_nmf         |
+| Clustering with network regularization           | uses network-based nmf                    | net_nmf        |
+| Consensus Clustering with network regularization | uses bootstrapping with network-based nmf | cc_net_nmf     |
 
 ## Steps to run pipelines
 ###1. Setup github access:
