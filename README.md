@@ -1,5 +1,5 @@
-# Samples_Clustering_Pipeline
-This pipeline clusters samples using nmf with or with out a network and consensus clustering.
+# Samples_Clustering_Pipeline 
+This is the KnowEnG group
 
 ## Steps to run pipelines
 ###1. Setup github access:
