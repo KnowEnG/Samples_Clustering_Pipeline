@@ -50,30 +50,24 @@ cd Samples_Clustering_Pipeline
   make run_env
  ```
 
-###6. Use one of the following "make" command to select and run a clustering option:
-
+###6. Use one of the following "make" commands to select and run a clustering option:
   * Clustering
  ```
 make run_nmf
  ```
- 
   * Consensus Clustering
  ```
 make run_cc_nmf
- ```
  
-   * Clustering with network regularization
+  * Clustering with network regularization
  ```
 make run_cc_nmf
  ```
- 
- 
   * Consensus Clustering with network regularization
  ```
 make run_cc_net_nmf
  ```
  
-
 ###6. Run methods seperately
 
 * Create your own run directory outside Samples_Clustering_Pipeline repo
