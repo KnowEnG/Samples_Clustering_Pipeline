@@ -360,6 +360,7 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('consensus_data', 'df'))
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
     out_df.to_csv(file_name, sep='\t')
+    run_parameters['consensus_clustering_file'] = file_name
 
     return
 
@@ -375,5 +376,6 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
     df_tmp = kn.create_df_with_sample_labels(sample_names, labels)
     df_tmp.to_csv(file_name, sep='\t', header=None)
+    run_parameters['cluster_labels_file'] = file_name
 
     return
