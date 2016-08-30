@@ -12,6 +12,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import knpackage.toolbox as kn
+from multiprocessing import Pool
+import itertools
 
 
 def run_nmf(run_parameters):
@@ -171,7 +173,35 @@ def run_cc_net_nmf(run_parameters):
     return
 
 
-def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
+def exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample):
+    """Worker to execute net_nmf_clusters in a single process
+
+    Args:
+        network_mat: genes x genes symmetric matrix.
+        spreadsheet_mat: genes x samples matrix.
+        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
+        lap_val: laplacian matrix component, L = lap_dag - lap_val.
+        run_parameters: dictionay of run-time parameters.
+        sample: each single loop.
+
+    Returns:
+        None
+    """
+    sample_random, sample_permutation = kn.sample_a_matrix(
+        spreadsheet_mat, np.float64(run_parameters["rows_sampling_fraction"]),
+        np.float64(run_parameters["cols_sampling_fraction"]))
+    sample_smooth, iterations = \
+        kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
+
+    print("{} of {}: iterations = {}".format(sample + 1, run_parameters["number_of_bootstraps"], iterations))
+
+    sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
+    h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
+
+    save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
+
+
+def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_processeses):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -180,44 +210,63 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
         spreadsheet_mat: genes x samples matrix.
         lap_dag: laplacian matrix component, L = lap_dag - lap_val.
         lap_val: laplacian matrix component, L = lap_dag - lap_val.
-        run_parameters: dictionay of run-time parameters.
+        run_parameters: dictionary of run-time parameters.
     """
-    for sample in range(0, int(run_parameters["number_of_bootstraps"])):
-        sample_random, sample_permutation = kn.sample_a_matrix(
-            spreadsheet_mat, np.float64(run_parameters["rows_sampling_fraction"]),
-            np.float64(run_parameters["cols_sampling_fraction"]))
-        sample_smooth, iterations = \
-            kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
-
-        print("{} of {}: iterations = {}".format(sample + 1, run_parameters["number_of_bootstraps"], iterations))
-
-        sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
-        h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
-
-        save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-
-    return
+    number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+    range_list = range(0, number_of_bootstraps)
+    p = Pool(processes=number_of_processeses)
+    p.starmap(exec_net_nmf_clusters_worker,
+              zip(itertools.repeat(network_mat),
+                  itertools.repeat(spreadsheet_mat),
+                  itertools.repeat(lap_dag),
+                  itertools.repeat(lap_val),
+                  itertools.repeat(run_parameters),
+                  range_list))
+    p.close()
+    p.join()
 
 
-def find_and_save_nmf_clusters(spreadsheet_mat, run_parameters):
+def exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
+    """Worker to execute nmf_clusters in a single process
+
+    Args:
+        spreadsheet_mat: genes x samples matrix.
+        run_parameters: dictionary of run-time parameters.
+        sample: each loops.
+
+    Returns:
+        None
+
+    """
+    sample_random, sample_permutation = kn.sample_a_matrix(
+        spreadsheet_mat, np.float64(run_parameters["rows_sampling_fraction"]),
+        np.float64(run_parameters["cols_sampling_fraction"]))
+
+    h_mat = kn.perform_nmf(sample_random, run_parameters)
+    save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
+
+    print('nmf {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
+
+
+def find_and_save_nmf_clusters(spreadsheet_mat, run_parameters, number_of_processes):
     """ central loop: compute components for the consensus matrix by
         non-negative matrix factorization.
 
     Args:
         spreadsheet_mat: genes x samples matrix.
-        run_parameters: dictionay of run-time parameters.
+        run_parameters: dictionary of run-time parameters.
+        number_of_processes: number of processes to be running in parallel
     """
-    for sample in range(0, int(run_parameters["number_of_bootstraps"])):
-        sample_random, sample_permutation = kn.sample_a_matrix(
-            spreadsheet_mat, np.float64(run_parameters["rows_sampling_fraction"]),
-            np.float64(run_parameters["cols_sampling_fraction"]))
+    number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+    p = Pool(processes=number_of_processes)
+    range_list = range(0, number_of_bootstraps)
+    p.starmap(exec_nmf_clusters_worker,
+              zip(itertools.repeat(spreadsheet_mat),
+                  itertools.repeat(run_parameters),
+                  range_list))
 
-        h_mat = kn.perform_nmf(sample_random, run_parameters)
-        save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-
-        print('nmf {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
-
-    return
+    p.close()
+    p.join()
 
 
 def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):

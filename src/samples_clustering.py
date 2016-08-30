@@ -5,6 +5,8 @@ Created on Wed Jul 20 14:47:45 2016
 @author: The Gene Sets Characterization dev team
 
 """
+# Number of processes to execute in parallel
+number_of_processes = 32
 
 def nmf(run_parameters):
     '''nmf clustering'''
@@ -14,7 +16,7 @@ def nmf(run_parameters):
 def cc_nmf(run_parameters):
     '''kmeans consensus clustering of the nmf-based clusters'''
     from sample_clustering_toolbox import run_cc_nmf
-    run_cc_nmf(run_parameters)
+    run_cc_nmf(run_parameters, number_of_processes)
 
 def net_nmf(run_parameters):
     '''net-nmf clustering "'''
@@ -24,7 +26,7 @@ def net_nmf(run_parameters):
 def cc_net_nmf(run_parameters):
     '''kmeans consensus clustering of the net-nmf-based clusters'''
     from sample_clustering_toolbox import run_cc_net_nmf
-    run_cc_net_nmf(run_parameters)
+    run_cc_net_nmf(run_parameters, number_of_processes)
 
 SELECT = {
     "cluster_nmf":nmf,
