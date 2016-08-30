@@ -7,10 +7,10 @@ method: net_cluster_nmf
 # 	net_cluster_nmf
 # 	cc_net_cluster_nmf
 
-gg_network_name_full_path: ./run_dir/input_data/keg_ST90_4col.edge
+gg_network_name_full_path: ./input_data/keg_ST90_4col.edge
 #	4 col edge file for building adjacency matrix in net nmf and rwr.
 
-spreadsheet_name_full_path: ./run_dir/input_data/tcga_ucec_somatic_mutation_data.df
+spreadsheet_name_full_path: ./input_data/tcga_ucec_somatic_mutation_data.df
 #	dataframe == matrix with row and column names in .tsv format.
 
 results_directory: ./run_dir/results
