@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER Jing Ge <jingge2@illinois.edu>
+MAINTAINER Dan Lanier <lanier4@illinois.edu>
 
 ENV SRC_LOC /home
 
