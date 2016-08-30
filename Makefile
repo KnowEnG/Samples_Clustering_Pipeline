@@ -41,3 +41,6 @@ copy_run_files:
 
 clean_dir_recursively:
 	$(RMR) $(RUN_DIR)
+
+unit_tests:
+	PYTHONPATH=`pwd`/src; cd test/unit; make all_unit_tests 

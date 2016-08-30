@@ -6,7 +6,7 @@ Created on Wed Jul 20 14:47:45 2016
 
 """
 # Number of processes to be executed in parallel
-number_of_processes = 32
+number_of_processes = 5 
 
 def nmf(run_parameters):
     '''nmf clustering'''

@@ -58,7 +58,7 @@ def run_cc_nmf(run_parameters, number_of_processes):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
-    find_and_save_nmf_clusters(spreadsheet_mat, run_parameters)
+    find_and_save_nmf_clusters(spreadsheet_mat, run_parameters, number_of_processes)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
@@ -155,7 +155,7 @@ def run_cc_net_nmf(run_parameters, number_of_processes):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
 
-    find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+    find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_processes)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
