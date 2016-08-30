@@ -43,7 +43,7 @@ def run_nmf(run_parameters):
     return
 
 
-def run_cc_nmf(run_parameters):
+def run_cc_nmf(run_parameters, number_of_processes):
     """ wrapper: call sequence to perform non-negative matrix factorization with
         consensus clustering and write results.
 
@@ -122,7 +122,7 @@ def run_net_nmf(run_parameters):
     return
 
 
-def run_cc_net_nmf(run_parameters):
+def run_cc_net_nmf(run_parameters, number_of_processes):
     """ wrapper: call sequence to perform network based stratification with consensus clustering
         and write results.
 
