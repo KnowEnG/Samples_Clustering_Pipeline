@@ -5,7 +5,7 @@ Created on Wed Jul 20 14:47:45 2016
 @author: The Gene Sets Characterization dev team
 
 """
-# Number of processes to execute in parallel
+# Number of processes to be executed in parallel
 number_of_processes = 32
 
 def nmf(run_parameters):
