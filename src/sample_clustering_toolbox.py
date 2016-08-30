@@ -201,7 +201,7 @@ def exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val,
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
 
-def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_processeses):
+def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_processes):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -214,7 +214,7 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
     """
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
     range_list = range(0, number_of_bootstraps)
-    p = Pool(processes=number_of_processeses)
+    p = Pool(processes=number_of_processes)
     p.starmap(exec_net_nmf_clusters_worker,
               zip(itertools.repeat(network_mat),
                   itertools.repeat(spreadsheet_mat),

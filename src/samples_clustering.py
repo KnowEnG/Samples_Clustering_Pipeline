@@ -5,8 +5,12 @@ Created on Wed Jul 20 14:47:45 2016
 @author: The Gene Sets Characterization dev team
 
 """
+import multiprocessing
+
 # Number of processes to be executed in parallel
-number_of_processes = 5 
+number_of_processes = multiprocessing.cpu_count()
+print("Using parallelism {}".format(number_of_processes))
+
 
 def nmf(run_parameters):
     '''nmf clustering'''
