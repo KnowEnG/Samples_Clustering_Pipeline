@@ -9,7 +9,7 @@ BENCHMARKS = ./test/benchmarks/
 SCRIPT = ./src/samples_clustering.py
 
 
-all: decompress_input_data create_run_dir copy_run_files
+all: create_run_dir copy_run_files
 
 run_nmf:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cluster_nmf_run_file.yml 
