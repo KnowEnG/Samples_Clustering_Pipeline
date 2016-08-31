@@ -129,7 +129,7 @@ def run_net_nmf(run_parameters):
     return
 
 
-def run_cc_net_nmf(run_parameters, number_of_processes):
+def run_cc_net_nmf(run_parameters):
     """ wrapper: call sequence to perform network based stratification with consensus clustering
         and write results.
 
@@ -161,8 +161,15 @@ def run_cc_net_nmf(run_parameters, number_of_processes):
     spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
+    if int(run_parameters['use_paralell_processing']) != 0:
+        # Number of processes to be executed in parallel
+        number_of_processes = multiprocessing.cpu_count()
+        print("Using parallelism {}".format(number_of_processes))
 
-    find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_processes)
+        find_and_save_net_nmf_clusters_paralell(network_mat, spreadsheet_mat, lap_diag, lap_pos,
+                                                run_parameters, number_of_processes)
+    else:
+        find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
@@ -208,7 +215,7 @@ def exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val,
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
 
-def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_processes):
+def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -218,6 +225,22 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
         lap_dag: laplacian matrix component, L = lap_dag - lap_val.
         lap_val: laplacian matrix component, L = lap_dag - lap_val.
         run_parameters: dictionary of run-time parameters.
+    """
+    number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+    for sample in range(0, number_of_bootstraps):
+        exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
+
+def find_and_save_net_nmf_clusters_paralell(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_processes):
+    """ central loop: compute components for the consensus matrix from the input
+        network and spreadsheet matrices and save them to temp files.
+
+    Args:
+        network_mat: genes x genes symmetric matrix.
+        spreadsheet_mat: genes x samples matrix.
+        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
+        lap_val: laplacian matrix component, L = lap_dag - lap_val.
+        run_parameters: dictionary of run-time parameters.
+        number_of_processes: number of processes to be running in parallel
     """
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
     range_list = range(0, number_of_bootstraps)
@@ -231,7 +254,6 @@ def find_and_save_net_nmf_clusters(network_mat, spreadsheet_mat, lap_dag, lap_va
                   range_list))
     p.close()
     p.join()
-
 
 def exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     """Worker to execute nmf_clusters in a single process
