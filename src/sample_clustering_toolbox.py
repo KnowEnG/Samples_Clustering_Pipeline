@@ -60,10 +60,10 @@ def run_cc_nmf(run_parameters):
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
     if int(run_parameters['use_paralell_processing']) != 0:
         # Number of processes to be executed in parallel
-        number_of_processes = multiprocessing.cpu_count()
-        print("Using parallelism {}".format(number_of_processes))
+        number_of_cpus = multiprocessing.cpu_count()
+        print("Using parallelism {}".format(number_of_cpus))
 
-        find_and_save_nmf_clusters_paralell(spreadsheet_mat, run_parameters, number_of_processes)
+        find_and_save_nmf_clusters_paralell(spreadsheet_mat, run_parameters, number_of_cpus)
     else:
         find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
 
@@ -163,11 +163,11 @@ def run_cc_net_nmf(run_parameters):
     sample_names = spreadsheet_df.columns
     if int(run_parameters['use_paralell_processing']) != 0:
         # Number of processes to be executed in parallel
-        number_of_processes = multiprocessing.cpu_count()
-        print("Using parallelism {}".format(number_of_processes))
+        number_of_cpus = multiprocessing.cpu_count()
+        print("Using parallelism {}".format(number_of_cpus))
 
         find_and_save_net_nmf_clusters_paralell(network_mat, spreadsheet_mat, lap_diag, lap_pos,
-                                                run_parameters, number_of_processes)
+                                                run_parameters, number_of_cpus)
     else:
         find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
 
@@ -230,7 +230,7 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
     for sample in range(0, number_of_bootstraps):
         exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
-def find_and_save_net_nmf_clusters_paralell(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_processes):
+def find_and_save_net_nmf_clusters_paralell(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_cpus):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -240,11 +240,11 @@ def find_and_save_net_nmf_clusters_paralell(network_mat, spreadsheet_mat, lap_da
         lap_dag: laplacian matrix component, L = lap_dag - lap_val.
         lap_val: laplacian matrix component, L = lap_dag - lap_val.
         run_parameters: dictionary of run-time parameters.
-        number_of_processes: number of processes to be running in parallel
+        number_of_cpus: number of processes to be running in parallel
     """
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
     range_list = range(0, number_of_bootstraps)
-    p = Pool(processes=number_of_processes)
+    p = Pool(processes=number_of_cpus)
     p.starmap(exec_net_nmf_clusters_worker,
               zip(itertools.repeat(network_mat),
                   itertools.repeat(spreadsheet_mat),
@@ -290,17 +290,17 @@ def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
     for sample in range(0, number_of_bootstraps):
         exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
 
-def find_and_save_nmf_clusters_paralell(spreadsheet_mat, run_parameters, number_of_processes):
+def find_and_save_nmf_clusters_paralell(spreadsheet_mat, run_parameters, number_of_cpus):
     """ central loop: compute components for the consensus matrix by
         non-negative matrix factorization.
 
     Args:
         spreadsheet_mat: genes x samples matrix.
         run_parameters: dictionary of run-time parameters.
-        number_of_processes: number of processes to be running in parallel
+        number_of_cpus: number of processes to be running in parallel
     """
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
-    p = Pool(processes=number_of_processes)
+    p = Pool(processes=number_of_cpus)
     range_list = range(0, number_of_bootstraps)
     p.starmap(exec_nmf_clusters_worker,
               zip(itertools.repeat(spreadsheet_mat),
