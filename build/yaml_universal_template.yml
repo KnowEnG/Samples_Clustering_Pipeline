@@ -1,5 +1,7 @@
 # yaml parameters file template with all options for nmf and net-nmf with or without consensus clustering
 
+use_paralell_processing: "0"
+
 method: cc_net_cluster_nmf
 #	A clustering method name recongized by samples_clustering.py.
 # 	cluster_nmf
