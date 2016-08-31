@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import knpackage.toolbox as kn
 from multiprocessing import Pool
 import itertools
+import multiprocessing
 
 
 def run_nmf(run_parameters):
@@ -43,7 +44,7 @@ def run_nmf(run_parameters):
     return
 
 
-def run_cc_nmf(run_parameters, number_of_processes):
+def run_cc_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization with
         consensus clustering and write results.
 
@@ -57,8 +58,14 @@ def run_cc_nmf(run_parameters, number_of_processes):
     spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
+    if int(run_parameters['use_paralell_processing']) != 0:
+        # Number of processes to be executed in parallel
+        number_of_processes = multiprocessing.cpu_count()
+        print("Using parallelism {}".format(number_of_processes))
 
-    find_and_save_nmf_clusters(spreadsheet_mat, run_parameters, number_of_processes)
+        find_and_save_nmf_clusters_paralell(spreadsheet_mat, run_parameters, number_of_processes)
+    else:
+        find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
@@ -248,7 +255,20 @@ def exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     print('nmf {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
 
 
-def find_and_save_nmf_clusters(spreadsheet_mat, run_parameters, number_of_processes):
+def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
+    """ central loop: compute components for the consensus matrix by
+        non-negative matrix factorization.
+
+    Args:
+        spreadsheet_mat: genes x samples matrix.
+        run_parameters: dictionary of run-time parameters.
+    """
+    number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+
+    for sample in range(0, number_of_bootstraps):
+        exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
+
+def find_and_save_nmf_clusters_paralell(spreadsheet_mat, run_parameters, number_of_processes):
     """ central loop: compute components for the consensus matrix by
         non-negative matrix factorization.
 
