@@ -1,4 +1,4 @@
-# yaml parameters file template with all options for nmf and net-nmf with or without consensus clustering
+# yaml parameters file template with all options for nmf and net-nmf with or without consensus clustering 
 
 use_parallel_processing: "1"
 
