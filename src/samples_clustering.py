@@ -20,7 +20,9 @@ def nmf(run_parameters):
 def cc_nmf(run_parameters):
     '''kmeans consensus clustering of the nmf-based clusters'''
     from sample_clustering_toolbox import run_cc_nmf
-    run_cc_nmf(run_parameters, number_of_processes)
+    print('debug tracking: cc_nmf called:')
+    print(run_parameters)
+    run_cc_nmf(run_parameters)
 
 def net_nmf(run_parameters):
     '''net-nmf clustering "'''
