@@ -3,6 +3,7 @@ MAINTAINER Dan Lanier <lanier4@illinois.edu>
 
 ENV SRC_LOC /home
 
+# Install the latest knpackage
 RUN pip3 install -I knpackage 
 
 # Clone from github
