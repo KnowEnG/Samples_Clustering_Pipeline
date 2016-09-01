@@ -3,6 +3,8 @@ MAINTAINER Dan Lanier <lanier4@illinois.edu>
 
 ENV SRC_LOC /home
 
+RUN pip3 install -I knpackage 
+
 # Clone from github
 RUN git clone https://username:password@github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git ${SRC_LOC} 
 
