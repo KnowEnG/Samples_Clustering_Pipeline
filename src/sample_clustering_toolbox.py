@@ -207,7 +207,7 @@ def exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val,
     sample_smooth, iterations = \
         kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
 
-    print("{} of {}: iterations = {}".format(sample + 1, run_parameters["number_of_bootstraps"], iterations))
+    print("bootstrap {} of {}: rwr iterations = {}".format(sample + 1, run_parameters["number_of_bootstraps"], iterations))
 
     sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
@@ -274,7 +274,7 @@ def exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     h_mat = kn.perform_nmf(sample_random, run_parameters)
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
-    print('nmf {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
+    print('bootstraps {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
 
 
 def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
