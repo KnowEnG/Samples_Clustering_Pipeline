@@ -274,7 +274,7 @@ def exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     h_mat = kn.perform_nmf(sample_random, run_parameters)
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
-    print('bootstraps {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
+    print('bootstrap {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
 
 
 def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
