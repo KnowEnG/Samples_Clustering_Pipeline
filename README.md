@@ -102,3 +102,5 @@ cd Samples_Clustering_Pipeline
 4 make run_cc_net_nmf
 
 * The make instructions above apply.
+
+* Check on docker.hub to get the latest image 
