@@ -95,7 +95,7 @@ cd Samples_Clustering_Pipeline
 ## How to set up and run in a terminal if you have docker installed:
 1 Change directory to the directory where you want to run.
 
-2 docker run -it knowengdev/samples_clustering_pipeline:09_01_2016
+2 docker run -v /FullPathOfDirectory/ToPut/OutputInto -it knowengdev/samples_clustering_pipeline:09_01_2016
 
 3 make all
 
@@ -104,3 +104,5 @@ cd Samples_Clustering_Pipeline
 * The make instructions above apply.
 
 * Check on docker.hub to get the latest image 
+
+* If you don't "cp" your data into the volume you mounted it will dissapear when you exit docker
