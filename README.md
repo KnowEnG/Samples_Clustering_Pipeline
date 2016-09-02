@@ -103,6 +103,6 @@ cd Samples_Clustering_Pipeline
 
 * The make instructions above apply.
 
-* Check on docker.hub to get the latest image 
+* Check on docker.hub to get the latest image. 
 
-* If you don't "cp" your data into the volume you mounted it will dissapear when you exit docker
+* If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
