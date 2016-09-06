@@ -187,7 +187,7 @@ def run_cc_net_nmf(run_parameters):
     return
 
 
-def exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample):
+def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample):
     """Worker to execute net_nmf_clusters in a single process
 
     Args:
@@ -228,7 +228,7 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
     """
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
     for sample in range(0, number_of_bootstraps):
-        exec_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
+        run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_cpus):
     """ central loop: compute components for the consensus matrix from the input
@@ -245,7 +245,7 @@ def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_da
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
     range_list = range(0, number_of_bootstraps)
     p = Pool(processes=number_of_cpus)
-    p.starmap(exec_net_nmf_clusters_worker,
+    p.starmap(run_net_nmf_clusters_worker,
               zip(itertools.repeat(network_mat),
                   itertools.repeat(spreadsheet_mat),
                   itertools.repeat(lap_dag),
@@ -255,7 +255,7 @@ def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_da
     p.close()
     p.join()
 
-def exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
+def run_net_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     """Worker to execute nmf_clusters in a single process
 
     Args:
@@ -288,7 +288,7 @@ def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
 
     for sample in range(0, number_of_bootstraps):
-        exec_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
+        run_net_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
 
 def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_cpus):
     """ central loop: compute components for the consensus matrix by
@@ -302,7 +302,7 @@ def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_
     number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
     p = Pool(processes=number_of_cpus)
     range_list = range(0, number_of_bootstraps)
-    p.starmap(exec_nmf_clusters_worker,
+    p.starmap(run_net_nmf_clusters_worker,
               zip(itertools.repeat(spreadsheet_mat),
                   itertools.repeat(run_parameters),
                   range_list))
