@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Samples Clustering Pipeline 
 This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, samples clustering pipeline. 
 This pipeline clusters samples in a user submitted spreadsheet (with samples as columns and genes as rows). 
@@ -91,3 +92,25 @@ cd Samples_Clustering_Pipeline
   
 * Output files are saved in results directory
  
+## How to set up and run in a terminal if you have docker installed:
+1 Change directory to the directory where you want to run.
+
+2 docker run -v `pwd`:`pwd` -it knowengdev/samples_clustering_pipeline:09_01_2016
+
+3 make all
+
+4 make run_cc_net_nmf
+
+* The make instructions above apply.
+
+* Check on docker.hub to get the latest image. 
+
+* If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
+=======
+# Samples_Clustering_Pipeline
+Clusters a given sample using one of four clustering options
+
+* User submits a spreadsheet with samples as columns and genes as rows. 
+* System clusters samples.
+* Specific example: network-based stratification of patients 
+>>>>>>> upstream/master
