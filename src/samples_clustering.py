@@ -8,22 +8,22 @@ Created on Wed Jul 20 14:47:45 2016
 
 def nmf(run_parameters):
     '''nmf clustering'''
-    from sample_clustering_toolbox import run_nmf
+    from src.sample_clustering_toolbox import run_nmf
     run_nmf(run_parameters) 
 
 def cc_nmf(run_parameters):
     '''kmeans consensus clustering of the nmf-based clusters'''
-    from sample_clustering_toolbox import run_cc_nmf
+    from src.sample_clustering_toolbox import run_cc_nmf
     run_cc_nmf(run_parameters)
 
 def net_nmf(run_parameters):
     '''net-nmf clustering "'''
-    from sample_clustering_toolbox import run_net_nmf
+    from src.sample_clustering_toolbox import run_net_nmf
     run_net_nmf(run_parameters)
 
 def cc_net_nmf(run_parameters):
     '''kmeans consensus clustering of the net-nmf-based clusters'''
-    from sample_clustering_toolbox import run_cc_net_nmf
+    from src.sample_clustering_toolbox import run_cc_net_nmf
     run_cc_net_nmf(run_parameters)
 
 SELECT = {
