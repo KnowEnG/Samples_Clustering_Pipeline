@@ -131,7 +131,7 @@ def get_test_paramters_dictionary():
         'gg_network_name_full_path': '../../data/networks/keg_ST90_4col.edge',
         'spreadsheet_name_full_path': '../../data/spreadsheets/tcga_ucec_somatic_mutation_data.df',
         'results_directory': '.',
-        'tmp_directory': '.',
+        'tmp_directory': '..',
         'number_of_clusters': '3',
         'display_clusters': "0",
         'nmf_conv_check_freq': "50",
