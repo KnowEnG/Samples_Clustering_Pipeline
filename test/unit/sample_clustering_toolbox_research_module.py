@@ -5,10 +5,7 @@ Created on WEd Aug  17 2016
 @author: del
 @author: The Gene Sets Characterization dev team
 """
-import unittest
 import numpy as np
-import os
-import src.sample_clustering_toolbox as sctbx
 
 
 def get_nmf_sample_data(nrows, ncols, k):
@@ -130,8 +127,8 @@ def get_test_paramters_dictionary():
         'method_4': 'cc_net_cluster_nmf',
         'gg_network_name_full_path': '../../data/networks/keg_ST90_4col.edge',
         'spreadsheet_name_full_path': '../../data/spreadsheets/tcga_ucec_somatic_mutation_data.df',
-        'results_directory': '.',
-        'tmp_directory': '..',
+        'results_directory': './tmp',
+        'tmp_directory': './tmp',
         'number_of_clusters': '3',
         'display_clusters': "0",
         'nmf_conv_check_freq': "50",
@@ -144,5 +141,5 @@ def get_test_paramters_dictionary():
         'rows_sampling_fraction': "0.8",
         'cols_sampling_fraction': "0.8",
         'number_of_bootstraps': "5",
-        'run_directory': '.'}
+        'run_directory': './tmp'}
     return test_parameters

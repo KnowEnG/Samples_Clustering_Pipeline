@@ -2,8 +2,8 @@ import os
 import unittest
 from unittest import TestCase
 
-import test.unit.sample_clustering_toolbox_research_module as tstdata
-import src.sample_clustering_toolbox as sctbx
+import sample_clustering_toolbox_research_module as tstdata
+import sample_clustering_toolbox as sctbx
 
 class TestRun_nmf(TestCase):
     def test_run_nmf(self):

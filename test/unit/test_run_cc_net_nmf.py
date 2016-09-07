@@ -2,11 +2,11 @@ import os
 import unittest
 from unittest import TestCase
 
-import test.unit.sample_clustering_toolbox_research_module as tstdata
-import src.sample_clustering_toolbox as sctbx
+import sample_clustering_toolbox_research_module as tstdata
+import sample_clustering_toolbox as sctbx
 
 class TestRun_cc_net_nmf(TestCase):
-    
+
     def test_run_cc_net_nmf(self):
         run_parameters = tstdata.get_test_paramters_dictionary()
         run_parameters['method'] = run_parameters['method_4']
