@@ -14,8 +14,8 @@ import pandas as pd
 import os
 import sys
 
-#sample_clustering_unit_test_directory = '/Users/lanier4/PycharmProjects/Samples_Clustering_Pipeline/src'
-sample_clustering_unit_test_directory = '/Users/jingge2/PycharmProjects/KnowEng/Samples_Clustering_Pipeline/src' 
+sample_clustering_unit_test_directory = '/Users/lanier4/PycharmProjects/Samples_Clustering_Pipeline/src'
+#sample_clustering_unit_test_directory = '/Users/jingge2/PycharmProjects/KnowEng/Samples_Clustering_Pipeline/src'
 sys.path.extend(sample_clustering_unit_test_directory)
 import sample_clustering_toolbox as sctbx
 
@@ -130,16 +130,16 @@ def sets_a_eq_b(a, b):
 
 def get_test_paramters_dictionary():
     test_parameters = {
-        'test_directory': '/Users/lanier4/BigDataTank/nbs_run',
+        'test_directory': '.',
         'method': 'cc_net_cluster_nmf',
         'method_1': 'cluster_nmf',
         'method_2': 'cc_cluster_nmf',
         'method_3': 'net_cluster_nmf',
         'method_4': 'cc_net_cluster_nmf',
-        'gg_network_name_full_path': './input_data/keg_ST90_4col.edge',
-        'spreadsheet_name_full_path': './input_data/tcga_ucec_somatic_mutation_data.df',
-        'results_directory': './run_dir/results',
-        'tmp_directory': './run_dir/tmp',
+        'gg_network_name_full_path': '../../data/networks/keg_ST90_4col.edge',
+        'spreadsheet_name_full_path': '../../data/spreadsheets/tcga_ucec_somatic_mutation_data.df',
+        'results_directory': '.',
+        'tmp_directory': '.',
         'number_of_clusters': '3',
         'display_clusters': "0",
         'nmf_conv_check_freq': "50",
@@ -152,7 +152,7 @@ def get_test_paramters_dictionary():
         'rows_sampling_fraction': "0.8",
         'cols_sampling_fraction': "0.8",
         'number_of_bootstraps': "5",
-        'run_directory': './run_dir'}
+        'run_directory': '.'}
     return test_parameters
 
 class sample_clustering_toolbox_test(unittest.TestCase):

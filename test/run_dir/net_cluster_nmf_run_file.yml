@@ -2,7 +2,7 @@
 
 use_parallel_processing: "1"
 
-method: cluster_nmf
+method: net_cluster_nmf
 #	A clustering method name recongized by samples_clustering.py.
 # 	cluster_nmf
 # 	cc_cluster_nmf
@@ -60,3 +60,4 @@ cols_sampling_fraction: "0.8"
 
 number_of_bootstraps: "5"
 #	Number of random samplings to perform and incorporate into the consensus matrix.
+
