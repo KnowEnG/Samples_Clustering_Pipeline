@@ -5,19 +5,10 @@ Created on WEd Aug  17 2016
 @author: del
 @author: The Gene Sets Characterization dev team
 """
-import knpackage.toolbox as kn
 import unittest
 import numpy as np
-import pandas as pd
-# import scipy.sparse as spar
-# import scipy.stats as stats
 import os
-import sys
-
-sample_clustering_unit_test_directory = '/Users/lanier4/PycharmProjects/Samples_Clustering_Pipeline/src'
-#sample_clustering_unit_test_directory = '/Users/jingge2/PycharmProjects/KnowEng/Samples_Clustering_Pipeline/src'
-sys.path.extend(sample_clustering_unit_test_directory)
-import sample_clustering_toolbox as sctbx
+import src.sample_clustering_toolbox as sctbx
 
 
 def get_nmf_sample_data(nrows, ncols, k):

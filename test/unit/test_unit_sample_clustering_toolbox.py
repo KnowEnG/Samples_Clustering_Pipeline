@@ -12,11 +12,9 @@ lanier4@illinois.edu
 """
 
 import unittest
-import sys
-
 import test.unit.test_sample_clustering_toolbox as tkeg
 
-#                               method B
+# method B
 mySuit = tkeg.suite()
 runner = unittest.TextTestRunner()
 myResult2 = runner.run(mySuit)
