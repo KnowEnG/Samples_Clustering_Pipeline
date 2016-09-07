@@ -12,16 +12,16 @@ SCRIPT = ../src/samples_clustering.py
 all: create_run_dir copy_run_files
 
 run_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cluster_nmf_run_file.yml 
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf_run_file.yml 
 
 run_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file net_cluster_nmf_run_file.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file net_nmf_run_file.yml
 
 run_cc_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_cluster_nmf_run_file.yml 
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_nmf_run_file.yml 
 
 run_cc_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_cluster_nmf_run_file.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf_run_file.yml
 
 
 decompress_input_data:
