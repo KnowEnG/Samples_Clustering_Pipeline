@@ -86,7 +86,7 @@ cd Samples_Clustering_Pipeline/test
 
 ```
   export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
-  python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file file_name.yml
+  python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file custom_run_file.yml
   ```
   
 * Output files are saved in results directory
