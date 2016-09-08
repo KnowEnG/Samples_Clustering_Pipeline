@@ -15,4 +15,20 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 ```
     make push_to_dockerhub
 
+# Running the docker image to set up an environment
+
+## To set up and run in a terminal  if you have docker installed:
+1 Change directory to the directory  where you want to run.
+
+2 docker run -v `pwd`:`pwd` -it knowengdev/samples_clustering_pipeline:09_01_2016
+
+3 make all
+
+4 make run_cc_net_nmf
+
+* The make instructions above apply.
+
+* Check on docker.hub to get the latest image. 
+
+* If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
 
