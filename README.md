@@ -89,7 +89,7 @@ cd Samples_Clustering_Pipeline/test
   python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file custom_run_file.yml
   ```
   
-* Output files are saved in results directory
+* Output files are saved in results_directory_name/ (caution: make clean_dir_recursively will erase the ouput files)
  
 ## How to set up and run in a terminal if you have docker installed:
 1 Change directory to the directory where you want to run.
