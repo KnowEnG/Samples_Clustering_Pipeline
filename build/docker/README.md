@@ -3,7 +3,7 @@ This Dockefile contains all the commands, in order, needed to build Samples Clus
 
 ## Getting Started
 Simply run the following command to build an image with the latest code changes. It uses the Dockerfile in current directory 
-and generates a docker image with the tag indicating the date what is was created.
+and generates a docker image named sample_clustering_pipelin with the tag indicating the date what is was created.
 ```
     make build_docker_image
 ```
