@@ -7,6 +7,61 @@ Created on WEd Aug  17 2016
 """
 import numpy as np
 
+def get_clustered_spreadsheet(n_clusters, cluster_width, row_multiplier=1):
+    """ synthetic spreadsheet data with n_clusters (2 : 7) of n_clusters * cluster_width samplse """
+    n_clusters_array = np.array([3,4])
+    nrows = np.product(n_clusters_array*row_multiplier)
+    ncols = n_clusters * cluster_width
+    SSArr = np.zeros((nrows, ncols))
+    row_seg_len = int(nrows / n_clusters)
+    row_0 = 0
+    col_0 = 0
+    row_fin = row_seg_len
+    col_fin = cluster_width
+    SSArr[row_0:row_fin, col_0:col_fin] += 1
+    for k in range(0, n_clusters-1):
+        row_0 = row_fin
+        col_0 = col_fin
+        row_fin = row_0 + row_seg_len
+        col_fin = col_0 + cluster_width
+        SSArr[row_0:row_fin, col_0:col_fin] += 1
+
+    return SSArr
+
+def get_square_3_cluster_spreadsheet(cluster_rows=3):
+    d = cluster_rows
+    I = np.ones((d,d))
+    oh = np.zeros((d,d))
+    A = np.concatenate([I,oh,oh],axis=1)
+    B = np.concatenate([oh,I,oh],axis=1)
+    C = np.concatenate([oh,oh,I],axis=1)
+    spreadsheet = np.concatenate([A,B,C],axis=0)
+    return spreadsheet
+
+def get_long_3_cluster_spreadsheet(cluster_rows=3, rows_double=3):
+    d = cluster_rows
+    I = np.ones((d,d))
+    oh = np.zeros((d,d))
+    A = np.concatenate([I,oh,oh],axis=1)
+    B = np.concatenate([oh,I,oh],axis=1)
+    C = np.concatenate([oh,oh,I],axis=1)
+    for g in range(0, rows_double):
+        A = np.concatenate([A,A],axis=0)
+        B = np.concatenate([B,B],axis=0)
+        C = np.concatenate([C,C],axis=0)
+
+    spreadsheet = np.concatenate([A,B,C],axis=0)
+    return spreadsheet
+
+
+def get_wide_3_cluster_spreadsheet(cluster_rows=3):
+    I = np.ones((cluster_rows))
+    oh = np.zeros((cluster_rows))
+    spreadsheet = np.zeros((3, cluster_rows * 3))
+    spreadsheet[0, :] = np.concatenate([I, oh, oh])
+    spreadsheet[1, :] = np.concatenate([oh, I, oh])
+    spreadsheet[2, :] = np.concatenate([oh, oh, I])
+    return spreadsheet
 
 def get_nmf_sample_data(nrows, ncols, k):
     """ get synthetic data for nmf
