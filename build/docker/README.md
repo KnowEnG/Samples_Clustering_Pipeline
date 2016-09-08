@@ -2,7 +2,7 @@
 This Dockefile contains all the commands, in order, needed to build Samples Clustering Pipeline docker image.
 
 ## Getting Started
-Simply run the following command to build an image with latest code changea. It uses the Dockerfile in current directory 
+Simply run the following command to build an image with the latest code changea. It uses the Dockerfile in current directory 
 and generates a docker image with the tag indicating the date what is was created.
 ```
     make build_docker_image
