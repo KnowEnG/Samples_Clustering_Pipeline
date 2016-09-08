@@ -44,7 +44,7 @@ cd Samples_Clustering_Pipeline
 ```
 
  
-###5. Use the following "make" command to create a local directory "run_dir" and place all the parameters files in it.
+###5. Use the following "make" command to create a local directory "run_dir" and place all the run files in it.
  ```
   make run_env
  ```
