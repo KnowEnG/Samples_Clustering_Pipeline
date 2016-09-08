@@ -8,7 +8,7 @@ Simply run the "make" command to build the samples_clustering_pipeline docker im
 The results of the "make" command are a docker image called "samples_clustering_pipeline" and a tag with today's date and time.
 
 
-Then login to docker hub before you push to it. When prompted, enter your password and press enter.
+Now login to docker hub. When prompted, enter your password and press enter.
 ```
     make login_to_docker username=your docker login here email=your email as in your Docker profile here
 ```
