@@ -2,7 +2,7 @@
 This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, samples clustering pipeline. 
 This pipeline clusters samples in a user submitted spreadsheet (with samples as columns and genes as rows). 
 
-One can select one of four clustering options that are based non-negative matrix factorization (nmf):
+One can select one of four clustering options that are based on non-negative matrix factorization (nmf):
 
 
 | **Options**                                      | **Method**                           | **Parameters** |
@@ -37,16 +37,16 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  pip3 install knpackage
 ```
 
-###4. Change directory to  the Samples_Clustering_Pipeline
+###4. Change directory to  the Samples_Clustering_Pipeline/test
 
 ```
-cd Samples_Clustering_Pipeline
+cd Samples_Clustering_Pipeline/test
 ```
 
  
-###5. Use the following "make" command to create a local directory "run_dir" and place all the parameters files in it.
+###5. Use the following "make" command to create a local directory "run_dir" and place all the run files in it.
  ```
-  make run_env
+  make env_setup
  ```
 
 ###6. Use one of the following "make" commands to select and run a clustering option:
@@ -61,7 +61,7 @@ cd Samples_Clustering_Pipeline
 
  
 ## How to run it with your data 
-###6. Setup your run environment
+### Setup your run environment
 
 * Create a  run directory
 
@@ -76,39 +76,19 @@ cd Samples_Clustering_Pipeline
  mkdir results_directory_name
  ```
  
-* Create run_paramerters file (yml format) 
+* Create run_paramerters file (commented template file: data/run_files/zzz_clustering_run_file_template.yml) 
 
-  filename.yml
+  custom_run_file.yml
 
-* Make sure the directories of the input data in `cluster_nmf_run_file.yml` are correct
+* Make sure the directories of the input data in `custom_run_file.yml` are correct
  
 * Run Samples Clustering Pipeline
 
 ```
   export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
-  python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file file_name.yml
+  python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file custom_run_file.yml
   ```
   
-* Output files are saved in results directory
+### Output files are saved in results_directory_name/ (CAUTION: make clean_dir_recursively will erase the ouput files)
  
-## How to set up and run in a terminal if you have docker installed:
-1 Change directory to the directory where you want to run.
-
-2 docker run -v `pwd`:`pwd` -it knowengdev/samples_clustering_pipeline:09_01_2016
-
-3 make all
-
-4 make run_cc_net_nmf
-
-* The make instructions above apply.
-
-* Check on docker.hub to get the latest image. 
-
-* If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
-=======
-# Samples_Clustering_Pipeline
-Clusters a given sample using one of four clustering options
-
-* User submits a spreadsheet with samples as columns and genes as rows. 
-* System clusters samples.
-* Specific example: network-based stratification of patients 
+## Note: docker image file instructions are in the build directory
