@@ -14,7 +14,7 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 * Upload your image to docker hub:
 ```
     make push_to_dockerhub
-
+```
 # Running the docker image to set up an environment
 
 ## To set up and run in a terminal  if you have docker installed:
