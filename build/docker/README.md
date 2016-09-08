@@ -1,8 +1,8 @@
 # Samples Clustering Pipeline Docker Image
-This Dockefile contains all the commands, in order, needed to build Samples Clustering Pipeline docker image.
+The Dockefile in this directory contains all the commands, in order, needed to build samples_clustering_pipeline docker image.
 
 ## Getting Started
-Simply run the "make" command to build the samples_clustering_pipeline image. The makefile assumes there is a Dockerfile in current directory. The results of the "make" command are a docker image called "sample_clustering_pipeline" and a tag with today's date and time.
+Simply run the "make" command to build the samples_clustering_pipeline image. The makefile assumes there is a Dockerfile in current directory. The results of the "make" command are a docker image called "samples_clustering_pipeline" and a tag with today's date and time.
 ```
     make build_docker_image
 ```
