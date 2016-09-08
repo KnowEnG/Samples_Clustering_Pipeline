@@ -89,6 +89,6 @@ cd Samples_Clustering_Pipeline/test
   python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file custom_run_file.yml
   ```
   
-* Output files are saved in results_directory_name/ (caution: make clean_dir_recursively will erase the ouput files)
+### Output files are saved in results_directory_name/ (CAUTION: make clean_dir_recursively will erase the ouput files)
  
 ## Note: docker image file instructions are in the build directory
