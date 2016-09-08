@@ -78,9 +78,9 @@ cd Samples_Clustering_Pipeline/test
  
 * Create run_paramerters file (commented template file: data/run_files/zzz_clustering_run_file_template.yml) 
 
-  filename.yml
+  custom_run_file.yml
 
-* Make sure the directories of the input data in `cluster_nmf_run_file.yml` are correct
+* Make sure the directories of the input data in `custom_run_file.yml` are correct
  
 * Run Samples Clustering Pipeline
 
