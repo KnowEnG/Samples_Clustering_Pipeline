@@ -10,7 +10,7 @@ RUN_FILES = ../data/run_files
 SCRIPT = ../src/samples_clustering.py
 
 
-all: create_run_dir copy_run_files
+env_setup: create_run_dir copy_run_files
 
 run_nmf:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf_run_file.yml 
@@ -48,3 +48,6 @@ unit_test_setup:
 
 unit_tests:
 	cd unit; make all_unit_tests
+	
+unit_test_cleanup:
+	$(RMR) $(UNIT_TEST_TEMP_DIR)
