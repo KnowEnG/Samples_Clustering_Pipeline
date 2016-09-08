@@ -61,7 +61,7 @@ cd Samples_Clustering_Pipeline/test
 
  
 ## How to run it with your data 
-###6. Setup your run environment
+### Setup your run environment
 
 * Create a  run directory
 
