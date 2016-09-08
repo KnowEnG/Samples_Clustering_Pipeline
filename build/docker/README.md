@@ -26,7 +26,7 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 
 4 make run_cc_net_nmf
 
-* The make instructions above apply.
+* The make instructions in Samples_Clustering_Pipeline README.md apply.
 
 * Check on docker.hub to get the latest image. 
 
