@@ -23,7 +23,7 @@ class TestRun_nmf_clusters_worker(TestCase):
         self.run_parameters['number_of_bootstraps'] = 10
         self.run_parameters['method'] = self.run_parameters['method_1']
 
-        cluster_rows = 5
+        cluster_rows = 3
         spreadsheet_consensus_mat = tstdata.get_square_3_cluster_spreadsheet(cluster_rows)
         spreadsheet_mat = tstdata.get_wide_3_cluster_spreadsheet(cluster_rows)
 
