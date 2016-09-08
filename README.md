@@ -76,7 +76,7 @@ cd Samples_Clustering_Pipeline/test
  mkdir results_directory_name
  ```
  
-* Create run_paramerters file (yml format) 
+* Create run_paramerters file (commented template file: data/run_files/zzz_clustering_run_file_template.yml) 
 
   filename.yml
 
