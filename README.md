@@ -91,24 +91,4 @@ cd Samples_Clustering_Pipeline/test
   
 * Output files are saved in results_directory_name/ (caution: make clean_dir_recursively will erase the ouput files)
  
-## How to set up and run in a terminal if you have docker installed:
-1 Change directory to the directory where you want to run.
-
-2 docker run -v `pwd`:`pwd` -it knowengdev/samples_clustering_pipeline:09_01_2016
-
-3 make all
-
-4 make run_cc_net_nmf
-
-* The make instructions above apply.
-
-* Check on docker.hub to get the latest image. 
-
-* If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
-=======
-# Samples_Clustering_Pipeline
-Clusters a given sample using one of four clustering options
-
-* User submits a spreadsheet with samples as columns and genes as rows. 
-* System clusters samples.
-* Specific example: network-based stratification of patients 
+## Note: docker image file instructions are in the build directory
