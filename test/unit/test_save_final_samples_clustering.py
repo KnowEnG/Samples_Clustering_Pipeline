@@ -32,19 +32,3 @@ class TestSave_final_samples_clustering(TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-"""
-def save_final_samples_clustering(sample_names, labels, run_parameters):
-    #"" wtite .tsv file that assings a cluster number label to the sample_names.
-
-    Args:
-        sample_names: (unique) data identifiers.
-        labels: cluster number assignments.
-        run_parameters: write path (run_parameters["results_directory"]).
-    #""
-    file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
-    df_tmp = kn.create_df_with_sample_labels(sample_names, labels)
-    df_tmp.to_csv(file_name, sep='\t', header=None)
-    run_parameters['cluster_labels_file'] = file_name
-
-"""
