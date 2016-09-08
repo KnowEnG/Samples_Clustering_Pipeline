@@ -37,10 +37,10 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  pip3 install knpackage
 ```
 
-###4. Change directory to  the Samples_Clustering_Pipeline
+###4. Change directory to  the Samples_Clustering_Pipeline/test
 
 ```
-cd Samples_Clustering_Pipeline
+cd Samples_Clustering_Pipeline/test
 ```
 
  
