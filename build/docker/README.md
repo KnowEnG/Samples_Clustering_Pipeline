@@ -4,5 +4,7 @@
 ### Get the current base image from docker hub and buid an image with updated knpackage.toolbox and clone Samples Clustering Pipeline
  `make build_docker_image`
 
+### Move the current base image to the docker hub
+ `make push_to_dockerhub`
 
 
