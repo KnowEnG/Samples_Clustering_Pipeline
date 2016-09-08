@@ -24,15 +24,15 @@ def generate_synthetic_data(row_num, col_num, k):
 
     for i in range(k):
         spreadsheet_df.values[i*g:(i+1)*g, i*u:(i+1)*u] = 1
-    spreadsheet_df.to_csv("synthethic_gg_network.edge", header=True, index=True, sep='\t')
+    spreadsheet_df.to_csv("synthetic_user_spreadsheet.df", header=True, index=True, sep='\t')
 
     val = []
-    li = spreadsheet_df.index.values
+    gene_names = spreadsheet_df.index.values
     for i in range(k):
-        a = itertools.combinations(li[g*i: g*(i+1)], 2)
-        for i in a:
+        combine_two = itertools.combinations(gene_names[g*i: g*(i+1)], 2)
+        for i in combine_two:
             val.append(list(i)+[1, "test"])
     edge_file = pd.DataFrame(val, columns=['g1', 'g2', 'wt', 'type'], index=None)
-    edge_file.to_csv("synthetic_user_spreadsheet.df", header=False, index=False, sep='\t')
+    edge_file.to_csv("synthetic_gg_network.edge", header=False, index=False, sep='\t')
 
 generate_synthetic_data(420, 120, 3)
