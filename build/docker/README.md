@@ -1,4 +1,4 @@
-# Samples Clustering Pipeline
+# Samples Clustering Pipeline Docker Image
 This Dockefile contains all the commands, in order, needed to build Samples Clustering Pipeline docker image.
 
 ## Getting Started
