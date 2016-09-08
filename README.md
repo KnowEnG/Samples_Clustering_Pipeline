@@ -46,7 +46,7 @@ cd Samples_Clustering_Pipeline/test
  
 ###5. Use the following "make" command to create a local directory "run_dir" and place all the run files in it.
  ```
-  make run_env
+  make env_setup
  ```
 
 ###6. Use one of the following "make" commands to select and run a clustering option:
