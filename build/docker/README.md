@@ -12,7 +12,7 @@ Now login to docker hub. When prompted, enter your password and press enter.
 ```
     make login_to_docker username=your docker login here email=your email as in your Docker profile here
 ```
-Last, upload your image to docker hub!
+Upload your image to docker hub!
 ```
     make push_to_dockerhub
 ```
