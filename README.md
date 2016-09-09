@@ -16,7 +16,7 @@ There are four possible clustering methods that one can choose from:
 Note: all of the clustering methods mentioned above use the non-negative matrix factorization (nmf) as the main clustering algorithm.
 
 * * * 
-## How to run this pipeline with supplied data
+## How to run this pipeline with Our data
 * * * 
 ###1. Get Access to KnowEnG-Research Repo:
 Email omarsobh@illinois.edu infrastructure team (IST) lead to:
@@ -70,7 +70,9 @@ cd test
 | make run_cc_net_nmf | Consensus Clustering with network regularization |
 
  
-## How to run it with your data
+* * * 
+## How to run this pipeline with Our data
+* * * 
 ### Setup your run environment
 
 Follow steps 1-4 above then do the following:
