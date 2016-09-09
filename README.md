@@ -74,7 +74,7 @@ make env_setup
 ## How to run this pipeline with Our data
 * * * 
 
-**Follow steps 1-4 above then do the following:**
+__***Follow steps 1-4 above then do the following:***__
 
 ### * Create your run directory
 
