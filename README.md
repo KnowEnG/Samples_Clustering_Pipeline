@@ -82,21 +82,21 @@ Follow steps 1-4 above then do the following:
  mkdir run_directory
  ```
 
-* Change directory to the run_directory
+### * Change directory to the run_directory
 
  ```
  cd run_directory
  ```
 
-* Create your results directory
+### * Create your results directory
 
  ```
  mkdir results_directory
  ```
  
-* Create run_paramters file (Look for examples of run_parameters in the  Sample_Clustering_Pipeline/data/run_files ```template_run_parameters.yml```
+### * Create run_paramters file (Look for examples of run_parameters in the  Sample_Clustering_Pipeline/data/run_files ```template_run_parameters.yml```
 
-* Run the Samples Clustering Pipeline:
+### * Run the Samples Clustering Pipeline:
   * Update PYTHONPATH enviroment variable
    ``` 
    export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
