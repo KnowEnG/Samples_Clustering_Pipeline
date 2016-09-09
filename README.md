@@ -82,6 +82,7 @@ cd Samples_Clustering_Pipeline/test
  ```
  
 * Create run_paramerters file
+
 ```
  cp ./data/run_flies/template_run_parameters.yml custom_run_file.yml
 ```
