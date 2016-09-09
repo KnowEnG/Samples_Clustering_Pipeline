@@ -1,11 +1,10 @@
-# Samples Clustering Pipeline 
+# KnowEnG's Samples Clustering Pipeline 
 
-This is one of the KnowEnG's pipelines (KnowEnG stands for Knowledge Engine for Genomics and isne of the NIH Big Data to Knowledge Center of Excellence)
+*KnowEnG stands for Knowledge Engine for Genomics. KnowEnG is one of the NIH Big Data to Knowledge Centers of Excellence*
 
-This pipeline applies a network based clustering on the columns of a given spreadsheet. The spreadsheet's columns correspond to sample-labels and its rows correspond to a gene-labels.
+This pipeline clusters the columns of a given spreadsheet, where spreadsheet's columns correspond to sample-labels and rows correspond to gene-labels).
 
-
-One can select one of four clustering options that are based on non-negative matrix factorization (nmf):
+There are four possible clustering methods that one can chose from:
 
 
 | **Options**                                      | **Method**                           | **Parameters** |
@@ -14,6 +13,9 @@ One can select one of four clustering options that are based on non-negative mat
 | Consensus Clustering                             | bootstrapping with nmf               | cc_nmf         |
 | Clustering with network regularization           | network-based nmf                    | net_nmf        |
 | Consensus Clustering with network regularization | bootstrapping with network-based nmf | cc_net_nmf     |
+
+
+Note: all of the clustering methods mentioned above use the non-negative matrix factorization (nmf) as the main clustering algorithm.
 
 ## How to run this pipeline with provided data
 ###1. Get Access to KnowEnG-Research Repo:
