@@ -91,10 +91,10 @@ Follow steps 1-4 above then do the following:
  mkdir results_directory
  ```
  
-* Create run_paramters file (Look for examples of run_parameters in the  Sample_Clustering_Pipeline/data/run_files ```
- template_run_parameters.yml```
+* Create run_paramters file (Look for examples of run_parameters in the  Sample_Clustering_Pipeline/data/run_files 
+```template_run_parameters.yml```
 
-* Run yjr Samples Clustering Pipeline
+* Run the Samples Clustering Pipeline
 
 ```
   export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
