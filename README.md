@@ -17,6 +17,7 @@ Note: all of the clustering methods mentioned above use the non-negative matrix 
 
 * * * 
 ## How to run this pipeline with supplied data
+* * * 
 ###1. Get Access to KnowEnG-Research Repo:
 Email omarsobh@illinois.edu infrastructure team (IST) lead to:
 
