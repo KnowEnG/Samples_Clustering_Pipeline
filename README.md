@@ -26,7 +26,7 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  git clone https://github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git
 ```
  
-###3. Install the following (Mac OS or Linux)
+###3. Install the following (Ubentu or Linux)
   ```
  apt-get install -y python3-pip
  apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
