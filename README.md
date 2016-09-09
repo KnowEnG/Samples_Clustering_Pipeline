@@ -1,7 +1,5 @@
 # KnowEnG's Samples Clustering Pipeline 
 
-*KnowEnG stands for Knowledge Engine for Genomics. KnowEnG is one of the NIH Big Data to Knowledge Centers of Excellence*
-
 This pipeline clusters the columns of a given spreadsheet, where spreadsheet's columns correspond to sample-labels and rows correspond to gene-labels.
 
 There are four possible clustering methods that one can chose from:
