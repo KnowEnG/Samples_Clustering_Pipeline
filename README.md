@@ -54,7 +54,7 @@ cd Samples_Clustering_Pipeline
 cd test
 ```
  
-###6. Use the following "make" command to create a local directory "run_dir" and place all the run files in it.
+###6. Create a local directory "run_dir" and place all the run files in it
  ```
   make env_setup
  ```
@@ -96,7 +96,7 @@ Follow steps 1-4 above then do the following:
  
 ### * Create run_paramters file 
  ``` 
- Look for examples of run_parameters in the  Sample_Clustering_Pipeline/data/run_files template_run_parameters.yml
+ Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files template_run_parameters.yml
  ```
 
 ### * Run the Samples Clustering Pipeline:
