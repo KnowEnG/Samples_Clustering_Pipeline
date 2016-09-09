@@ -17,7 +17,7 @@ number_of_bootstraps: "5"
 rows_sampling_fraction: "0.8"
 cols_sampling_fraction: "0.8"
 
-# iterations between invariance checks; loop exit; absolute max iterations; network weighting factor
+# iterations between loop invariance checks; loop exit test; absolute max loops; network weighting factor
 nmf_conv_check_freq: "50"
 nmf_max_invariance: "200"
 nmf_max_iterations: "10000"
