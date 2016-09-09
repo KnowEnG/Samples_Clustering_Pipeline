@@ -103,12 +103,12 @@ Follow steps 1-4 above then do the following:
 
   * Update PYTHONPATH enviroment variable
    ``` 
-   export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
+   export PYTHONPATH='./src':$PYTHONPATH    
    ```
    
   * Run
    ```
-  python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file template_run_parameters.yml
+  python3 ./src/samples_clustering.py -run_directory ./ -run_file template_run_parameters.yml
    ```
 
  
