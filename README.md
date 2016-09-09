@@ -71,6 +71,8 @@ cd test
 ## How to run it with your data
 ### Setup your run environment
 
+Follow steps 1-4 above then do the following:
+
 * Create your run directory
 
  ```
@@ -89,10 +91,10 @@ cd test
  mkdir results_directory
  ```
  
-* Create your run_paramerters file
+* Copy a template run_paramters file and edit it to suit your needs
 
  ```
- cp ./data/run_flies/template_run_parameters.yml custom_run_file.yml
+ cp ./data/run_flies/template_run_parameters.yml template_run_parameters.yml
  ```
 
 
