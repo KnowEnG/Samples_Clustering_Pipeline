@@ -3,7 +3,7 @@ This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excel
 
 This pipeline clusters the columns of a given spreadsheet, where spreadsheet's columns correspond to sample-labels and rows correspond to gene-labels.
 
-There are four possible clustering methods that one can choose from:
+There are four clustering methods that one can choose from:
 
 
 | **Options**                                      | **Method**                           | **Parameters** |
