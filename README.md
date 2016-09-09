@@ -46,18 +46,18 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
 cd Samples_Clustering_Pipeline
 ```
 
-###4. Change directory to test
+###5. Change directory to test
 
 ```
 cd test
 ```
  
-###5. Use the following "make" command to create a local directory "run_dir" and place all the run files in it.
+###6. Use the following "make" command to create a local directory "run_dir" and place all the run files in it.
  ```
   make env_setup
  ```
 
-###6. Use one of the following "make" commands to select and run a clustering option:
+###7. Use one of the following "make" commands to select and run a clustering option:
 
 
 | **Command**         | **Option**                                       | 
