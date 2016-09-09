@@ -10,18 +10,20 @@ spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data
 results_directory: ./run_dir/results
 tmp_directory: ./run_dir/tmp
 
-# estimated number of clusters; number of bootstraps (number of sub-samples included in consensus)
+# estimated number of clusters; bootstraps = number of sub-samples included in consensus
 number_of_clusters: "3"
 number_of_bootstraps: "5"
 
 rows_sampling_fraction: "0.8"
 cols_sampling_fraction: "0.8"
- 
+
+# iterations between invariance checks; loop exit; absolute max iterations; network weighting factor
 nmf_conv_check_freq: "50"
 nmf_max_invariance: "200"
 nmf_max_iterations: "10000"
 nmf_penalty_parameter: "1400"
 
+# random walk with restart absolute max iterations; restart vector weight; delta norm loop exit;
 rwr_max_iterations: "100"
 rwr_restart_probability: "0.7"
 rwr_convergence_tolerence: "0.0001"
