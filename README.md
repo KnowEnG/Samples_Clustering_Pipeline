@@ -65,7 +65,7 @@ cd Samples_Clustering_Pipeline/test
 | make run_cc_net_nmf | Consensus Clustering with network regularization |
 
  
-## How to run it with your data 
+## How to run it with your data
 ### Setup your run environment
 
 * Create a  run directory
@@ -81,10 +81,10 @@ cd Samples_Clustering_Pipeline/test
  mkdir results_directory_name
  ```
  
-* Create run_paramerters file (commented template file: data/run_files/zzz_clustering_run_file_template.yml) 
-
-  custom_run_file.yml
-
+* Create run_paramerters file
+```
+  cp ./data/run_flies/template_run_parameters.yml custom_run_file.yml
+```
 * Make sure the directories of the input data in `custom_run_file.yml` are correct
  
 * Run Samples Clustering Pipeline
@@ -94,6 +94,4 @@ cd Samples_Clustering_Pipeline/test
   python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file custom_run_file.yml
   ```
   
-### Output files are saved in results_directory_name/ (CAUTION: make clean_dir_recursively will erase the ouput files)
  
-## Note: docker image file instructions are in the build directory
