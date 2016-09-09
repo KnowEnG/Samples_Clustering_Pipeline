@@ -1,23 +1,30 @@
-# yaml parameters file template with all options for net-nmf with consensus clustering
-
-use_parallel_processing: "1"
+# 
 
 method: cc_net_cluster_nmf
 
+#	Gene x Gene Network stored in 4 col format.
+# Gene x Set-id Spreadsheet
 gg_network_name_full_path: ../data/networks/keg_ST90_4col.edge
 spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
+
+#	directories for storing run results and tmp data
 results_directory: ./run_dir/results
 tmp_directory: ./run_dir/tmp
+
 number_of_clusters: "3"
-display_clusters: "0"
-nmf_conv_check_freq: "50"
-nmf_max_iterations: "10000"
-nmf_max_invariance: "200"
-rwr_max_iterations: "100"
-rwr_convergence_tolerence: "0.0001"
-rwr_restart_probability: "0.7"
-nmf_penalty_parameter: "1400"
+number_of_bootstraps: "5"
 
 rows_sampling_fraction: "0.8"
 cols_sampling_fraction: "0.8"
-number_of_bootstraps: "5"
+
+nmf_conv_check_freq: "50"
+nmf_max_invariance: "200"
+nmf_max_iterations: "10000"
+nmf_penalty_parameter: "1400"
+
+rwr_max_iterations: "100"
+rwr_restart_probability: "0.7"
+rwr_convergence_tolerence: "0.0001"
+
+display_clusters: "0"
+use_parallel_processing: "1"
