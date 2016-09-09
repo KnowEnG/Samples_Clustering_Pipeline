@@ -86,14 +86,14 @@ cd test
 * Create your results directory (to save results under run_directory)
 
  ```
- mkdir results_directory_name
+ mkdir results_directory
  ```
  
 * Create your run_paramerters file
 
-```
+ ```
  cp ./data/run_flies/template_run_parameters.yml custom_run_file.yml
-```
+ ```
 
 
 * Make sure the directories of the input data in `custom_run_file.yml` are correct
