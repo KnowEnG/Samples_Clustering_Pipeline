@@ -71,20 +71,20 @@ cd test
 ## How to run it with your data
 ### Setup your run environment
 
-* Create a  run directory
+* Create your  run directory
 
  ```
  mkdir run_directory_name
  ```
 
-* Create results directory to save output files under run directory
+* Create your results directory to save output files under run directory
 
  ```
  cd run_directory_name
  mkdir results_directory_name
  ```
  
-* Create run_paramerters file
+* Create your run_paramerters file
 
 ```
  cp ./data/run_flies/template_run_parameters.yml custom_run_file.yml
