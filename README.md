@@ -1,5 +1,5 @@
 # KnowEnG's Samples Clustering Pipeline 
-
+This is the Knowledge Engine for Genomics (KnowEnG), an NIH BD2K Center of Excellence, Gene Set Characterization Pipeline.
 This pipeline clusters the columns of a given spreadsheet, where spreadsheet's columns correspond to sample-labels and rows correspond to gene-labels.
 
 There are four possible clustering methods that one can choose from:
