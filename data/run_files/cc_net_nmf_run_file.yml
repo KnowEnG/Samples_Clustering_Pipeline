@@ -1,4 +1,4 @@
-# YAML format parameters for consensus clustering network based non-negative matrix factorization -- a clustering method
+# YAML format parameters for consensus clustering network based non-negative matrix factorization
 
 method: cc_net_cluster_nmf
 
