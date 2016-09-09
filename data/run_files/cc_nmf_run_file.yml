@@ -22,3 +22,4 @@ nmf_max_invariance: "200"
 nmf_max_iterations: "10000"
 
 display_clusters: "0"
+use_parallel_processing: "1"

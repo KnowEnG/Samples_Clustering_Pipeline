@@ -25,4 +25,4 @@ rwr_restart_probability: "0.7"
 rwr_convergence_tolerence: "0.0001"
 
 display_clusters: "0"
-use_parallel_processing: "1"
+use_parallel_processing: "0"
