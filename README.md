@@ -71,16 +71,21 @@ cd test
 ## How to run it with your data
 ### Setup your run environment
 
-* Create your  run directory
+* Create your run directory
 
  ```
- mkdir run_directory_name
+ mkdir run_directory
  ```
 
-* Create your results directory to save output files under run directory
+* Change directory to Samples_Clustering_Pipeline 
 
  ```
- cd run_directory_name
+ cd run_directory
+ ```
+
+* Create your results directory (to save results under run_directory)
+
+ ```
  mkdir results_directory_name
  ```
  
