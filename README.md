@@ -94,7 +94,7 @@ __***Follow steps 1-4 above then do the following:***__
  mkdir results_directory
  ```
  
-### * Create run_paramters file 
+### * Create run_paramters file  (YAML Format)
  ``` 
  Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files template_run_parameters.yml
  ```
