@@ -19,7 +19,7 @@ Note: all of the clustering methods mentioned above use the non-negative matrix 
 ###1. Get Access to KnowEnG-Research Repo:
 Email omarsobh@illinois.edu infrastructure team (IST) lead to:
 
-1. __Access__ KnowEnG-Research github repo
+* __Access__ KnowEnG-Research github repo
 
 ###2. Clone the Samples_Clustering_Pipeline Repo
 ```
