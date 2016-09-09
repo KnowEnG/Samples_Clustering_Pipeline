@@ -97,10 +97,12 @@ Follow steps 1-4 above then do the following:
 ### * Create run_paramters file (Look for examples of run_parameters in the  Sample_Clustering_Pipeline/data/run_files ```template_run_parameters.yml```
 
 ### * Run the Samples Clustering Pipeline:
+
   * Update PYTHONPATH enviroment variable
    ``` 
    export PYTHONPATH='../Samples_Clustering_Pipeline/src':$PYTHONPATH    
    ```
+   
   * Run
    ```
   python3 ../Samples_Clustering_Pipeline/src/samples_clustering.py -run_directory ./ -run_file template_run_parameters.yml
