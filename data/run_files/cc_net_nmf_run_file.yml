@@ -6,7 +6,7 @@ method: cc_net_cluster_nmf
 gg_network_name_full_path: ../data/networks/keg_ST90_4col.edge
 spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
 
-# directories for storing run results and tmp data
+# directories for storing run results and temporary data
 results_directory: ./run_dir/results
 tmp_directory: ./run_dir/tmp
 
