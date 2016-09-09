@@ -71,7 +71,7 @@ make env_setup
 
  
 * * * 
-## How to run this pipeline with Our data
+## How to run this pipeline with Your data
 * * * 
 
 __***Follow steps 1-4 above then do the following:***__
