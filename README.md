@@ -73,11 +73,10 @@ cd test
 * * * 
 ## How to run this pipeline with Our data
 * * * 
-### Setup your run environment
 
 Follow steps 1-4 above then do the following:
 
-* Create your run directory
+### * Create your run directory
 
  ```
  mkdir run_directory
