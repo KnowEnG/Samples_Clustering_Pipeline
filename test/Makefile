@@ -12,6 +12,8 @@ SCRIPT = ../src/samples_clustering.py
 
 env_setup: create_run_dir copy_run_files
 
+run_all_methods: run_nmf run_net_nmf run_cc_nmf run_cc_net_nmf
+
 run_nmf:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf_run_file.yml 
 
@@ -23,7 +25,6 @@ run_cc_nmf:
 
 run_cc_net_nmf:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf_run_file.yml
-
 
 decompress_input_data:
 	$(GZIP_D) $(INPUT_DATA_DIR)/*
