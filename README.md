@@ -55,9 +55,9 @@ cd test
 ```
  
 ###6. Create a local directory "run_dir" and place all the run files in it
- ```
-  make env_setup
- ```
+```
+make env_setup
+```
 
 ###7. Use one of the following "make" commands to select and run a clustering option:
 
