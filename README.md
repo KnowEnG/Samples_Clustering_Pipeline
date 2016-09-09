@@ -40,12 +40,17 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  pip3 install knpackage
 ```
 
-###4. Change directory to  the Samples_Clustering_Pipeline/test
+###4. Change directory to Samples_Clustering_Pipeline
 
 ```
-cd Samples_Clustering_Pipeline/test
+cd Samples_Clustering_Pipeline
 ```
 
+###4. Change directory to test
+
+```
+cd test
+```
  
 ###5. Use the following "make" command to create a local directory "run_dir" and place all the run files in it.
  ```
