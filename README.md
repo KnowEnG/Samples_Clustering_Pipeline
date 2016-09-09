@@ -79,13 +79,13 @@ Follow steps 1-4 above then do the following:
  mkdir run_directory
  ```
 
-* Change directory to Samples_Clustering_Pipeline 
+* Change directory to the run_directory
 
  ```
  cd run_directory
  ```
 
-* Create your results directory (to save results under run_directory)
+* Create your results directory
 
  ```
  mkdir results_directory
