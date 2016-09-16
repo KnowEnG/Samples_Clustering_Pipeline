@@ -1,10 +1,10 @@
-.. samples_clustering documentation master file, created by
-   sphinx-quickstart on Mon Sep 12 14:17:29 2016.
+.. samples_clustering_pipeline documentation master file, created by
+   sphinx-quickstart on Fri Sep 16 09:24:45 2016.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to samples_clustering's documentation!
-==============================================
+Welcome to samples_clustering_pipeline's documentation!
+=======================================================
 
 Contents:
 

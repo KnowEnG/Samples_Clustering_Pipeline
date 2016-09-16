@@ -96,9 +96,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/samples_clustering.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/samples_clustering_pipeline.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/samples_clustering.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/samples_clustering_pipeline.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -115,8 +115,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/samples_clustering"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/samples_clustering"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/samples_clustering_pipeline"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/samples_clustering_pipeline"
 	@echo "# devhelp"
 
 .PHONY: epub
