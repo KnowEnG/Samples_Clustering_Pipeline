@@ -20,3 +20,4 @@ var/
 .installed.cfg
 *.egg
 *.xml
+_mac/
