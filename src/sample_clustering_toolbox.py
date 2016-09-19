@@ -61,6 +61,8 @@ def run_cc_nmf(run_parameters):
     if int(run_parameters['use_parallel_processing']) != 0:
         # Number of processes to be executed in parallel
         number_of_cpus = multiprocessing.cpu_count()
+        if(int(run_parameters["number_of_bootstraps"]) < number_of_cpus):
+            number_of_cpus = int(run_parameters["number_of_bootstraps"])
         print("Using parallelism {}".format(number_of_cpus))
 
         find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_cpus)
@@ -164,6 +166,8 @@ def run_cc_net_nmf(run_parameters):
     if int(run_parameters['use_parallel_processing']) != 0:
         # Number of processes to be executed in parallel
         number_of_cpus = multiprocessing.cpu_count()
+        if(int(run_parameters["number_of_bootstraps"]) < number_of_cpus):
+            number_of_cpus = int(run_parameters["number_of_bootstraps"])
         print("Using parallelism {}".format(number_of_cpus))
 
         find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos,
