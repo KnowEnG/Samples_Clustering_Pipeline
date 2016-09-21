@@ -21,3 +21,6 @@ var/
 *.egg
 *.xml
 _mac/
+_mac
+.xml
+xml
