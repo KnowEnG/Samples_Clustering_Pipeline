@@ -19,4 +19,5 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-
+*.xml
+_mac/

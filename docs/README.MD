@@ -10,4 +10,5 @@
 * Use the ./docs/Makefile to generate the _html_ code:
     * >> make html
 
-* In your browser bookmark the ./docs/build/html/index.html documentation homepage.
+* In your browser menu use File - Open File... to bookmark the ./docs/build/html/index.html homepage.
+* that page has links to search, index and functions listing pages with links to view the source code.
