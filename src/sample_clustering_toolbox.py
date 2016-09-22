@@ -27,7 +27,7 @@ def perform_pearson_correlation(spreadsheet, drug_response):
     """
     pc_array = np.zeros(spreadsheet.shape[0])
     for row in range(0, spreadsheet.shape[0]):
-        pc, pval = pcc(spreadsheet[row,:], drug_response)
+        pc, pval = pcc(spreadsheet[row,:], drug_response[0])
         pc_array[row] =  pc
 
     return pc_array
