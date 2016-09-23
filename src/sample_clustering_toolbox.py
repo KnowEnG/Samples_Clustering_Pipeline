@@ -18,6 +18,7 @@ import multiprocessing
 
 from scipy.stats import pearsonr as pcc
 
+
 def perform_pearson_correlation(spreadsheet, drug_response):
     """ Find correlation coefficient for each gene expression (spreadsheet row) with the drug response.
 
@@ -27,7 +28,7 @@ def perform_pearson_correlation(spreadsheet, drug_response):
     """
     pc_array = np.zeros(spreadsheet.shape[0])
     for row in range(0, spreadsheet.shape[0]):
-        pc, pval = pcc(spreadsheet[row,:], drug_response[0])
+        pc, pval = pcc(spreadsheet[row,:], drug_response)
         pc_array[row] =  pc
 
     return pc_array
