@@ -18,21 +18,6 @@ import multiprocessing
 
 from scipy.stats import pearsonr as pcc
 
-
-def perform_pearson_correlation(spreadsheet, drug_response):
-    """ Find correlation coefficient for each gene expression (spreadsheet row) with the drug response.
-
-    Args:
-        spreadsheet: genes x samples gene expression data
-        drug_response: one drug response for each sample
-    """
-    pc_array = np.zeros(spreadsheet.shape[0])
-    for row in range(0, spreadsheet.shape[0]):
-        pc, pval = pcc(spreadsheet[row,:], drug_response)
-        pc_array[row] =  pc
-
-    return pc_array
-
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
 
