@@ -109,7 +109,7 @@ to
 use_parallel_processing: "1"
 
 ```
-for parallel processing(if your machine supports it), which is faster.
+for parallel processing (if your machine supports it), which is faster.
 
 
 ### * Run the Samples Clustering Pipeline:
