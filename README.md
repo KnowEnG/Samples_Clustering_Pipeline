@@ -107,7 +107,6 @@ use_parallel_processing: "0"
 to
 ```
 use_parallel_processing: "1"
-
 ```
 for parallel processing (if your machine supports it), which is faster.
 
