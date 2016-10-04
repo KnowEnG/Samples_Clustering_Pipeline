@@ -319,7 +319,7 @@ def determine_number_of_compute_nodes(cluster_ip_addresses, number_of_bootstraps
         number_of_bootstraps:  total number of loops needs to be distributed across clusters
 
     Returns:
-        number_of_compute_nodes: the number of compute nodes 
+        number_of_compute_nodes: the number of compute nodes
 
     '''
     available_computing_nodes = len(cluster_ip_addresses)
@@ -360,8 +360,7 @@ def determine_job_number_on_each_compute_node(number_of_bootstraps, number_of_co
         for i in range(number_of_compute_nodes):
             number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
 
-    print("number_of_scheduled_jobs across clusters")
-    print(number_of_scheduled_jobs)
+    print("number_of_scheduled_jobs across clusters : {}".format(number_of_scheduled_jobs))
     return number_of_scheduled_jobs
 
 
