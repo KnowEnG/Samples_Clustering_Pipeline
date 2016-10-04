@@ -208,8 +208,7 @@ def run_cc_net_nmf(run_parameters):
     return
 
 
-def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops,
-                          parallelism):
+def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
     import dispy
     import sys
     print("Start creating clusters {}.....".format(str(i)))
