@@ -232,7 +232,7 @@ def find_and_save_net_nmf_clusters_distribute_jobs(network_mat, spreadsheet_mat,
                                            loglevel=logging.WARNING)
             cluster_list.append(cur_cluster)
 
-        number_of_loops, parallelism = determine_parallilism(run_parameters)
+        number_of_loops, parallelism = determine_parallelism(run_parameters)
         thread_list = []
         print("Start spawning {} threads.....".format(len(cluster_ip_addresses)))
         for i in range(len(cluster_list)):
@@ -268,6 +268,9 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     Returns:
         None
     """
+    import knpackage.toolbox as kn
+    import numpy as np
+
     sample_random, sample_permutation = kn.sample_a_matrix(
         spreadsheet_mat, np.float64(run_parameters["rows_sampling_fraction"]),
         np.float64(run_parameters["cols_sampling_fraction"]))
@@ -299,7 +302,7 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
         run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 
-def determine_parallilism(run_parameters):
+def determine_parallelism(run_parameters):
     if (run_parameters['processing_method'] == 2):
         number_of_bootstraps = run_parameters["number_of_bootstraps"]
         print(">>>>>> In net_nmf_parallel_for_each_node: bootstrap number = {}...".format(number_of_bootstraps))
