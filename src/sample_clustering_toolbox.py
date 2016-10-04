@@ -168,16 +168,16 @@ def run_cc_net_nmf(run_parameters):
     spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
+
     if run_parameters['processing_method'] == 1:
         # Number of processes to be executed in parallel
-        number_of_cpus = multiprocessing.cpu_count()
-        if (run_parameters["number_of_bootstraps"] < number_of_cpus):
-            number_of_cpus = run_parameters["number_of_bootstraps"]
+        number_of_loops, parallelism = determine_parallelism(run_parameters)
         print("Number of bootstrap {}".format(int(run_parameters['number_of_bootstraps'])))
         find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
-                                                run_parameters["number_of_bootstraps"], number_of_cpus)
+                                                number_of_loops, parallelism)
     elif run_parameters['processing_method'] == 2:
         print("Start distributing jobs......")
+        number_of_loops, parallelism = determine_parallelism(run_parameters)
         find_and_save_net_nmf_clusters_distribute_jobs(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
         print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 0:
@@ -224,7 +224,13 @@ def find_and_save_net_nmf_clusters_distribute_jobs(network_mat, spreadsheet_mat,
     try:
         cluster_ip_addresses = run_parameters['cluster_ip_address']
         cluster_list = []
-        for i in range(len(cluster_ip_addresses)):
+        number_of_computing_nodes = len(cluster_ip_addresses)
+        if (run_parameters['number_of_bootstraps'] < number_of_computing_nodes):
+            range_list = range(0, run_parameters['number_of_bootstraps'])
+        else:
+            range_list = range(0, number_of_computing_nodes)
+
+        for i in range_list:
             cur_cluster = dispy.JobCluster(find_and_save_net_nmf_clusters_parallel,
                                            nodes=[cluster_ip_addresses[i]],
                                            depends=[run_net_nmf_clusters_worker,
@@ -305,9 +311,9 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
 def determine_parallelism(run_parameters):
     if (run_parameters['processing_method'] == 2):
         number_of_bootstraps = run_parameters["number_of_bootstraps"]
-        print(">>>>>> In net_nmf_parallel_for_each_node: bootstrap number = {}...".format(number_of_bootstraps))
+        print("Original bootstrap number = {}...".format(number_of_bootstraps))
         number_of_jobs_on_each_node = int(number_of_bootstraps / (len(run_parameters['cluster_ip_address'])))
-        print(">>>>>> On each node, number of jobs in total = {}...".format(number_of_jobs_on_each_node))
+        print("On each node, number of jobs to be executed = {}...".format(number_of_jobs_on_each_node))
         cur_cpus = multiprocessing.cpu_count()
         if (number_of_jobs_on_each_node > cur_cpus):
             number_of_cpus = cur_cpus
@@ -320,8 +326,6 @@ def determine_parallelism(run_parameters):
         number_of_cpus = multiprocessing.cpu_count()
         if (run_parameters["number_of_bootstraps"] < number_of_cpus):
             number_of_cpus = run_parameters["number_of_bootstraps"]
-        print(">>>> Number of bootstrap {}".format(int(run_parameters['number_of_bootstraps'])))
-
         return (run_parameters['number_of_bootstraps'], number_of_cpus)
 
 
