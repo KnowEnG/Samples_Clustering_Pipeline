@@ -257,8 +257,9 @@ def find_and_save_net_nmf_clusters_distribute_jobs(cluster_ip_addresses, number_
     import logging
     try:
         cluster_list = []
-
-        for i in range(0, number_of_compute_nodes):
+        range_list = range(0, number_of_compute_nodes)
+        print(range_list)
+        for i in range_list:
             cur_cluster = dispy.JobCluster(find_and_save_net_nmf_clusters_parallel,
                                            nodes=[cluster_ip_addresses[i]],
                                            depends=[run_net_nmf_clusters_worker,
