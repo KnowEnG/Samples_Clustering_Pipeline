@@ -209,7 +209,6 @@ def run_cc_net_nmf(run_parameters):
 
 
 def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
-    import dispy
     import sys
     print("Start creating clusters {}.....".format(str(i)))
     try:
@@ -224,7 +223,6 @@ def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, la
 def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
                                                  cluster_list):
     import threading
-    import dispy
     import sys
 
     number_of_jobs_each_node = determine_job_number_on_each_node(run_parameters['number_of_bootstraps'], len(cluster_list))
@@ -346,6 +344,8 @@ def determine_job_number_on_each_node(number_of_bootstraps, number_of_compute_no
         for i in range(number_of_compute_nodes):
             number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
 
+    print(">>>>> number_of_scheduled_jobs")
+    print(number_of_scheduled_jobs)
     return number_of_scheduled_jobs
 
 
