@@ -337,14 +337,14 @@ def determine_job_number_on_each_node(number_of_bootstraps, number_of_compute_no
     number_of_scheduled_jobs = []
     if rest_of_jobs > 0:
         count = 0
-        for i in number_of_compute_nodes:
+        for i in range(number_of_compute_nodes):
             if (count < rest_of_jobs):
                 number_of_scheduled_jobs.append(number_of_jobs_on_single_node + 1)
             else:
                 number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
             count += 1
     else:
-        for i in number_of_compute_nodes:
+        for i in range(number_of_compute_nodes):
             number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
 
     return number_of_scheduled_jobs
