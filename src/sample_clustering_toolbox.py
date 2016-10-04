@@ -180,6 +180,7 @@ def run_cc_net_nmf(run_parameters):
         number_of_loops, parallelism = determine_parallelism_within_single_compute_node(run_parameters)
         # determine number of compute nodes to use
         number_of_comptue_nodes = determine_number_of_compute_nodes(run_parameters)
+        print("number of compute nodes = {}".format(number_of_comptue_nodes))
         # create clusters
         cluster_list = find_and_save_net_nmf_clusters_distribute_jobs(run_parameters['cluster_ip_address'], number_of_comptue_nodes)
         # parallel submitting jobs
