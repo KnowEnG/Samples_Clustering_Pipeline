@@ -344,7 +344,7 @@ def determine_job_number_on_each_node(number_of_bootstraps, number_of_compute_no
         for i in range(number_of_compute_nodes):
             number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
 
-    print(">>>>> number_of_scheduled_jobs")
+    print("number_of_scheduled_jobs across clusters")
     print(number_of_scheduled_jobs)
     return number_of_scheduled_jobs
 
@@ -376,10 +376,12 @@ def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_da
     import sys
     import socket
 
-    parallelism = determine_parallelism_locally(number_of_loops)
-
     try:
+        parallelism = determine_parallelism_locally(number_of_loops)
+
         host = socket.gethostname()
+        print("Using parallelism {} on host {}.....".format(parallelism, host))
+
         range_list = range(0, number_of_loops)
         p = multiprocessing.Pool(processes=parallelism)
         p.starmap(run_net_nmf_clusters_worker,
