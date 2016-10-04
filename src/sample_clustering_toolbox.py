@@ -491,6 +491,11 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
         run_parameters: parmaeters including the "tmp_directory" name.
         sequence_number: temporary file name suffix.
     """
+    import os
+    import sys
+    import knpackage.toolbox as kn
+    import numpy as np
+
     tmp_dir = run_parameters["tmp_directory"]
     # time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
     time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
