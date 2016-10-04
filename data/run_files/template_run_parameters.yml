@@ -58,5 +58,5 @@ rows_sampling_fraction: "0.8"
 cols_sampling_fraction: "0.8"
 #	Rancom sample of columns portion.
 
-number_of_bootstraps: "5"
+number_of_bootstraps: 5
 #	Number of random samplings to perform and incorporate into the consensus matrix.
