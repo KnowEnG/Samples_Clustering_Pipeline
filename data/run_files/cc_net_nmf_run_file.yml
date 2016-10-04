@@ -29,4 +29,15 @@ rwr_restart_probability: "0.7"
 rwr_convergence_tolerence: "0.0001"
 
 display_clusters: "0"
-use_parallel_processing: "1"
+
+# 0 serial , 1 parallel locally, 2 distribute across clusters
+processing_method: 1
+
+cluster_ip_address:
+- "192.17.176.156"
+- "192.17.176.151"
+- "192.17.176.158"
+- "192.17.176.161"
+- "192.17.176.152"
+- "192.17.176.150"
+- "128.174.244.71"
