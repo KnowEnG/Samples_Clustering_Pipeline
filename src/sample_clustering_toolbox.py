@@ -18,6 +18,7 @@ import multiprocessing
 
 from scipy.stats import pearsonr as pcc
 
+
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
 
@@ -62,8 +63,8 @@ def run_cc_nmf(run_parameters):
     if run_parameters['use_parallel_processing'] != 0:
         # Number of processes to be executed in parallel
         number_of_cpus = multiprocessing.cpu_count()
-        if(int(run_parameters["number_of_bootstraps"]) < number_of_cpus):
-            number_of_cpus = int(run_parameters["number_of_bootstraps"])
+        if (run_parameters["number_of_bootstraps"] < number_of_cpus):
+            number_of_cpus = run_parameters["number_of_bootstraps"]
         print("Using parallelism {}".format(number_of_cpus))
 
         find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_cpus)
@@ -140,7 +141,7 @@ def run_cc_net_nmf(run_parameters):
         run_parameters: parameter set dictionary.
     """
     tmp_dir = 'tmp_cc_net_nmf'
-    if(run_parameters['processing_method'] == 2):
+    if (run_parameters['processing_method'] == 2):
         # Currently hard coded to jingge's namespace, need to change it once we have a dedicated share location
         run_parameters["tmp_directory"] = kn.create_dir("/mnt/backup/users/jingge/distributed_computing/tmp/", tmp_dir)
     else:
@@ -170,10 +171,11 @@ def run_cc_net_nmf(run_parameters):
     if run_parameters['processing_method'] == 1:
         # Number of processes to be executed in parallel
         number_of_cpus = multiprocessing.cpu_count()
-        if (int(run_parameters["number_of_bootstraps"]) < number_of_cpus):
-            number_of_cpus = int(run_parameters["number_of_bootstraps"])
+        if (run_parameters["number_of_bootstraps"] < number_of_cpus):
+            number_of_cpus = run_parameters["number_of_bootstraps"]
         print("Number of bootstrap {}".format(int(run_parameters['number_of_bootstraps'])))
-        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, run_parameters["number_of_bootstraps"], number_of_cpus)
+        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
+                                                run_parameters["number_of_bootstraps"], number_of_cpus)
     elif run_parameters['processing_method'] == 2:
         print("Start distributing jobs......")
         find_and_save_net_nmf_clusters_distribute_jobs(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
@@ -199,13 +201,14 @@ def run_cc_net_nmf(run_parameters):
     return
 
 
-
-def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops, parallelism):
+def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops,
+                          parallelism):
     import dispy
     import sys
     print("Start creating clusters {}.....".format(str(i)))
     try:
-        job = cluster.submit(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops, parallelism)
+        job = cluster.submit(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops,
+                             parallelism)
         job.id = i
         ret = job()
         print(ret, job.stdout, job.stderr, job.exception, job.ip_addr, job.start_time, job.end_time)
@@ -234,7 +237,8 @@ def find_and_save_net_nmf_clusters_distribute_jobs(network_mat, spreadsheet_mat,
         print("Start spawning {} threads.....".format(len(cluster_ip_addresses)))
         for i in range(len(cluster_list)):
             t = threading.Thread(target=create_cluster_worker, args=(
-                cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_loops, parallelism))
+                cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_loops,
+                parallelism))
             thread_list.append(t)
             t.start()
 
@@ -270,7 +274,8 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     sample_smooth, iterations = \
         kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
 
-    print("bootstrap {} of {}: rwr iterations = {}".format(sample + 1, run_parameters["number_of_bootstraps"], iterations))
+    print("bootstrap {} of {}: rwr iterations = {}".format(sample + 1, run_parameters["number_of_bootstraps"],
+                                                           iterations))
 
     sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
@@ -289,14 +294,14 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
         lap_val: laplacian matrix component, L = lap_dag - lap_val.
         run_parameters: dictionary of run-time parameters.
     """
-    number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+    number_of_bootstraps = run_parameters["number_of_bootstraps"]
     for sample in range(0, number_of_bootstraps):
         run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 
 def determine_parallilism(run_parameters):
-    if(run_parameters['processing_method'] == 2):
-        number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+    if (run_parameters['processing_method'] == 2):
+        number_of_bootstraps = run_parameters["number_of_bootstraps"]
         print(">>>>>> In net_nmf_parallel_for_each_node: bootstrap number = {}...".format(number_of_bootstraps))
         number_of_jobs_on_each_node = int(number_of_bootstraps / (len(run_parameters['cluster_ip_address'])))
         print(">>>>>> On each node, number of jobs in total = {}...".format(number_of_jobs_on_each_node))
@@ -307,17 +312,18 @@ def determine_parallilism(run_parameters):
             number_of_cpus = number_of_jobs_on_each_node
         return (number_of_jobs_on_each_node, number_of_cpus)
 
-    if(run_parameters['processing_method'] == 1):
+    if (run_parameters['processing_method'] == 1):
         # Number of processes to be executed in parallel
         number_of_cpus = multiprocessing.cpu_count()
-        if (int(run_parameters["number_of_bootstraps"]) < number_of_cpus):
-            number_of_cpus = int(run_parameters["number_of_bootstraps"])
+        if (run_parameters["number_of_bootstraps"] < number_of_cpus):
+            number_of_cpus = run_parameters["number_of_bootstraps"]
         print(">>>> Number of bootstrap {}".format(int(run_parameters['number_of_bootstraps'])))
 
         return (run_parameters['number_of_bootstraps'], number_of_cpus)
 
 
-def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_loops, parallelism):
+def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
+                                            number_of_loops, parallelism):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -383,10 +389,11 @@ def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
         spreadsheet_mat: genes x samples matrix.
         run_parameters: dictionary of run-time parameters.
     """
-    number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+    number_of_bootstraps = run_parameters["number_of_bootstraps"]
 
     for sample in range(0, number_of_bootstraps):
         run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
+
 
 def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_cpus):
     """ central loop: compute components for the consensus matrix by
@@ -397,7 +404,7 @@ def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_
         run_parameters: dictionary of run-time parameters.
         number_of_cpus: number of processes to be running in parallel
     """
-    number_of_bootstraps = int(run_parameters["number_of_bootstraps"])
+    number_of_bootstraps = run_parameters["number_of_bootstraps"]
     p = Pool(processes=number_of_cpus)
     range_list = range(0, number_of_bootstraps)
     p.starmap(run_nmf_clusters_worker,
@@ -482,7 +489,7 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
         sequence_number: temporary file name suffix.
     """
     tmp_dir = run_parameters["tmp_directory"]
-    #time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
+    # time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
     time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
 
     hname = os.path.join(tmp_dir, 'temp_h' + time_stamp)
@@ -546,7 +553,8 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         labels: cluster numbers for row names.
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
     """
-    file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('consensus_data', 'df'))
+    file_name = os.path.join(run_parameters["results_directory"],
+                             kn.create_timestamped_filename('consensus_data', 'df'))
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
     out_df.to_csv(file_name, sep='\t')
     run_parameters['consensus_clustering_file'] = file_name
