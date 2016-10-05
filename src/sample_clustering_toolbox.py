@@ -183,7 +183,7 @@ def run_cc_net_nmf(run_parameters):
                                                                     run_parameters['number_of_bootstraps'])
         print("number of compute nodes = {}".format(number_of_comptue_nodes))
         # create clusters
-        cluster_list = generate_clusters_cc_net_nmf(run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
+        cluster_list = generate_compute_clusters(run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
                                                     find_and_save_net_nmf_clusters_parallel,
                                                     [run_net_nmf_clusters_worker,
                                                      save_a_clustering_to_tmp,
@@ -284,14 +284,17 @@ def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, l
         raise OSError(sys.exc_info())
 
 
-def generate_clusters_cc_net_nmf(cluster_ip_addresses, func_name, dependency_list):
+def generate_compute_clusters(cluster_ip_addresses, func_name, dependency_list):
     '''
     Generate clusters based on given list of ip address
 
     Args:
         cluster_ip_addresses: a list of ip address
+        func_name: function name
+        dependency_list: the dependencies for running the current function
 
     Returns:
+        cluster_list: a list of clusters as dispy object
 
     '''
     import sys
@@ -302,13 +305,6 @@ def generate_clusters_cc_net_nmf(cluster_ip_addresses, func_name, dependency_lis
         range_list = range(0, len(cluster_ip_addresses))
         print(range_list)
         for i in range_list:
-            '''
-            cur_cluster = dispy.JobCluster(find_and_save_net_nmf_clusters_parallel,
-                                            nodes=[cluster_ip_addresses[i]],
-                                           depends=[run_net_nmf_clusters_worker,
-                                           save_a_clustering_to_tmp,determine_parallelism_locally],
-                                           loglevel=logging.WARNING)
-            '''
             cur_cluster = dispy.JobCluster(func_name,
                                            nodes=[cluster_ip_addresses[i]],
                                            depends=dependency_list,
@@ -316,7 +312,7 @@ def generate_clusters_cc_net_nmf(cluster_ip_addresses, func_name, dependency_lis
             cluster_list.append(cur_cluster)
         return cluster_list
     except:
-        print(sys.exc_info())
+        raise OSError(sys.exc_info())
 
 
 def determine_number_of_compute_nodes(cluster_ip_addresses, number_of_bootstraps):
