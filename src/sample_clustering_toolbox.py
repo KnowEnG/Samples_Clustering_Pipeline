@@ -184,10 +184,10 @@ def run_cc_net_nmf(run_parameters):
         print("number of compute nodes = {}".format(number_of_comptue_nodes))
         # create clusters
         cluster_list = generate_compute_clusters(run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
-                                                    find_and_save_net_nmf_clusters_parallel,
-                                                    [run_net_nmf_clusters_worker,
-                                                     save_a_clustering_to_tmp,
-                                                     determine_parallelism_locally])
+                                                 find_and_save_net_nmf_clusters_parallel,
+                                                 [run_net_nmf_clusters_worker,
+                                                  save_a_clustering_to_tmp,
+                                                  determine_parallelism_locally])
         # parallel submitting jobs
         parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
                                                      cluster_list)
@@ -261,7 +261,7 @@ def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, l
     import sys
 
     number_of_jobs_each_node = determine_job_number_on_each_compute_node(run_parameters['number_of_bootstraps'],
-                                                                 len(cluster_list))
+                                                                         len(cluster_list))
     thread_list = []
     print("Start spawning {} threads.....".format(len(cluster_list)))
     try:
