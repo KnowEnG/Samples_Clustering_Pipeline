@@ -187,6 +187,7 @@ def run_cc_net_nmf(run_parameters):
                                                  [run_net_nmf_clusters_worker,
                                                   save_a_clustering_to_tmp,
                                                   determine_parallelism_locally])
+
         # calculates number of jobs assigned to each compute node
         number_of_jobs_each_node = determine_job_number_on_each_compute_node(run_parameters['number_of_bootstraps'],
                                                                              len(cluster_list))
