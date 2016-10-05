@@ -13,8 +13,8 @@ tmp_directory: ./run_dir/tmp
 number_of_clusters: 3
 number_of_bootstraps: 5
 
-rows_sampling_fraction: "0.8"
-cols_sampling_fraction: "0.8"
+rows_sampling_fraction: 0.8
+cols_sampling_fraction: 0.8
 
 # iterations between loop invariance checks; loop exit test; absolute max loops
 nmf_conv_check_freq: "50"
