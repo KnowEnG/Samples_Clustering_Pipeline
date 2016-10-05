@@ -21,7 +21,7 @@ results_directory: ./run_dir/results
 tmp_directory: ./run_dir/tmp
 #	Directory where partial clustering results are written untill reading into consensus matrix.
 
-number_of_clusters: "3"
+number_of_clusters: 3
 #	Inner dimension of matrix factorization will be set to this.
 
 display_clusters: "0"

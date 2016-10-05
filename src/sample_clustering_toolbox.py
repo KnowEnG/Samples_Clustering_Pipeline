@@ -34,13 +34,13 @@ def run_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     sample_perm = np.arange(0, spreadsheet_mat.shape[1])
     linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters['number_of_clusters']))
+    labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
     sample_names = spreadsheet_df.columns
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
-    if int(run_parameters['display_clusters']) != 0:
-        con_mat_image = form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['number_of_clusters']))
+    if run_parameters['display_clusters'] != 0:
+        con_mat_image = form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters'])
         display_clusters(con_mat_image)
 
     return
@@ -74,7 +74,7 @@ def run_cc_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
     consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['number_of_clusters']))
+    labels = kn.perform_kmeans(consensus_matrix, run_parameters['number_of_clusters'])
 
     sample_names = spreadsheet_df.columns
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
@@ -82,8 +82,8 @@ def run_cc_nmf(run_parameters):
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
-    if int(run_parameters['display_clusters']) != 0:
-        display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['number_of_clusters'])))
+    if run_parameters['display_clusters'] != 0:
+        display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
 
     return
 
@@ -123,12 +123,12 @@ def run_net_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     sample_perm = np.arange(0, spreadsheet_mat.shape[1])
     linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = kn.perform_kmeans(linkage_matrix, int(run_parameters["number_of_clusters"]))
+    labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
-    if int(run_parameters['display_clusters']) != 0:
-        display_clusters(form_consensus_matrix_graphic(linkage_matrix, int(run_parameters['number_of_clusters'])))
+    if run_parameters['display_clusters'] != 0:
+        display_clusters(form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters']))
 
     return
 
@@ -196,15 +196,15 @@ def run_cc_net_nmf(run_parameters):
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
     consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    labels = kn.perform_kmeans(consensus_matrix, int(run_parameters['number_of_clusters']))
+    labels = kn.perform_kmeans(consensus_matrix, run_parameters['number_of_clusters'])
 
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
-    if int(run_parameters['display_clusters']) != 0:
-        display_clusters(form_consensus_matrix_graphic(consensus_matrix, int(run_parameters['number_of_clusters'])))
+    if run_parameters['display_clusters'] != 0:
+        display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
 
     return
 
@@ -345,13 +345,13 @@ def determine_job_number_on_each_compute_node(number_of_bootstraps, number_of_co
 
     '''
     number_of_jobs_on_single_node = int(number_of_bootstraps / number_of_compute_nodes)
-    rest_of_jobs = number_of_bootstraps % number_of_compute_nodes
+    remainder_of_jobs = number_of_bootstraps % number_of_compute_nodes
 
     number_of_scheduled_jobs = []
-    if rest_of_jobs > 0:
+    if remainder_of_jobs > 0:
         count = 0
         for i in range(number_of_compute_nodes):
-            if (count < rest_of_jobs):
+            if (count < remainder_of_jobs):
                 number_of_scheduled_jobs.append(number_of_jobs_on_single_node + 1)
             else:
                 number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
