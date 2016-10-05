@@ -194,7 +194,7 @@ def run_cc_net_nmf(run_parameters):
         arg_list = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
         # parallel submitting jobs
         #parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,cluster_list, number_of_jobs_each_node)
-        parallel_submitting_job_to_each_compute_node(*arg_list, cluster_list, number_of_jobs_each_node)
+        parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *arg_list)
 
 
         print("Finish distributing jobs......")
@@ -219,7 +219,7 @@ def run_cc_net_nmf(run_parameters):
     return
 
 
-def create_cluster_worker(cluster, i , *arguments, number_of_loops):
+def create_cluster_worker(cluster, i , number_of_loops, *arguments):
                 #(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
     '''
     Submit job to cluster
@@ -249,7 +249,7 @@ def create_cluster_worker(cluster, i , *arguments, number_of_loops):
         print(sys.exc_info())
 
 
-def parallel_submitting_job_to_each_compute_node(*arguments, cluster_list, number_of_jobs_each_node):
+def parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *arguments):
         #(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, cluster_list, number_of_jobs_each_node):
     '''
     Parallel submitting jobs to each node and start computation
