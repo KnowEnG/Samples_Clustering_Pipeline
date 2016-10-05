@@ -192,8 +192,8 @@ def run_cc_net_nmf(run_parameters):
                                                                              len(cluster_list))
         arg_list = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
         # parallel submitting jobs
-        #parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,cluster_list, number_of_jobs_each_node)
-        parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *arg_list)
+        parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,cluster_list, number_of_jobs_each_node)
+        #parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *arg_list)
 
 
         print("Finish distributing jobs......")
@@ -218,8 +218,8 @@ def run_cc_net_nmf(run_parameters):
     return
 
 
-def create_cluster_worker(cluster, i , number_of_loops, *arguments):
-                #(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
+def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
+                #(cluster, i , number_of_loops, *arguments):
     '''
     Submit job to cluster
 
@@ -239,8 +239,8 @@ def create_cluster_worker(cluster, i , number_of_loops, *arguments):
     import sys
     print("Start creating clusters {}.....".format(str(i)))
     try:
-        #job = cluster.submit(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops)
-        job = cluster.submit(number_of_loops, *arguments)
+        job = cluster.submit(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops)
+        #job = cluster.submit(number_of_loops, *arguments)
         job.id = i
         ret = job()
         print(ret, job.stdout, job.stderr, job.exception, job.ip_addr, job.start_time, job.end_time)
@@ -248,8 +248,9 @@ def create_cluster_worker(cluster, i , number_of_loops, *arguments):
         print(sys.exc_info())
 
 
-def parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *arguments):
-        #(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, cluster_list, number_of_jobs_each_node):
+def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, cluster_list, number_of_jobs_each_node):
+               # (cluster_list, number_of_jobs_each_node, *arguments):
+
     '''
     Parallel submitting jobs to each node and start computation
 
@@ -273,8 +274,8 @@ def parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_ea
     try:
         for i in range(len(cluster_list)):
             t = threading.Thread(target=create_cluster_worker, args=(
-                #cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
-                cluster_list[i], i, *arguments,
+                cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
+                #cluster_list[i], i, *arguments,
                 number_of_jobs_each_node[i]))
             thread_list.append(t)
             t.start()
