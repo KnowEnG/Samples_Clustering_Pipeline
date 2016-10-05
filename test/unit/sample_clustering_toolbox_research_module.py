@@ -184,8 +184,8 @@ def get_test_paramters_dictionary():
         'spreadsheet_name_full_path': '../../data/spreadsheets/tcga_ucec_somatic_mutation_data.df',
         'results_directory': './tmp',
         'tmp_directory': './tmp',
-        'number_of_clusters': '3',
-        'display_clusters': "0",
+        'number_of_clusters': 3,
+        'display_clusters': 0,
         'nmf_conv_check_freq': "50",
         'nmf_max_iterations': "10000",
         'nmf_max_invariance': "200",
@@ -195,6 +195,6 @@ def get_test_paramters_dictionary():
         'nmf_penalty_parameter': "1400",
         'rows_sampling_fraction': "0.8",
         'cols_sampling_fraction': "0.8",
-        'number_of_bootstraps': "5",
+        'number_of_bootstraps': 5,
         'run_directory': './tmp'}
     return test_parameters
