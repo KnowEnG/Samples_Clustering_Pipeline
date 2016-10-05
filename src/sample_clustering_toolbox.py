@@ -173,7 +173,7 @@ def run_cc_net_nmf(run_parameters):
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters['number_of_bootstraps']
         print("Number of bootstrap {}".format(number_of_loops))
-        find_and_save_net_nmf_clusters_parallel(number_of_loops, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,number_of_loops)
         print("Finish parallel computing locally......")
     elif run_parameters['processing_method'] == 2:
         print("Start distributing jobs......")
@@ -275,7 +275,6 @@ def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, l
         for i in range(len(cluster_list)):
             t = threading.Thread(target=create_cluster_worker, args=(
                 cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
-                #cluster_list[i], i, *arguments,
                 number_of_jobs_each_node[i]))
             thread_list.append(t)
             t.start()
@@ -444,7 +443,7 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
         run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 
-def find_and_save_net_nmf_clusters_parallel(number_of_loops, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
+def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_loops):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
