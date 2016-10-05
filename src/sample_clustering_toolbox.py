@@ -188,9 +188,15 @@ def run_cc_net_nmf(run_parameters):
                                                  [run_net_nmf_clusters_worker,
                                                   save_a_clustering_to_tmp,
                                                   determine_parallelism_locally])
+        # calculates number of jobs assigned to each compute node
+        number_of_jobs_each_node = determine_job_number_on_each_compute_node(run_parameters['number_of_bootstraps'],
+                                                                             len(cluster_list))
+        arg_list = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
         # parallel submitting jobs
-        parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
-                                                     cluster_list)
+        #parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,cluster_list, number_of_jobs_each_node)
+        parallel_submitting_job_to_each_compute_node(*arg_list, cluster_list, number_of_jobs_each_node)
+
+
         print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 0:
         find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
@@ -213,7 +219,8 @@ def run_cc_net_nmf(run_parameters):
     return
 
 
-def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
+def create_cluster_worker(cluster, i , *arguments, number_of_loops):
+                #(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
     '''
     Submit job to cluster
 
@@ -233,7 +240,8 @@ def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, la
     import sys
     print("Start creating clusters {}.....".format(str(i)))
     try:
-        job = cluster.submit(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops)
+        #job = cluster.submit(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops)
+        job = cluster.submit(*arguments, number_of_loops)
         job.id = i
         ret = job()
         print(ret, job.stdout, job.stderr, job.exception, job.ip_addr, job.start_time, job.end_time)
@@ -241,8 +249,8 @@ def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, la
         print(sys.exc_info())
 
 
-def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
-                                                 cluster_list):
+def parallel_submitting_job_to_each_compute_node(*arguments, cluster_list, number_of_jobs_each_node):
+        #(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, cluster_list, number_of_jobs_each_node):
     '''
     Parallel submitting jobs to each node and start computation
 
@@ -253,6 +261,7 @@ def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, l
         lap_val: laplacian matrix component, L = lap_dag - lap_val.
         run_parameters: dictionay of run-time parameters.
         cluster_list: a list of clusters that will be used run distribute jobs
+        number_of_jobs_each_node: a list of numbers indicates the number of jobs assigned to each compute node
 
     Returns:
 
@@ -260,14 +269,13 @@ def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, l
     import threading
     import sys
 
-    number_of_jobs_each_node = determine_job_number_on_each_compute_node(run_parameters['number_of_bootstraps'],
-                                                                         len(cluster_list))
     thread_list = []
     print("Start spawning {} threads.....".format(len(cluster_list)))
     try:
         for i in range(len(cluster_list)):
             t = threading.Thread(target=create_cluster_worker, args=(
-                cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
+                #cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
+                cluster_list[i], i, *arguments,
                 number_of_jobs_each_node[i]))
             thread_list.append(t)
             t.start()
