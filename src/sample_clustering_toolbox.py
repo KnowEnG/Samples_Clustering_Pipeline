@@ -709,12 +709,13 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     out_df.to_csv(file_name, sep='\t')
     run_parameters['consensus_clustering_file'] = file_name
 
-    d_name = 'cluster_estimate=%d'%(run_parameters['number_of_clusters'])
-    silhouette_average_dict = {d_name: silhouette_score(consensus_matrix, labels)}
+    silhouette_average = silhouette_score(consensus_matrix, labels)
+    silhouette_score_string = 'cluster estimate = %d, silhouette score = %g'%(run_parameters['number_of_clusters'], silhouette_average)
     silhouette_filename = os.path.join(run_parameters["results_directory"],
-                                       kn.create_timestamped_filename('silhouette_average', 'df'))
-    silhouette_df = pd.DataFrame(silhouette_average_dict)
-    silhouette_df.to_csv(silhouette_filename, sep='\t')
+                                       kn.create_timestamped_filename('silhouette_average', 'txt'))
+
+    with open(silhouette_filename, 'w') as fh:
+        fh.write(silhouette_score_string)
 
     return
 
@@ -733,6 +734,7 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     run_parameters['cluster_labels_file'] = file_name
 
     return
+
 
 def save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat=None):
     """ save a dataframe with the cluster average value for each feature (gene) in the spreadsheet
