@@ -31,7 +31,7 @@ rwr_convergence_tolerence: "0.0001"
 display_clusters: 0
 
 # 0 serial , 1 parallel locally, 2 distribute across clusters
-processing_method: 2
+processing_method: 1
 
 cluster_ip_address:
 - 172.31.47.99
