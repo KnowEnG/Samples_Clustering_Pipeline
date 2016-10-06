@@ -7,17 +7,13 @@ Created on Mon Aug  8 16:08:25 2016
 
 """
 import os
-import time
+import itertools
+import multiprocessing
+from multiprocessing import Pool
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import knpackage.toolbox as kn
-from multiprocessing import Pool
-import itertools
-import multiprocessing
-
-from scipy.stats import pearsonr as pcc
-
 
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
