@@ -13,6 +13,7 @@ from multiprocessing import Pool
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
 
 def run_nmf(run_parameters):
@@ -707,6 +708,13 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
     out_df.to_csv(file_name, sep='\t')
     run_parameters['consensus_clustering_file'] = file_name
+
+    d_name = 'cluster_estimate=%d'%(run_parameters['number_of_clusters'])
+    silhouette_average_dict = {d_name: silhouette_score(consensus_matrix, labels)}
+    silhouette_filename = os.path.join(run_parameters["results_directory"],
+                                       kn.create_timestamped_filename('silhouette_average', 'df'))
+    silhouette_df = pd.DataFrame(silhouette_average_dict)
+    silhouette_df.to_csv(silhouette_filename, sep='\t')
 
     return
 
