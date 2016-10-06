@@ -142,7 +142,7 @@ def run_cc_net_nmf(run_parameters):
     tmp_dir = 'tmp_cc_net_nmf'
     if (run_parameters['processing_method'] == 2):
         # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir("/mnt/storage/clustershare", tmp_dir)
+        run_parameters["tmp_directory"] = kn.create_dir("/mnt/ramdisk/", tmp_dir)
     else:
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
 
@@ -194,7 +194,6 @@ def run_cc_net_nmf(run_parameters):
         # parallel submitting jobs
         parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,cluster_list, number_of_jobs_each_node)
         #parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *arg_list)
-
 
         print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 0:
@@ -426,6 +425,19 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
+    move_files('/mnt/ramdisk', '/mnt/clustershare/')
+
+
+
+def move_files(src, dst):
+    import shutil
+    import sys
+    try:
+        shutil.move(src, dst)
+    except:
+        raise OSError(sys.exc_info())
+
+
 
 
 def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
@@ -570,7 +582,10 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
     Returns:
         indicator_matrix: input summed with "temp_p*" files in run_parameters["tmp_directory"].
     """
-    tmp_dir = run_parameters["tmp_directory"]
+    if run_parameters['processing_method'] == 2:
+        tmp_dir = '/mnt/clustershare/'
+    else:
+        tmp_dir = run_parameters["tmp_directory"]
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
         if tmp_f[0:6] == 'temp_p':
@@ -591,7 +606,11 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
     Returns:
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
-    tmp_dir = run_parameters["tmp_directory"]
+    if run_parameters['processing_method'] == 2:
+        tmp_dir = '/mnt/clustershare/'
+    else:
+        tmp_dir = run_parameters["tmp_directory"]
+
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
         if tmp_f[0:6] == 'temp_p':
