@@ -143,7 +143,7 @@ def run_cc_net_nmf(run_parameters):
     tmp_dir = 'tmp_cc_net_nmf'
     if (run_parameters['processing_method'] == 2):
         # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir("/mnt/storage/clustershare", tmp_dir)
+        run_parameters["tmp_directory"] = kn.create_dir("/mnt/ramdisk/", tmp_dir)
     else:
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
 
