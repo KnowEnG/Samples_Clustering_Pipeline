@@ -27,5 +27,4 @@ rwr_convergence_tolerence: "0.0001"
 display_clusters: 0
 processing_method: 0
 
-has_phenotype_data: False
 phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
