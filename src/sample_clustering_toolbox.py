@@ -173,7 +173,7 @@ def run_cc_net_nmf(run_parameters):
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters['number_of_bootstraps']
         print("Number of bootstrap {}".format(number_of_loops))
-        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,number_of_loops)
+        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops)
         print("Finish parallel computing locally......")
     elif run_parameters['processing_method'] == 2:
         print("Start distributing jobs......")
@@ -426,8 +426,7 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-    move_files('/mnt/ramdisk', '/mnt/clustershare/')
-
+    #move_files('/mnt/ramdisk', '/mnt/clustershare/')
 
 
 def move_files(src, dst):
