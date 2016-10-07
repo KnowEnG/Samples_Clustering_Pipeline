@@ -33,6 +33,9 @@ display_clusters: 0
 # 0 serial , 1 parallel locally, 2 distribute across clusters
 processing_method: 1
 
+has_phenotype_data: False
+phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
+
 cluster_ip_address:
 - 172.31.47.99
 - 172.31.41.138

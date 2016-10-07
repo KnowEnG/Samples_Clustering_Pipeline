@@ -19,3 +19,6 @@ nmf_max_iterations: "10000"
 
 display_clusters: 0
 processing_method: 0
+
+has_phenotype_data: False
+phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
