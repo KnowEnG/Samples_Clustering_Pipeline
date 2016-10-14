@@ -15,6 +15,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
+import knpackage.distributed_computing_utils as dstutil
+
 
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
@@ -173,28 +175,34 @@ def run_cc_net_nmf(run_parameters):
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters['number_of_bootstraps']
         print("Number of bootstrap {}".format(number_of_loops))
-        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops)
+        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
+                                                number_of_loops)
         print("Finish parallel computing locally......")
     elif run_parameters['processing_method'] == 2:
         print("Start distributing jobs......")
+
         # determine number of compute nodes to use
-        number_of_comptue_nodes = determine_number_of_compute_nodes(run_parameters['cluster_ip_address'],
-                                                                    run_parameters['number_of_bootstraps'])
-        print("number of compute nodes = {}".format(number_of_comptue_nodes))
+        number_of_comptue_nodes = dstutil.determine_number_of_compute_nodes(run_parameters['cluster_ip_address'],
+                                                                            run_parameters['number_of_bootstraps'])
+        print("Number of compute nodes = {}".format(number_of_comptue_nodes))
         # create clusters
-        cluster_list = generate_compute_clusters(run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
-                                                 find_and_save_net_nmf_clusters_parallel,
-                                                 [run_net_nmf_clusters_worker,
-                                                  save_a_clustering_to_tmp,
-                                                  determine_parallelism_locally])
+        cluster_list = dstutil.generate_compute_clusters(
+            run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
+            find_and_save_net_nmf_clusters_parallel,
+            [run_net_nmf_clusters_worker,
+             save_a_clustering_to_tmp,
+             dstutil.determine_parallelism_locally])
 
         # calculates number of jobs assigned to each compute node
-        number_of_jobs_each_node = determine_job_number_on_each_compute_node(run_parameters['number_of_bootstraps'],
-                                                                             len(cluster_list))
-        arg_list = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
+        number_of_jobs_each_node = dstutil.determine_job_number_on_each_compute_node(
+            run_parameters['number_of_bootstraps'],
+            len(cluster_list))
+
+        # defines the number of arguments pass to worker function
+        func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
+
         # parallel submitting jobs
-        parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,cluster_list, number_of_jobs_each_node)
-        #parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *arg_list)
+        dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
 
         print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 0:
@@ -217,183 +225,6 @@ def run_cc_net_nmf(run_parameters):
         display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
 
     return
-
-
-def create_cluster_worker(cluster, i, network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops):
-                #(cluster, i , number_of_loops, *arguments):
-    '''
-    Submit job to cluster
-
-    Args:
-        cluster: current cluster
-        i: current index
-        network_mat: genes x genes symmetric matrix.
-        spreadsheet_mat: genes x samples matrix.
-        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
-        lap_val: laplacian matrix component, L = lap_dag - lap_val.
-        run_parameters: dictionay of run-time parameters.
-        number_of_loops: total number of loops will be run on the current job
-
-    Returns:
-
-    '''
-    import sys
-    print("Start creating clusters {}.....".format(str(i)))
-    try:
-        job = cluster.submit(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_loops)
-        #job = cluster.submit(number_of_loops, *arguments)
-        job.id = i
-        ret = job()
-        print(ret, job.stdout, job.stderr, job.exception, job.ip_addr, job.start_time, job.end_time)
-    except:
-        print(sys.exc_info())
-
-
-def parallel_submitting_job_to_each_compute_node(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, cluster_list, number_of_jobs_each_node):
-               # (cluster_list, number_of_jobs_each_node, *arguments):
-
-    '''
-    Parallel submitting jobs to each node and start computation
-
-    Args:
-        network_mat: genes x genes symmetric matrix.
-        spreadsheet_mat: genes x samples matrix.
-        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
-        lap_val: laplacian matrix component, L = lap_dag - lap_val.
-        run_parameters: dictionay of run-time parameters.
-        cluster_list: a list of clusters that will be used run distribute jobs
-        number_of_jobs_each_node: a list of numbers indicates the number of jobs assigned to each compute node
-
-    Returns:
-
-    '''
-    import threading
-    import sys
-
-    thread_list = []
-    print("Start spawning {} threads.....".format(len(cluster_list)))
-    try:
-        for i in range(len(cluster_list)):
-            t = threading.Thread(target=create_cluster_worker, args=(
-                cluster_list[i], i, network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
-                number_of_jobs_each_node[i]))
-            thread_list.append(t)
-            t.start()
-
-        for thread in thread_list:
-            thread.join()
-
-        for cluster in cluster_list:
-            cluster.print_status()
-
-        for cluster in cluster_list:
-            cluster.close()
-    except:
-        raise OSError(sys.exc_info())
-
-
-def generate_compute_clusters(cluster_ip_addresses, func_name, dependency_list):
-    '''
-    Generate clusters based on given list of ip address
-
-    Args:
-        cluster_ip_addresses: a list of ip address
-        func_name: function name
-        dependency_list: the dependencies for running the current function
-
-    Returns:
-        cluster_list: a list of clusters as dispy object
-
-    '''
-    import sys
-    import dispy
-    import logging
-    try:
-        cluster_list = []
-        range_list = range(0, len(cluster_ip_addresses))
-        print(range_list)
-        for i in range_list:
-            cur_cluster = dispy.JobCluster(func_name,
-                                           nodes=[cluster_ip_addresses[i]],
-                                           depends=dependency_list,
-                                           loglevel=logging.WARNING)
-            cluster_list.append(cur_cluster)
-        return cluster_list
-    except:
-        raise OSError(sys.exc_info())
-
-
-def determine_number_of_compute_nodes(cluster_ip_addresses, number_of_bootstraps):
-    '''
-    Determine the total number of compute nodes will be used in execution
-
-    Args:
-        cluster_ip_addresses: a list of ip address
-        number_of_bootstraps:  total number of loops needs to be distributed across clusters
-
-    Returns:
-        number_of_compute_nodes: the number of compute nodes
-
-    '''
-    available_computing_nodes = len(cluster_ip_addresses)
-
-    if (number_of_bootstraps < available_computing_nodes):
-        number_of_compute_nodes = number_of_bootstraps
-    else:
-        number_of_compute_nodes = available_computing_nodes
-
-    return number_of_compute_nodes
-
-
-def determine_job_number_on_each_compute_node(number_of_bootstraps, number_of_compute_nodes):
-    '''
-    Determine total number of jobs run on each compute node
-
-    Args:
-        number_of_bootstraps: total number of loops needs to be distributed across compute nodes
-        number_of_compute_nodes: total number of available compute nodes
-
-    Returns:
-        number_of_scheduled_jobs: a list of integer indicates number of jobs distribution across compute nodes
-
-    '''
-    number_of_jobs_on_single_node = int(number_of_bootstraps / number_of_compute_nodes)
-    remainder_of_jobs = number_of_bootstraps % number_of_compute_nodes
-
-    number_of_scheduled_jobs = []
-    if remainder_of_jobs > 0:
-        count = 0
-        for i in range(number_of_compute_nodes):
-            if (count < remainder_of_jobs):
-                number_of_scheduled_jobs.append(number_of_jobs_on_single_node + 1)
-            else:
-                number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
-            count += 1
-    else:
-        for i in range(number_of_compute_nodes):
-            number_of_scheduled_jobs.append(number_of_jobs_on_single_node)
-
-    print("number_of_scheduled_jobs across clusters : {}".format(number_of_scheduled_jobs))
-    return number_of_scheduled_jobs
-
-
-def determine_parallelism_locally(number_of_loops):
-    '''
-    Determine the parallelism on the current compute node
-    
-    Args:
-        number_of_loops: total number of loops will be executed on current compute node
-
-    Returns:
-        number_of_cpu: parallelism on current compute node
-
-    '''
-    import multiprocessing
-    number_of_cpu = multiprocessing.cpu_count()
-    if (number_of_loops < number_of_cpu):
-        return number_of_loops
-    else:
-        return number_of_cpu
 
 
 def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample):
@@ -426,7 +257,7 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-    #move_files('/mnt/ramdisk', '/mnt/clustershare/')
+    # move_files('/mnt/ramdisk', '/mnt/clustershare/')
 
 
 def move_files(src, dst):
@@ -436,8 +267,6 @@ def move_files(src, dst):
         shutil.move(src, dst)
     except:
         raise OSError(sys.exc_info())
-
-
 
 
 def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
@@ -456,7 +285,8 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
         run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 
-def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, number_of_loops):
+def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
+                                            number_of_loops):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -472,9 +302,10 @@ def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_da
     import itertools
     import sys
     import socket
+    import knpackage.distributed_computing_utils as dstutil
 
     try:
-        parallelism = determine_parallelism_locally(number_of_loops)
+        parallelism = dstutil.determine_parallelism_locally(number_of_loops)
 
         host = socket.gethostname()
         print("Using parallelism {} on host {}.....".format(parallelism, host))
@@ -638,6 +469,7 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
     import numpy as np
 
     tmp_dir = run_parameters["tmp_directory"]
+
     # time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
     time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
 
@@ -709,7 +541,8 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     run_parameters['consensus_clustering_file'] = file_name
 
     silhouette_average = silhouette_score(consensus_matrix, labels)
-    silhouette_score_string = 'cluster estimate = %d, silhouette score = %g'%(run_parameters['number_of_clusters'], silhouette_average)
+    silhouette_score_string = 'cluster estimate = %d, silhouette score = %g' % (
+        run_parameters['number_of_clusters'], silhouette_average)
     silhouette_filename = os.path.join(run_parameters["results_directory"],
                                        kn.create_timestamped_filename('silhouette_average', 'txt'))
 
@@ -746,8 +579,9 @@ def save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_ma
     Returns:
         (writes the gene_cluster_average...tsv file and gene_cluster_smoothed_average...tsv if network_mat input)
     """
-    clusters_df = pd.DataFrame({i:spreadsheet_df.iloc[:, labels==i].mean(axis=1) for i in np.unique(labels)})
-    file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('gene_cluster_average', 'tsv'))
+    clusters_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
+    file_name = os.path.join(run_parameters["results_directory"],
+                             kn.create_timestamped_filename('gene_cluster_average', 'tsv'))
     clusters_df.to_csv(file_name, sep='\t')
     if network_mat is None:
         pass
