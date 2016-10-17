@@ -7,9 +7,6 @@ Created on Mon Aug  8 16:08:25 2016
 
 """
 import os
-import itertools
-import multiprocessing
-from multiprocessing import Pool
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -59,14 +56,12 @@ def run_cc_nmf(run_parameters):
     spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
+
     if run_parameters['processing_method'] == 'parl_loc':
         # Number of processes to be executed in parallel
-        number_of_cpus = multiprocessing.cpu_count()
-        if (run_parameters["number_of_bootstraps"] < number_of_cpus):
-            number_of_cpus = run_parameters["number_of_bootstraps"]
-        print("Using parallelism {}".format(number_of_cpus))
+        number_of_loops = run_parameters["number_of_bootstraps"]
 
-        find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_cpus)
+        find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
     elif run_parameters['processing_method'] == 'dist_comp':
         print("Start distributing jobs......")
 
@@ -164,13 +159,23 @@ def run_net_nmf(run_parameters):
 
 
 def update_tmp_directory(run_parameters, tmp_dir):
+    ''' Update tmp_directory value in rum_parameters dictionary
+
+    Args:
+        run_parameters: run_parameters as the dictionary config
+        tmp_dir: temporary directory prefix subjected to different functions
+
+    Returns:
+        run_parameters: an updated run_parameters
+
+    '''
     if (run_parameters['processing_method'] == 'dist_comp'):
         # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir("/mnt/clustershare/knoweng/", tmp_dir)
+        run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
     else:
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
     return run_parameters
-    
+
 
 def run_cc_net_nmf(run_parameters):
     """ wrapper: call sequence to perform network based stratification with consensus clustering
@@ -289,14 +294,26 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-    # move_files('/mnt/ramdisk', '/mnt/clustershare/')
+    move_files(run_parameters['tmp_directory'], run_parameters['cluster_shared_volumn'])
 
 
 def move_files(src, dst):
-    import shutil
+    '''Move files from source directory to destination
+    Args:
+        src: source directory
+        dst: destination directory
+
+    Returns:
+
+    '''
+    import subprocess
     import sys
     try:
-        shutil.move(src, dst)
+        cmd = ['mv', src, dst]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, err = process.communicate()
+        print(output)
+        print(err)
     except:
         raise OSError(sys.exc_info())
 
@@ -464,7 +481,8 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
         indicator_matrix: input summed with "temp_p*" files in run_parameters["tmp_directory"].
     """
     if run_parameters['processing_method'] == 'dist_comp':
-        tmp_dir = os.path.join('/mnt/clustershare/knoweng/', os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
+        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
+                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
     else:
         tmp_dir = run_parameters["tmp_directory"]
     dir_list = os.listdir(tmp_dir)
@@ -488,7 +506,8 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
     if run_parameters['processing_method'] == 'dist_comp':
-        tmp_dir = os.path.join('/mnt/clustershare/knoweng/', os.path.basename(os.path.normpath(run_parameters['tmp_directory']))) 
+        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
+                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
     else:
         tmp_dir = run_parameters["tmp_directory"]
 
@@ -619,7 +638,8 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         phenotype_data = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
         phenotype_data.insert(0, 'Cluster number', 'NA')
         phenotype_data.loc[df_tmp.index.values, 'Cluster number'] = df_tmp.values
-        pheno_file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('phenotype_data', 'tsv'))
+        pheno_file_name = os.path.join(run_parameters["results_directory"],
+                                       kn.create_timestamped_filename('phenotype_data', 'tsv'))
         phenotype_data.to_csv(pheno_file_name, sep='\t', header=True, index=True, na_rep='NA')
     return
 
