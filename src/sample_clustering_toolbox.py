@@ -54,8 +54,7 @@ def run_cc_nmf(run_parameters):
         run_parameters: parameter set dictionary.
     """
     tmp_dir = 'tmp_cc_nmf'
-    run_parameters["tmp_directory"] = kn.create_dir(
-        run_parameters["run_directory"], tmp_dir)
+    run_parameters = update_tmp_directory(run_parameters, tmp_dir)
 
     spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     spreadsheet_mat = spreadsheet_df.as_matrix()
@@ -164,6 +163,15 @@ def run_net_nmf(run_parameters):
     return
 
 
+def update_tmp_directory(run_parameters, tmp_dir):
+    if (run_parameters['processing_method'] == 'dist_comp'):
+        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
+        run_parameters["tmp_directory"] = kn.create_dir("/mnt/clustershare/knoweng/", tmp_dir)
+    else:
+        run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+    return run_parameters
+    
+
 def run_cc_net_nmf(run_parameters):
     """ wrapper: call sequence to perform network based stratification with consensus clustering
         and write results.
@@ -172,11 +180,7 @@ def run_cc_net_nmf(run_parameters):
         run_parameters: parameter set dictionary.
     """
     tmp_dir = 'tmp_cc_net_nmf'
-    if (run_parameters['processing_method'] == 'dist_comp'):
-        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir("/mnt/clustershare/knoweng/", tmp_dir)    
-    else:
-        run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+    run_parameters = update_tmp_directory(run_parameters, tmp_dir)
 
     spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     network_df = kn.get_network_df(run_parameters['gg_network_name_full_path'])
