@@ -78,7 +78,7 @@ def run_cc_nmf(run_parameters):
         # create clusters
         cluster_list = dstutil.generate_compute_clusters(
             run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
-            find_and_save_net_nmf_clusters_parallel,
+            find_and_save_nmf_clusters_parallel,
             [run_nmf_clusters_worker,
              save_a_clustering_to_tmp,
              dstutil.determine_parallelism_locally])
@@ -89,7 +89,7 @@ def run_cc_nmf(run_parameters):
             len(cluster_list))
 
         # defines the number of arguments pass to worker function
-        func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
+        func_args = [spreadsheet_mat, run_parameters]
 
         # parallel submitting jobs
         dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
