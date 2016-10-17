@@ -30,8 +30,8 @@ rwr_convergence_tolerence: "0.0001"
 
 display_clusters: 0
 
-# 0 serial , 1 parallel locally, 2 distribute across clusters
-processing_method: 1
+# processing_method dictionary, valid values are serial, parl_loc, dist_comp 
+processing_method: dist_comp 
 
 phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
 

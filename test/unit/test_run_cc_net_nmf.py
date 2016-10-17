@@ -13,6 +13,7 @@ class TestRun_cc_net_nmf(TestCase):
 
         run_parameters['display_clusters'] = 0
         run_parameters["use_now_name"] = 0
+        run_parameters["processing_method"] = 'parl_loc' 
 
         sctbx.run_cc_net_nmf(run_parameters)
         file_name = run_parameters['cluster_labels_file']

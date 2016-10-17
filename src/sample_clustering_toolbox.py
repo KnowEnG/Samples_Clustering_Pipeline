@@ -60,7 +60,7 @@ def run_cc_nmf(run_parameters):
     spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
-    if run_parameters['processing_method'] != 0:
+    if run_parameters['processing_method'] != 'serial':
         # Number of processes to be executed in parallel
         number_of_cpus = multiprocessing.cpu_count()
         if (run_parameters["number_of_bootstraps"] < number_of_cpus):
@@ -143,7 +143,7 @@ def run_cc_net_nmf(run_parameters):
         run_parameters: parameter set dictionary.
     """
     tmp_dir = 'tmp_cc_net_nmf'
-    if (run_parameters['processing_method'] == 2):
+    if (run_parameters['processing_method'] == 'dist_comp'):
         # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
         run_parameters["tmp_directory"] = kn.create_dir("/mnt/clustershare/knoweng/", tmp_dir)    
     else:
@@ -171,14 +171,14 @@ def run_cc_net_nmf(run_parameters):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
 
-    if run_parameters['processing_method'] == 1:
+    if run_parameters['processing_method'] == 'parl_loc':
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters['number_of_bootstraps']
         print("Number of bootstrap {}".format(number_of_loops))
         find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
                                                 number_of_loops)
         print("Finish parallel computing locally......")
-    elif run_parameters['processing_method'] == 2:
+    elif run_parameters['processing_method'] == 'dist_comp':
         print("Start distributing jobs......")
 
         # determine number of compute nodes to use
@@ -205,7 +205,7 @@ def run_cc_net_nmf(run_parameters):
         dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
 
         print("Finish distributing jobs......")
-    elif run_parameters['processing_method'] == 0:
+    elif run_parameters['processing_method'] == 'serial':
         find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
     else:
         raise ValueError('processing_method contains bad value.')
@@ -413,7 +413,7 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
     Returns:
         indicator_matrix: input summed with "temp_p*" files in run_parameters["tmp_directory"].
     """
-    if run_parameters['processing_method'] == 2:
+    if run_parameters['processing_method'] == 'dist_comp':
         tmp_dir = os.path.join('/mnt/clustershare/knoweng/', os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
     else:
         tmp_dir = run_parameters["tmp_directory"]
@@ -437,7 +437,7 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
     Returns:
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
-    if run_parameters['processing_method'] == 2:
+    if run_parameters['processing_method'] == 'dist_comp':
         tmp_dir = os.path.join('/mnt/clustershare/knoweng/', os.path.basename(os.path.normpath(run_parameters['tmp_directory']))) 
     else:
         tmp_dir = run_parameters["tmp_directory"]
