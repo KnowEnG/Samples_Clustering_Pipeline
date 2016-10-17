@@ -371,6 +371,8 @@ def run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
         None
 
     """
+    import knpackage.toolbox as kn
+
     sample_random, sample_permutation = kn.sample_a_matrix(
         spreadsheet_mat, run_parameters["rows_sampling_fraction"],
         run_parameters["cols_sampling_fraction"])
