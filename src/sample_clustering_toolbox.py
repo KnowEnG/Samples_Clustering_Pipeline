@@ -60,7 +60,7 @@ def run_cc_nmf(run_parameters):
     spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
-    if run_parameters['processing_method'] != 'serial':
+    if run_parameters['processing_method'] == 'parl_loc':
         # Number of processes to be executed in parallel
         number_of_cpus = multiprocessing.cpu_count()
         if (run_parameters["number_of_bootstraps"] < number_of_cpus):
@@ -68,8 +68,37 @@ def run_cc_nmf(run_parameters):
         print("Using parallelism {}".format(number_of_cpus))
 
         find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_cpus)
-    else:
+    elif run_parameters['processing_method'] == 'dist_comp':
+        print("Start distributing jobs......")
+
+        # determine number of compute nodes to use
+        number_of_comptue_nodes = dstutil.determine_number_of_compute_nodes(run_parameters['cluster_ip_address'],
+                                                                            run_parameters['number_of_bootstraps'])
+        print("Number of compute nodes = {}".format(number_of_comptue_nodes))
+        # create clusters
+        cluster_list = dstutil.generate_compute_clusters(
+            run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
+            find_and_save_net_nmf_clusters_parallel,
+            [run_nmf_clusters_worker,
+             save_a_clustering_to_tmp,
+             dstutil.determine_parallelism_locally])
+
+        # calculates number of jobs assigned to each compute node
+        number_of_jobs_each_node = dstutil.determine_job_number_on_each_compute_node(
+            run_parameters['number_of_bootstraps'],
+            len(cluster_list))
+
+        # defines the number of arguments pass to worker function
+        func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
+
+        # parallel submitting jobs
+        dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
+
+        print("Finish distributing jobs......")
+    elif run_parameters['processing_method'] == 'serial':
         find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
+    else:
+        raise ValueError('processing_method contains bad value.')
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
     indicator_matrix = linkage_matrix.copy()
@@ -242,7 +271,6 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
         None
     """
     import knpackage.toolbox as kn
-    import numpy as np
 
     sample_random, sample_permutation = kn.sample_a_matrix(
         spreadsheet_mat, run_parameters["rows_sampling_fraction"],
@@ -363,7 +391,7 @@ def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
         run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
 
 
-def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_cpus):
+def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops):
     """ central loop: compute components for the consensus matrix by
         non-negative matrix factorization.
 
@@ -372,16 +400,32 @@ def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_
         run_parameters: dictionary of run-time parameters.
         number_of_cpus: number of processes to be running in parallel
     """
-    number_of_bootstraps = run_parameters["number_of_bootstraps"]
-    p = Pool(processes=number_of_cpus)
-    range_list = range(0, number_of_bootstraps)
-    p.starmap(run_nmf_clusters_worker,
-              zip(itertools.repeat(spreadsheet_mat),
-                  itertools.repeat(run_parameters),
-                  range_list))
+    import multiprocessing
+    import itertools
+    import sys
+    import socket
+    import knpackage.distributed_computing_utils as dstutil
 
-    p.close()
-    p.join()
+    try:
+        parallelism = dstutil.determine_parallelism_locally(number_of_loops)
+
+        host = socket.gethostname()
+        print("Using parallelism {} on host {}.....".format(parallelism, host))
+
+        number_of_bootstraps = run_parameters["number_of_bootstraps"]
+        range_list = range(0, number_of_bootstraps)
+
+        p = multiprocessing.Pool(processes=parallelism)
+        p.starmap(run_nmf_clusters_worker,
+                  zip(itertools.repeat(spreadsheet_mat),
+                      itertools.repeat(run_parameters),
+                      range_list))
+
+        p.close()
+        p.join()
+        return "Succeeded running parallel processing on node {}.".format(host)
+    except:
+        raise OSError("Failed running parallel processing on node {}: {}".format(host, sys.exc_info()))
 
 
 def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
