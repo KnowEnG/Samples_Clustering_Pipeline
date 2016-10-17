@@ -145,7 +145,7 @@ def run_cc_net_nmf(run_parameters):
     tmp_dir = 'tmp_cc_net_nmf'
     if (run_parameters['processing_method'] == 2):
         # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir("/mnt/ramdisk/", tmp_dir)
+        run_parameters["tmp_directory"] = kn.create_dir("/mnt/clustershare/knoweng/", tmp_dir)    
     else:
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
 
@@ -414,7 +414,7 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
         indicator_matrix: input summed with "temp_p*" files in run_parameters["tmp_directory"].
     """
     if run_parameters['processing_method'] == 2:
-        tmp_dir = '/mnt/clustershare/'
+        tmp_dir = os.path.join('/mnt/clustershare/knoweng/', os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
     else:
         tmp_dir = run_parameters["tmp_directory"]
     dir_list = os.listdir(tmp_dir)
@@ -438,7 +438,7 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
     if run_parameters['processing_method'] == 2:
-        tmp_dir = '/mnt/clustershare/'
+        tmp_dir = os.path.join('/mnt/clustershare/knoweng/', os.path.basename(os.path.normpath(run_parameters['tmp_directory']))) 
     else:
         tmp_dir = run_parameters["tmp_directory"]
 
@@ -472,6 +472,7 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
 
     # time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
     time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
+    os.makedirs(tmp_dir, mode=0o755, exist_ok=True)
 
     hname = os.path.join(tmp_dir, 'temp_h' + time_stamp)
     pname = os.path.join(tmp_dir, 'temp_p' + time_stamp)
