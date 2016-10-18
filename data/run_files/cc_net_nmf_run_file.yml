@@ -30,8 +30,11 @@ rwr_convergence_tolerence: "0.0001"
 
 display_clusters: 0
 
-# processing_method dictionary, valid values are serial, parl_loc, dist_comp 
-processing_method: dist_comp 
+# processing_method dictionary, valid values are serial, parl_loc, dist_comp
+# Single core machine: set the processing_method value to be serial
+# multi core machine: set the processing_method value to be parl_loc
+# multi node machine: set the processing_method value to be dist_comp 
+processing_method: parl_loc
 
 phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
 
@@ -53,3 +56,4 @@ cluster_ip_address:
 cluster_shared_ram: /mnt/ramdisk/knoweng/
 # AWS configuration
 cluster_shared_volumn: /mnt/clustershare/knoweng/
+
