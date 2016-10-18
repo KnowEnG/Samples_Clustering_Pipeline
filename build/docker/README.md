@@ -3,14 +3,15 @@
 ## Set up and run in a terminal (if you have docker installed):
 1 Change directory to the directory  where you want to run.
 
-2 docker run -v \`pwd\`:\`pwd\` -it knowengdev/samples_clustering_pipeline:10_17_2016    
-     (or use current tag)
+2 docker run -v \`pwd\`:/home/test/run_dir/ -it knowengdev/samples_clustering_pipeline:10_18_2016 
 
 3 cd test
 
 4 make env_setup
 
-5 make run_cc_net_nmf
+5 edit the .yml file (use the comments to see options)
+
+6 make run_cc_net_nmf
 
 * The make options in Samples_Clustering_Pipeline/README.md apply.
 
