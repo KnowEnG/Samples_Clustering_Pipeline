@@ -9,7 +9,9 @@
 
 4 make env_setup
 
-5 make run_cc_net_nmf
+5 edit the .yml file (use the comments to see options)
+
+6 make run_cc_net_nmf
 
 * The make options in Samples_Clustering_Pipeline/README.md apply.
 
