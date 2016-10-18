@@ -28,6 +28,7 @@ processing_method: dist_comp
 
 phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
 
+# AWS configuration
 cluster_ip_address:
 # AWS env
 - 172.31.47.99
@@ -41,6 +42,7 @@ cluster_ip_address:
 #- 192.17.176.150
 #- 128.174.244.71
 
+# AWS configuration
 cluster_shared_ram: /mnt/ramdisk/knoweng/
-
+# AWS configuration
 cluster_shared_volumn: /mnt/clustershare/knoweng/
