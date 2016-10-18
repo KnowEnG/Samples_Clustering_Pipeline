@@ -1,0 +1,14 @@
+.PHONY: docker_pipelines docker_run_cc_net_nmf docker_run_cc_nmf 
+
+# Set up the environment to run docker image
+# It includes create a run directory, copy run_files for docker to run directory and decompress input data 
+env_setup: 
+	make create_run_dir copy_run_files 
+
+# Run cc_net_nmf pipeline on AWS cluster 
+docker_run_cc_net_nmf:
+	curl -L -H 'Content-Type: application/json' -X POST -d '{"schedule":"R1\/\/P3M","name":"aws_docker_run_cc_net_nmf","container":{"type":"DOCKER","image":"knowengdev/samples_clustering_pipeline:10_18_2016","forcePullImage": true, "volumes": [{"containerPath": "/mnt/clustershare/knoweng/", "hostPath":"/mnt/clustershare/knoweng/", "mode":"RW"}, {"containerPath": "/home/test/run_dir", "hostPath":"/home/ubuntu", "mode":"RW"}]},"cpus":"36","mem":"5120","retries": "0","command":"cd test; make env_setup run_cc_net_nmf"}' knownbs.dyndns.org:4400/scheduler/iso8601	
+
+# Run net_nmf pipeline on AWS cluster
+docker_run_cc_nmf:
+	curl -L -H 'Content-Type: application/json' -X POST -d '{"schedule":"R1\/\/P3M","name":"aws_docker_run_net_nmf","container":{"type":"DOCKER","image":"knowengdev/samples_clustering_pipeline:10_18_2016","forcePullImage": true, "volumes": [{"containerPath": "/mnt/clustershare/knoweng/", "hostPath":"/mnt/clustershare/knoweng/", "mode":"RW"}]},"cpus":"36","mem":"5120","retries": "0","command":"cd test; make env_setup run_net_nmf"}' knownbs.dyndns.org:4400/scheduler/iso8601	
