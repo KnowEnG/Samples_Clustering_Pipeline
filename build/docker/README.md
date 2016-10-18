@@ -3,7 +3,8 @@
 ## Set up and run in a terminal (if you have docker installed):
 1 Change directory to the directory  where you want to run.
 
-2 docker run -v \`pwd\`:\`pwd\` -it knowengdev/samples_clustering_pipeline:09_01_2016
+2 docker run -v \`pwd\`:\`pwd\` -it knowengdev/samples_clustering_pipeline:10_17_2016    
+     (or use current tag)
 
 3 make all
 
