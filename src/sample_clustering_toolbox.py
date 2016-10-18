@@ -294,28 +294,7 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-    move_files(run_parameters['tmp_directory'], run_parameters['cluster_shared_volumn'])
-
-
-def move_files(src, dst):
-    '''Move files from source directory to destination
-    Args:
-        src: source directory
-        dst: destination directory
-
-    Returns:
-
-    '''
-    import subprocess
-    import sys
-    try:
-        cmd = ['mv', src, dst]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output, err = process.communicate()
-        print(output)
-        print(err)
-    except:
-        raise OSError(sys.exc_info())
+    #move_files(run_parameters['tmp_directory'], run_parameters['cluster_shared_volumn'])
 
 
 def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
