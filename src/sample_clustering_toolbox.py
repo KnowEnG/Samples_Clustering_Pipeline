@@ -282,8 +282,8 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     import knpackage.toolbox as kn
 
     sample_random, sample_permutation = kn.sample_a_matrix(
-        spreadsheet_mat, run_parameters["rows_sampling_fraction"],
-        run_parameters["cols_sampling_fraction"])
+        spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
+        float(run_parameters["cols_sampling_fraction"]))
     sample_smooth, iterations = \
         kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
 
@@ -370,8 +370,8 @@ def run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     import knpackage.toolbox as kn
 
     sample_random, sample_permutation = kn.sample_a_matrix(
-        spreadsheet_mat, run_parameters["rows_sampling_fraction"],
-        run_parameters["cols_sampling_fraction"])
+        spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
+        float(run_parameters["cols_sampling_fraction"]))
 
     h_mat = kn.perform_nmf(sample_random, run_parameters)
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
