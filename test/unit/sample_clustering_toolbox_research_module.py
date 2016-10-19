@@ -196,5 +196,10 @@ def get_test_paramters_dictionary():
         'rows_sampling_fraction': "0.8",
         'cols_sampling_fraction': "0.8",
         'number_of_bootstraps': 5,
-        'run_directory': './tmp'}
+        'run_directory': './tmp',
+        'processing_method': 'serial',
+        'processing_method_1': 'serial',
+        'processing_method_2': 'parl_loc',
+        'processing_method_3': 'dist_comp'}
+
     return test_parameters
