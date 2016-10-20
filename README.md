@@ -100,15 +100,12 @@ __***Follow steps 1-4 above then do the following:***__
  Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files template_run_parameters.yml
  ```
 ### * Modify run_paramters file  (YAML Format)
-Change 
+Change processing_method to one of: serial, parl_loc, dist_comp depending on your machine.
 ```
-use_parallel_processing: "0"
+processing_method: parl_loc
 ```
-to
-```
-use_parallel_processing: "1"
-```
-for parallel processing (if your machine supports it), which is faster.
+
+set the data file targets to the files you want to run, and the parameters as appropriate for your data.
 
 
 ### * Run the Samples Clustering Pipeline:
