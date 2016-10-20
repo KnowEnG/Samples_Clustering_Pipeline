@@ -26,7 +26,7 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 docker run -v \`pwd\`:/home/test/run_dir/ -it knowengdev/samples_clustering_pipeline:10_18_2016 
 ```
 
-### * Change directory to the test
+### * Change directory to the "test" directory
 ```
 cd test
 ```
