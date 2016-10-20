@@ -21,20 +21,23 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 ## How to run this docker image
 * * * 
 
-1 Change directory to the directory  where you want to run.
+### * Change directory to the directory  where you want to run
 
-2 docker run -v \`pwd\`:/home/test/run_dir/ -it knowengdev/samples_clustering_pipeline:10_18_2016 
+### * Run the following docker command to run the specific docker image:
+```
+docker run -v \`pwd\`:/home/test/run_dir/ -it knowengdev/samples_clustering_pipeline:10_18_2016 
+```
 
-3 cd test
+### * Change directory to the test
+```
+cd test
+```
+### * Create a local directory "run_dir" and place all the run files in it
+```
+make env_setup
+```
 
-4 make env_setup
-
-5 edit the .yml file (use the comments to see options)
-
-6 make run_cc_net_nmf
-
-* The make options in Samples_Clustering_Pipeline/README.md apply.
-
-* Check on docker.hub to get the latest image. 
-
-* If you don't "cp" your data into the volume you mounted it will disappear when you exit docker.
+### * Run the Sample Clustering Pipeline
+```
+make run_cc_net_nmf
+```
