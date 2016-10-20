@@ -15,16 +15,16 @@ env_setup: create_run_dir copy_run_files
 run_all_methods: run_nmf run_net_nmf run_cc_nmf run_cc_net_nmf
 
 run_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf_run_file.yml 
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf.yml 
 
 run_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file net_nmf_run_file.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file net_nmf.yml
 
 run_cc_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_nmf_run_file.yml 
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_nmf.yml 
 
 run_cc_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf_run_file.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf.yml
 
 decompress_input_data:
 	$(GZIP_D) $(INPUT_DATA_DIR)/*
@@ -54,4 +54,5 @@ unit_test_cleanup:
 	$(RMR) $(UNIT_TEST_TEMP_DIR)
 
 run_benchmark_test:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file benchmark_cc_net_nmf_run_file.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file benchmark_cc_net_nmf.yml
+
