@@ -4,6 +4,3 @@
 * The members of each cluster may have different numbering assignments (0,2,1) vs (1,2,3).
 * The parameter "number_of_bootstraps" should be at least 200, 1000 would be better
 * The parameter "processing_method" must be set for your environment: dist_comp is fastest, parl_loc is fast, and serial works anywhere
-
-https://healthsciences.ucsd.edu/som/medicine/research/labs/ideker/software/Pages/default.aspx
-
