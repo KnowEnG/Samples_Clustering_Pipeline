@@ -37,7 +37,7 @@ cd test
 make env_setup
 ```
 
-### * Run the Sample Clustering Pipeline
+### * Run the Samples Clustering Pipeline
 ```
 make run_cc_net_nmf
 ```
