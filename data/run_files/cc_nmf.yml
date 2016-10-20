@@ -27,7 +27,7 @@ display_clusters: 0
 # Single core machine: set the processing_method value to be serial
 # multi core machine: set the processing_method value to be parl_loc
 # multi node machine: set the processing_method value to be dist_comp 
-processing_method: dist_comp 
+processing_method: parl_loc 
 
 phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
 

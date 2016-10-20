@@ -9,54 +9,57 @@ method: cc_net_cluster_nmf
 # 	net_cluster_nmf
 # 	cc_net_cluster_nmf
 
-gg_network_name_full_path: ./run_dir/input_data/keg_ST90_4col.edge
-#	4 col edge file for building adjacency matrix in net nmf and rwr.
+# Gene x Gene Network stored in 4 col format;   Gene x Set-id Spreadsheet
+gg_network_name_full_path: ../data/networks/keg_ST90_4col.edge
+spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
 
-spreadsheet_name_full_path: ./run_dir/input_data/tcga_ucec_somatic_mutation_data.df
-#	dataframe == matrix with row and column names in .tsv format.
-
+# directories for storing run results and temporary data
 results_directory: ./run_dir/results
-#	Where the computational output will be written.
-
 tmp_directory: ./run_dir/tmp
-#	Directory where partial clustering results are written untill reading into consensus matrix.
 
+# estimated number of clusters; bootstraps = number of sub-samples included in consensus
 number_of_clusters: 3
-#	Inner dimension of matrix factorization will be set to this.
+number_of_bootstraps: 4
+
+rows_sampling_fraction: 0.8
+cols_sampling_fraction: 0.8
+
+# iterations between loop invariance checks; loop exit test; absolute max loops; network weighting factor
+nmf_conv_check_freq: "50"
+nmf_max_invariance: "200"
+nmf_max_iterations: "10000"
+nmf_penalty_parameter: "1400"
+
+# random walk with restart absolute max iterations; restart vector weight; delta norm loop exit;
+rwr_max_iterations: "100"
+rwr_restart_probability: "0.7"
+rwr_convergence_tolerence: "0.0001"
 
 display_clusters: 0
-#	Display clustering graphically may require system accomodations.
 
-nmf_conv_check_freq: "50"
-#	Number of iterations between convergence check calculation (both nmf and net-nmf).
+# processing_method dictionary, valid values are serial, parl_loc, dist_comp
+# single core machine: set the processing_method value to be serial
+# multi core machine: set the processing_method value to be parl_loc
+# multi node machine: set the processing_method value to be dist_comp 
+processing_method: parl_loc
 
-nmf_max_iterations: "10000"
-#	Maximum number of iterations in one bootstrap.
+phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
 
-nmf_max_invariance: "200"
-#	Maximum number of iterations without change in clustering.
+# AWS configuration
+cluster_ip_address:
+# AWS env
+- 172.31.47.99
+- 172.31.41.138
+# Dev env
+#- 192.17.176.156
+#- 192.17.176.151
+#- 192.17.176.158
+#- 192.17.176.161
+#- 192.17.176.152
+#- 192.17.176.150
+#- 128.174.244.71
 
-
-#			Required for network based nmf:
-rwr_max_iterations: "100"
-#	Random walk with restart; maximum number of iterations without convergence.
-
-rwr_convergence_tolerence: "0.0001"
-#	Finish rwr when the frobenius norm of the spreadsheet vector(s) is within tolerence of the previous one.
-
-rwr_restart_probability: "0.7"
-#	rwr_restart_probability = alhpa in Vn+1 = alpha * N * Vn + (1-alpha) * Vo
-
-nmf_penalty_parameter: "1400"
-#	nmf_penalty_parameter = lambda as in: minimize ||X-W*H|| + lambda(W'*N*W)
-
-
-#			Required for consensus clustering:
-rows_sampling_fraction: "0.8"
-#	Random sample of rows portion.
-
-cols_sampling_fraction: "0.8"
-#	Rancom sample of columns portion.
-
-number_of_bootstraps: 5
-#	Number of random samplings to perform and incorporate into the consensus matrix.
+# AWS configuration
+cluster_shared_ram: /mnt/ramdisk/knoweng/
+# AWS configuration
+cluster_shared_volumn: /mnt/clustershare/knoweng/
