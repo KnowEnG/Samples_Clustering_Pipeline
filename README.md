@@ -102,7 +102,7 @@ __***Follow steps 1-4 above then do the following:***__
 ### * Modify run_paramters file  (YAML Format)
 Change processing_method to one of: serial, parl_loc, dist_comp depending on your machine.
 ```
-processing_method: parl_loc
+processing_method: serial
 ```
 
 set the data file targets to the files you want to run, and the parameters as appropriate for your data.
