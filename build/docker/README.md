@@ -23,7 +23,7 @@ The Dockefile in this directory contains all the commands, in order, needed to b
 
 ### * Change directory to the directory  where you want to run
 
-### * Run the following docker command to run the specific docker image:
+### * Run the following command with the specified docker image:
 ```
 docker run -v \`pwd\`:/home/test/run_dir/ -it knowengdev/samples_clustering_pipeline:10_18_2016 
 ```
