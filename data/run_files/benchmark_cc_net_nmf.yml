@@ -29,7 +29,7 @@ rwr_max_iterations: "100"
 rwr_restart_probability: "0.7"
 rwr_convergence_tolerence: "0.0001"
 
-display_clusters: 1
+display_clusters: 0
 
 # processing_method dictionary, valid values are serial, parl_loc, dist_comp
 # single core machine: set the processing_method value to be serial
