@@ -27,13 +27,10 @@ run_cc_net_nmf:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf.yml
 
 decompress_input_data:
-	$(GZIP_D) $(INPUT_DATA_DIR)/*
+	$(GZIP_D) $(INPUT_DATA_DIR)/networks/* $(INPUT_DATA_DIR)/spreadsheets/*
  
 compress_input_data:
-	$(GZIP) $(INPUT_DATA_DIR)/*
-
-create_input_data:
-	$(MKDIR_P) $(INPUT_DATA_DIR)	
+	$(GZIP) $(INPUT_DATA_DIR)/networks/* $(INPUT_DATA_DIR)/spreadsheets/*
 
 create_run_dir:
 	$(MKDIR_P) $(RESULTS_DIR) 
