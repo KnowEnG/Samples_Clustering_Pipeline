@@ -11,4 +11,3 @@ RUN git clone https://username:password@github.com/KnowEnG-Research/Samples_Clus
 
 # Set up working directory
 WORKDIR ${SRC_LOC}
- 
