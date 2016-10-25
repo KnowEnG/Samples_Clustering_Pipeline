@@ -24,26 +24,6 @@ nmf_max_iterations:         10000
 nmf_penalty_parameter:      1400
 
 
-processing_method:          dist_comp  # available methods: serial, parl_loc, dist_comp
+processing_method:          parl_loc  # available methods: serial, parl_loc, dist_comp
                                        # available clusters: AWS, CS Cluster
-
-# ----------------------
-# Running on AWS cluster
-# ----------------------
-cluster_shared_volumn:      /mnt/clustershare/knoweng/
-cluster_ip_address:
-                            - 172.31.47.99
-                            - 172.31.41.138
-# ----------------------
-# Running on CS cluster
-# ----------------------
-# cluster_shared_volumn:    /mnt/clustershare/knoweng/ -- place holder to be updated by Jing
-#                           - 192.17.176.156
-#                           - 192.17.176.151
-#                           - 192.17.176.158
-#                           - 192.17.176.161
-#                           - 192.17.176.152
-#                           - 192.17.176.150
-#                           - 128.174.244.71
-#
 
