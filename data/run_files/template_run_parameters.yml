@@ -1,13 +1,6 @@
 # yaml parameters file template with all options for nmf and net-nmf with or without consensus clustering
 
-use_parallel_processing: "0"
-
-method: cc_net_cluster_nmf
-#	A clustering method name recongized by samples_clustering.py.
-# 	cluster_nmf
-# 	cc_cluster_nmf
-# 	net_cluster_nmf
-# 	cc_net_cluster_nmf
+method: cc_net_cluster_nmf	# cluster_nmf, cc_cluster_nmf, net_cluster_nmf, cc_net_cluster_nmf
 
 # Gene x Gene Network stored in 4 col format;   Gene x Set-id Spreadsheet
 gg_network_name_full_path: ../data/networks/keg_ST90_4col.edge
@@ -25,15 +18,15 @@ rows_sampling_fraction: 0.8
 cols_sampling_fraction: 0.8
 
 # iterations between loop invariance checks; loop exit test; absolute max loops; network weighting factor
-nmf_conv_check_freq: "50"
-nmf_max_invariance: "200"
-nmf_max_iterations: "10000"
-nmf_penalty_parameter: "1400"
+nmf_conv_check_freq: 50
+nmf_max_invariance: 200
+nmf_max_iterations: 10000
+nmf_penalty_parameter: 1400
 
 # random walk with restart absolute max iterations; restart vector weight; delta norm loop exit;
-rwr_max_iterations: "100"
-rwr_restart_probability: "0.7"
-rwr_convergence_tolerence: "0.0001"
+rwr_max_iterations: 100
+rwr_restart_probability: 0.7
+rwr_convergence_tolerence: 0.0001
 
 display_clusters: 0
 
@@ -41,9 +34,9 @@ display_clusters: 0
 # single core machine: set the processing_method value to be serial
 # multi core machine: set the processing_method value to be parl_loc
 # multi node machine: set the processing_method value to be dist_comp 
-processing_method: parl_loc
+processing_method: serial
 
-phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
+#phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
 
 # AWS configuration
 cluster_ip_address:
