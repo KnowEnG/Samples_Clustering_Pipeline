@@ -51,5 +51,5 @@ unit_test_cleanup:
 	$(RMR) $(UNIT_TEST_TEMP_DIR)
 
 run_benchmark_test:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file benchmark_cc_net_nmf.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf_paralell.yml
 

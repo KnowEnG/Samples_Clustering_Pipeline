@@ -28,9 +28,9 @@ def cc_net_nmf(run_parameters):
 
 SELECT = {
     "nmf":nmf,
-    "cc_cluster_nmf":cc_nmf,
+    "cc_nmf":cc_nmf,
     "net_nmf":net_nmf,
-    "cc_net_cluster_nmf":cc_net_nmf}
+    "cc_net_nmf":cc_net_nmf}
 
 def main():
     import sys
