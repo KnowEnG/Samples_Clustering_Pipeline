@@ -36,9 +36,10 @@ def run_nmf(run_parameters):
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_gene_cluster_average(spreadsheet_df, labels, run_parameters)
 
-    if run_parameters['display_clusters'] != 0:
-        con_mat_image = form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters'])
-        display_clusters(con_mat_image)
+    if 'display_clusters' in run_parameters:
+        if run_parameters['display_clusters'] != 0:
+            con_mat_image = form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters'])
+            display_clusters(con_mat_image)
 
     return
 
@@ -106,8 +107,9 @@ def run_cc_nmf(run_parameters):
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
-    if run_parameters['display_clusters'] != 0:
-        display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
+    if 'display_clusters' in run_parameters:
+        if run_parameters['display_clusters'] != 0:
+            display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
 
     return
 
@@ -152,8 +154,9 @@ def run_net_nmf(run_parameters):
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat)
 
-    if run_parameters['display_clusters'] != 0:
-        display_clusters(form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters']))
+    if 'display_clusters' in run_parameters:
+        if run_parameters['display_clusters'] != 0:
+            display_clusters(form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters']))
 
     return
 
@@ -259,8 +262,9 @@ def run_cc_net_nmf(run_parameters):
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
-    if run_parameters['display_clusters'] != 0:
-        display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
+    if 'display_clusters' in run_parameters:
+        if run_parameters['display_clusters'] != 0:
+            display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
 
     return
 
