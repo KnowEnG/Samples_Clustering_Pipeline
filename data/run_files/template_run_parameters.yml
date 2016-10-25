@@ -1,4 +1,3 @@
-# yaml parameters file template with all options for nmf and net-nmf with or without consensus clustering
 
 method: cc_net_cluster_nmf	# cluster_nmf, cc_cluster_nmf, net_cluster_nmf, cc_net_cluster_nmf
 
