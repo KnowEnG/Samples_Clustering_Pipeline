@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Created on Wed Jul 20 14:47:45 2016
-
-@author: The Gene Sets Characterization dev team
-
+@author: The KnowEnG dev team
 """
 
 def nmf(run_parameters):
@@ -33,6 +30,9 @@ SELECT = {
     "cc_net_nmf":cc_net_nmf}
 
 def main():
+    """
+    This is the main function to perform sample clustering
+    """
     import sys
     from knpackage.toolbox import get_run_directory_and_file
     from knpackage.toolbox import get_run_parameters
