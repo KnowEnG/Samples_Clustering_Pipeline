@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-Created on Mon Aug  8 16:08:25 2016
-
-@author: del
-@author: The Gene Sets Characterization dev team
-
+@author: The KnowEnG dev team
 """
 import os
 import numpy as np
