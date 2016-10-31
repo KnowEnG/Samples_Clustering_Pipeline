@@ -1,12 +1,9 @@
-# ----------------------------------------------------------------
-# Variables setup Section                                        -
-# ----------------------------------------------------------------
-SCRIPT = 		../src/samples_clustering.py
-RUN_DIR = 		./run_dir
-RUN_FILES = 		../data/run_files
-RESULTS_DIR = 		$(RUN_DIR)/results
-INPUT_DATA_DIR = 	../data
-UNIT_TEST_TEMP_DIR =	 ./unit/tmp
+SCRIPT = ../src/samples_clustering.py
+RUN_DIR = ./run_dir
+RUN_FILES = ../data/run_files
+RESULTS_DIR = $(RUN_DIR)/results
+INPUT_DATA_DIR = ../data
+UNIT_TEST_TEMP_DIR = ./unit/tmp
 
 RMR = rm -rf
 GZIP = gzip
@@ -60,7 +57,7 @@ unit_tests:
 	cd unit; make all_unit_tests
 	
 run_benchmark_test:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf_paralell.yml	
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file PARALLEL_cc_net_nmf.yml	
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -
