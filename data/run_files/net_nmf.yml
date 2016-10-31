@@ -1,9 +1,8 @@
 
-method: net_nmf            		# Available methods: nmf, cc_nmf, net_nmf, cc_net_nmf
+method: net_nmf             # Available methods: nmf, cc_nmf, net_nmf, cc_net_nmf
 
 gg_network_name_full_path:  ../data/networks/keg_ST90_4col.edge
 spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
-phenotype_data_full_path:   ../data/spreadsheets/UCECppheno_table.txt
 
 results_directory:           ./run_dir/results
 tmp_directory:               ./run_dir/tmp
