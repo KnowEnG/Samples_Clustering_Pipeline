@@ -67,7 +67,7 @@ make env_setup
 |:------------------- |:------------------------------------------------ | 
 | make run_nmf        | Clustering                                       |
 | make run_cc_nmf     | Consensus Clustering                             |
-| make run_cc_nmf     | Clustering with network regularization           |
+| make run_net_nmf     | Clustering with network regularization           |
 | make run_cc_net_nmf | Consensus Clustering with network regularization |
 
  
