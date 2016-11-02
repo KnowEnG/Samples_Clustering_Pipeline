@@ -97,7 +97,7 @@ __***Follow steps 1-4 above then do the following:***__
  
 ### * Create run_paramters file  (YAML Format)
  ``` 
- Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files template_run_parameters.yml
+ Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files TEMPLATE_cc_net_cluster_nmf.yml
  ```
 ### * Modify run_paramters file  (YAML Format)
 Change processing_method to one of: serial, parl_loc, dist_comp depending on your machine.
