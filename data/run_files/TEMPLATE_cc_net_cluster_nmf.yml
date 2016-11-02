@@ -1,5 +1,5 @@
 
-method: cc_net_cluster_nmf      # cluster_nmf, cc_cluster_nmf, net_cluster_nmf, cc_net_cluster_nmf
+method: cc_net_nmf      # nmf, cc_nmf, net_nmf, cc_net_nmf
 
 # Gene x Gene Network stored in 4 col format;   Gene x Set-id Spreadsheet
 gg_network_name_full_path: ../data/networks/keg_ST90_4col.edge
