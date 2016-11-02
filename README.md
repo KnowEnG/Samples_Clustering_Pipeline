@@ -117,5 +117,5 @@ set the data file targets to the files you want to run, and the parameters as ap
    
   * Run
    ```
-  python3 ../src/samples_clustering.py -run_directory ./ -run_file template_run_parameters.yml
+  python3 ../src/samples_clustering.py -run_directory ./ -run_file TEMPLATE_cc_net_cluster_nmf.yml
    ```
