@@ -196,7 +196,6 @@ def run_cc_net_nmf(run_parameters):
     network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
 
     network_df = kn.symmetrize_df(network_df)
-    # network_mat = convert_df_to_sparse(network_df, len(unique_gene_names))
     network_mat = kn.convert_network_df_to_sparse(
         network_df, len(unique_gene_names), len(unique_gene_names))
 
