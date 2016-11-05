@@ -67,7 +67,7 @@ make env_setup
 |:------------------- |:------------------------------------------------ | 
 | make run_nmf        | Clustering                                       |
 | make run_cc_nmf     | Consensus Clustering                             |
-| make run_cc_nmf     | Clustering with network regularization           |
+| make run_net_nmf     | Clustering with network regularization           |
 | make run_cc_net_nmf | Consensus Clustering with network regularization |
 
  
@@ -97,7 +97,7 @@ __***Follow steps 1-4 above then do the following:***__
  
 ### * Create run_paramters file  (YAML Format)
  ``` 
- Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files template_run_parameters.yml
+ Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files TEMPLATE_cc_net_cluster_nmf.yml
  ```
 ### * Modify run_paramters file  (YAML Format)
 Change processing_method to one of: serial, parl_loc, dist_comp depending on your machine.
@@ -117,5 +117,5 @@ set the data file targets to the files you want to run, and the parameters as ap
    
   * Run
    ```
-  python3 ../src/samples_clustering.py -run_directory ./ -run_file template_run_parameters.yml
+  python3 ../src/samples_clustering.py -run_directory ./ -run_file TEMPLATE_cc_net_cluster_nmf.yml
    ```
