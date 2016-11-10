@@ -31,11 +31,6 @@ def run_nmf(run_parameters):
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_gene_cluster_average(spreadsheet_df, labels, run_parameters)
 
-    if 'display_clusters' in run_parameters:
-        if run_parameters['display_clusters'] != 0:
-            con_mat_image = form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters'])
-            display_clusters(con_mat_image)
-
     return
 
 
@@ -102,10 +97,6 @@ def run_cc_nmf(run_parameters):
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
-    if 'display_clusters' in run_parameters:
-        if run_parameters['display_clusters'] != 0:
-            display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
-
     return
 
 
@@ -148,10 +139,6 @@ def run_net_nmf(run_parameters):
 
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat)
-
-    if 'display_clusters' in run_parameters:
-        if run_parameters['display_clusters'] != 0:
-            display_clusters(form_consensus_matrix_graphic(linkage_matrix, run_parameters['number_of_clusters']))
 
     return
 
@@ -255,10 +242,6 @@ def run_cc_net_nmf(run_parameters):
     save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat)
 
     kn.remove_dir(run_parameters["tmp_directory"])
-
-    if 'display_clusters' in run_parameters:
-        if run_parameters['display_clusters'] != 0:
-            display_clusters(form_consensus_matrix_graphic(consensus_matrix, run_parameters['number_of_clusters']))
 
     return
 
@@ -548,27 +531,6 @@ def form_consensus_matrix_graphic(consensus_matrix, k=3):
     cc_cm = cc_cm[sorted_labels[:, None], sorted_labels]
 
     return cc_cm
-
-
-def display_clusters(consensus_matrix):
-    """ graphic display the consensus matrix.
-
-    Args:
-         consenus matrix: usually a smallish square matrix.
-    """
-    methods = [None, 'none', 'nearest', 'bilinear', 'bicubic', 'spline16',
-               'spline36', 'hanning', 'hamming', 'hermite', 'kaiser', 'quadric',
-               'catrom', 'gaussian', 'bessel', 'mitchell', 'sinc', 'lanczos']
-    grid = consensus_matrix
-    fig, axes = plt.subplots(3, 6, figsize=(12, 6),
-                             subplot_kw={'xticks': [], 'yticks': []})
-    fig.subplots_adjust(hspace=0.3, wspace=0.05)
-    for ax_n, interp_method in zip(axes.flat, methods):
-        ax_n.imshow(grid, interpolation=interp_method)
-        ax_n.set_title(interp_method)
-    plt.show()
-
-    return
 
 
 def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters):
