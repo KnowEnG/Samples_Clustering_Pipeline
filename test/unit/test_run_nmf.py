@@ -9,7 +9,6 @@ class TestRun_nmf(TestCase):
     def test_run_nmf(self):
         run_parameters = tstdata.get_test_paramters_dictionary()
 
-        run_parameters['display_clusters'] = 0
         run_parameters["use_now_name"] = 0
 
         sctbx.run_nmf(run_parameters)

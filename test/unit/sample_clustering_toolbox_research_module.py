@@ -184,7 +184,6 @@ def get_test_paramters_dictionary():
         'results_directory': './tmp',
         'tmp_directory': './tmp',
         'number_of_clusters': 3,
-        'display_clusters': 0,
         'nmf_conv_check_freq': 50,
         'nmf_max_iterations': 10000,
         'nmf_max_invariance': 200,
