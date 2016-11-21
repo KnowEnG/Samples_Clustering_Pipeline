@@ -10,7 +10,6 @@ class TestRun_net_nmf(TestCase):
         run_parameters = tstdata.get_test_paramters_dictionary()
         run_parameters['method'] = run_parameters['method_3']
 
-        run_parameters['display_clusters'] = 0
         run_parameters["use_now_name"] = 0
 
         sctbx.run_net_nmf(run_parameters)

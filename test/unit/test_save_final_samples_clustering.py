@@ -13,7 +13,6 @@ class TestSave_final_samples_clustering(TestCase):
         self.run_parameters["run_directory"] = '.'
         self.run_parameters["tmp_directory"] = kn.create_dir(self.run_parameters["run_directory"], 'tmp_cc_net_nmf')
         self.run_parameters["results_directory"] = self.run_parameters["tmp_directory"]
-        self.run_parameters['display_clusters'] = 0
         self.run_parameters["use_now_name"] = 0
 
     def tearDown(self):

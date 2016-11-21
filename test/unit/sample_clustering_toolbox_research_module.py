@@ -174,7 +174,6 @@ def sets_a_eq_b(a, b):
 def get_test_paramters_dictionary():
     test_parameters = {
         'test_directory': '.',
-        'use_parallel_processing': '1',
         'method': 'cc_net_cluster_nmf',
         'method_1': 'cluster_nmf',
         'method_2': 'cc_cluster_nmf',
@@ -184,17 +183,21 @@ def get_test_paramters_dictionary():
         'spreadsheet_name_full_path': '../../data/spreadsheets/tcga_ucec_somatic_mutation_data.df',
         'results_directory': './tmp',
         'tmp_directory': './tmp',
-        'number_of_clusters': '3',
-        'display_clusters': "0",
-        'nmf_conv_check_freq': "50",
-        'nmf_max_iterations': "10000",
-        'nmf_max_invariance': "200",
-        'rwr_max_iterations': "100",
-        'rwr_convergence_tolerence': "0.0001",
-        'rwr_restart_probability': "0.7",
-        'nmf_penalty_parameter': "1400",
-        'rows_sampling_fraction': "0.8",
-        'cols_sampling_fraction': "0.8",
-        'number_of_bootstraps': "5",
-        'run_directory': './tmp'}
+        'number_of_clusters': 3,
+        'nmf_conv_check_freq': 50,
+        'nmf_max_iterations': 10000,
+        'nmf_max_invariance': 200,
+        'rwr_max_iterations': 100,
+        'rwr_convergence_tolerence': 0.0001,
+        'rwr_restart_probability': 0.7,
+        'nmf_penalty_parameter': 1400,
+        'rows_sampling_fraction': 0.8,
+        'cols_sampling_fraction': 0.8,
+        'number_of_bootstraps': 5,
+        'run_directory': './tmp',
+        'processing_method': 'serial',
+        'processing_method_1': 'serial',
+        'processing_method_2': 'parl_loc',
+        'processing_method_3': 'dist_comp'}
+
     return test_parameters
