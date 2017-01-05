@@ -7,7 +7,7 @@ ENV SRC_LOC /home
 RUN pip3 install -I knpackage dispy 
 
 # Clone from github
-RUN git clone https://username:password@github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git ${SRC_LOC} 
+RUN git clone https://github.com/KnowEnG/Samples_Clustering_Pipeline.git ${SRC_LOC} 
 
 # Set up working directory
 WORKDIR ${SRC_LOC}
