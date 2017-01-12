@@ -28,7 +28,7 @@ def run_nmf(run_parameters):
 
     sample_names = spreadsheet_df.columns
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     return
 
@@ -92,7 +92,7 @@ def run_cc_nmf(run_parameters):
     sample_names = spreadsheet_df.columns
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
@@ -137,7 +137,7 @@ def run_net_nmf(run_parameters):
     labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df, run_parameters, network_mat)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
     return
 
@@ -238,7 +238,7 @@ def run_cc_net_nmf(run_parameters):
 
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df, run_parameters, network_mat)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
@@ -541,19 +541,14 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         labels: cluster numbers for row names.
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
     """
-    file_name = os.path.join(run_parameters["results_directory"],
-                             kn.create_timestamped_filename('consensus_data', 'tsv'))
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
-    out_df.to_csv(file_name, sep='\t')
-    run_parameters['consensus_clustering_file'] = file_name
+    out_df.to_csv(get_output_file_name(run_parameters, 'consensus_data'), sep='\t')
 
     silhouette_average = silhouette_score(consensus_matrix, labels)
     silhouette_score_string = 'cluster estimate = %d, silhouette score = %g' % (
         run_parameters['number_of_clusters'], silhouette_average)
-    silhouette_filename = os.path.join(run_parameters["results_directory"],
-                                       kn.create_timestamped_filename('silhouette_average', 'txt'))
 
-    with open(silhouette_filename, 'w') as fh:
+    with open(get_output_file_name(run_parameters, 'silhouette_average'), 'w') as fh:
         fh.write(silhouette_score_string)
 
     return
@@ -575,20 +570,19 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         phenotype_data = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
         phenotype_data.insert(0, 'Cluster number', 'NA')
         phenotype_data.loc[cluster_labels_df.index.values, 'Cluster number'] = cluster_labels_df.values
-        pheno_file_name = os.path.join(run_parameters["results_directory"],
-                                       kn.create_timestamped_filename('phenotype_data', 'tsv'))
-        phenotype_data.to_csv(pheno_file_name, sep='\t', header=True, index=True, na_rep='NA')
+
+        phenotype_data.to_csv(get_output_file_name(run_parameters, 'phenotype_data'), sep='\t', header=True, index=True, na_rep='NA')
     return
 
 
-def save_spreadsheet_and_variance_heatmap(spreadsheet_df, run_parameters, network_mat=None):
+def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat=None):
     """ save the full genes by samples spreadsheet as processed or smoothed if network is provided.
         Also save variance in separate file.
     Args:
         spreadsheet_df:
         run_parameters:
         network_mat:    (optional)
-    Returns:
+    Returns:            (writes files)
 
     """
     if network_mat is not None:
@@ -597,13 +591,28 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, run_parameters, networ
     else:
         clusters_df = spreadsheet_df
 
-    file_name = os.path.join(run_parameters["results_directory"],
-                             kn.create_timestamped_filename('gene_by_samples', '_viz.tsv'))
-    clusters_df.to_csv(file_name, sep='\t')
+    clusters_df.to_csv(get_output_file_name(run_parameters, 'gene_by_samples', 'viz'), sep='\t')
+
+    cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
+    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'gene_cluster_average', 'viz'), sep='\t')
 
     clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
-    var_file_name = os.path.join(run_parameters["results_directory"],
-                             kn.create_timestamped_filename('gene_samples_variance', '_viz.tsv'))
-    clusters_variance_df.to_csv(var_file_name, sep='\t')
+    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'gene_samples_variance', 'viz'), sep='\t')
 
     return
+
+
+def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
+    """ get the full directory / filename for writing
+    Args:
+        run_parameters: dictionary with keys: "results_directory", "method" and "correlation_measure"
+        prefix_string:  the first letters of the ouput file name
+        suffix_string:  the last letters of the output file name before '.tsv'
+
+    Returns:
+        output_file_name:   full file and directory name suitable for file writing
+    """
+    output_file_name = os.path.join(run_parameters["results_directory"], prefix_string + '_' + run_parameters['method'])
+
+    output_file_name = kn.create_timestamped_filename(output_file_name) + '_' + suffix_string + '.' + type_suffix
+    return output_file_name
