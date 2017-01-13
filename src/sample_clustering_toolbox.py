@@ -594,10 +594,23 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     clusters_df.to_csv(get_output_file_name(run_parameters, 'gene_by_samples', 'viz'), sep='\t')
 
     cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
+    col_labels = []
+    for cluster_number in np.unique(labels):
+        col_labels.append('Cluster_%d'%(cluster_number))
+    cluster_ave_df.columns = col_labels
     cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'gene_cluster_average', 'viz'), sep='\t')
 
     clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
     clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'gene_samples_variance', 'viz'), sep='\t')
+
+    top_n_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns.values,
+                            index=cluster_ave_df.index.values)
+    top_n = 100
+    for sample in top_n_df.columns.values:
+        top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
+        top_n_df[sample].iloc[top_index[0:top_n]] = 1
+
+    top_n_df.to_csv(get_output_file_name(run_parameters, 'top_genes_for_cluster', 'viz'), sep='\t')
 
     return
 
@@ -613,6 +626,6 @@ def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_s
         output_file_name:   full file and directory name suitable for file writing
     """
     output_file_name = os.path.join(run_parameters["results_directory"], prefix_string + '_' + run_parameters['method'])
-
     output_file_name = kn.create_timestamped_filename(output_file_name) + '_' + suffix_string + '.' + type_suffix
+
     return output_file_name
