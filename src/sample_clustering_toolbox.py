@@ -563,13 +563,16 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         run_parameters: write path (run_parameters["results_directory"]).
     """
     file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
-    cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
-    cluster_labels_df.to_csv(file_name, sep='\t', header=None)
-    run_parameters['cluster_labels_file'] = file_name
+    cluster_labels_df = pd.DataFrame(data=None, index=None, columns=['Gene_ID', 'Cluster_ID'])
+    #cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
+    cluster_labels_df['Gene_ID'] = sample_names
+    cluster_labels_df['Cluster_ID'] = labels
+    cluster_labels_df.to_csv(file_name, sep='\t', index=0)
+
     if 'phenotype_data_full_path' in run_parameters.keys():
         phenotype_data = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
-        phenotype_data.insert(0, 'Cluster number', 'NA')
-        phenotype_data.loc[cluster_labels_df.index.values, 'Cluster number'] = cluster_labels_df.values
+        phenotype_data.insert(0, 'Cluster_ID', 'NA')
+        phenotype_data.loc[sample_names, 'Cluster_ID'] = labels
 
         phenotype_data.to_csv(get_output_file_name(run_parameters, 'phenotype_data'), sep='\t', header=True, index=True, na_rep='NA')
     return
