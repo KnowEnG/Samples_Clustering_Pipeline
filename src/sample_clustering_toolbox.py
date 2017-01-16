@@ -541,11 +541,11 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         labels: cluster numbers for row names.
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
     """
-    out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
+    out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
     out_df.to_csv(get_output_file_name(run_parameters, 'consensus_data'), sep='\t')
 
     silhouette_average = silhouette_score(consensus_matrix, labels)
-    silhouette_score_string = 'cluster estimate = %d, silhouette score = %g' % (
+    silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
         run_parameters['number_of_clusters'], silhouette_average)
 
     with open(get_output_file_name(run_parameters, 'silhouette_average'), 'w') as fh:
@@ -564,10 +564,9 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     """
     file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
     cluster_labels_df = pd.DataFrame(data=None, index=None, columns=['Gene_ID', 'Cluster_ID'])
-    #cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
     cluster_labels_df['Gene_ID'] = sample_names
     cluster_labels_df['Cluster_ID'] = labels
-    cluster_labels_df.to_csv(file_name, sep='\t', index=0)
+    cluster_labels_df.to_csv(file_name, sep='\t', index=None)
 
     if 'phenotype_data_full_path' in run_parameters.keys():
         phenotype_data = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
