@@ -600,10 +600,12 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     for cluster_number in np.unique(labels):
         col_labels.append('Cluster_%d'%(cluster_number))
     cluster_ave_df.columns = col_labels
+    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'gene_cluster_average', 'viz'), sep='\t',
+                          index_label='Gene_ID')
 
     clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
-    clusters_variance_df.insert(0,'Gene_ID', clusters_variance_df.index.values)
-    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'gene_samples_variance', 'viz'), sep='\t', index=None)
+    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'gene_samples_variance', 'viz'), sep='\t',
+                                index_label='Gene_ID')
 
     top_n_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
                             index=cluster_ave_df.index.values)
@@ -614,21 +616,9 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     for sample in top_n_df.columns.values:
         top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
         top_n_df[sample].iloc[top_index[0:top_n]] = 1
-    top_n_df.insert(0,'Gene_ID', top_n_df.index.values)
-    top_n_df.to_csv(get_output_file_name(run_parameters, 'top_genes_for_cluster', 'viz'), sep='\t', index=None)
-
-    cluster_ave_df.insert(0,'Gene_ID', cluster_ave_df.index.values)
-    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'gene_cluster_average', 'viz'), sep='\t', index=None)
-
+    top_n_df.to_csv(get_output_file_name(run_parameters, 'top_genes_for_cluster', 'viz'), sep='\t',
+                    index_label='Gene_ID')
     return
-"""
-col_labels = ['Gene_ID']
-for cluster_number in np.unique(labels):
-    col_labels.append('Cluster_%d'%(cluster_number))
-
-cluster_ave_df.reset_index(level=0, inplace=True)
-cluster_ave_df.columns = col_labels
-"""
 
 
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
