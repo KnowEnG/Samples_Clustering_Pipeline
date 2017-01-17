@@ -11,6 +11,8 @@ nmf_conv_check_freq:        50
 nmf_max_invariance:         200
 nmf_max_iterations:         10000
 
-processing_method:          dist_comp  # available methods: serial, parl_loc, dist_comp
+top_number_of_genes:        100
+
+processing_method:          parl_loc  # available methods: serial, parl_loc, dist_comp
                                        # available clusters: AWS, CS Cluster
 

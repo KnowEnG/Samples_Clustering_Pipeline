@@ -22,8 +22,9 @@ nmf_max_invariance:         200
 nmf_max_iterations:         10000
 nmf_penalty_parameter:      1400
 
+top_number_of_genes:        100
 
-processing_method:          dist_comp  # available methods: serial, parl_loc, dist_comp
+processing_method:          parl_loc  # available methods: serial, parl_loc, dist_comp
                                        # available clusters: AWS, CS Cluster
 
 

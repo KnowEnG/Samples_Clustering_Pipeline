@@ -28,7 +28,7 @@ def run_nmf(run_parameters):
 
     sample_names = spreadsheet_df.columns
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     return
 
@@ -92,7 +92,7 @@ def run_cc_nmf(run_parameters):
     sample_names = spreadsheet_df.columns
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
@@ -137,7 +137,7 @@ def run_net_nmf(run_parameters):
     labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
     return
 
@@ -238,7 +238,7 @@ def run_cc_net_nmf(run_parameters):
 
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
@@ -274,7 +274,6 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-    #move_files(run_parameters['tmp_directory'], run_parameters['cluster_shared_volumn'])
 
 
 def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
@@ -542,19 +541,14 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         labels: cluster numbers for row names.
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
     """
-    file_name = os.path.join(run_parameters["results_directory"],
-                             kn.create_timestamped_filename('consensus_data', 'df'))
-    out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
-    out_df.to_csv(file_name, sep='\t')
-    run_parameters['consensus_clustering_file'] = file_name
+    out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
+    out_df.to_csv(get_output_file_name(run_parameters, 'consensus_data'), sep='\t')
 
     silhouette_average = silhouette_score(consensus_matrix, labels)
-    silhouette_score_string = 'cluster estimate = %d, silhouette score = %g' % (
+    silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
         run_parameters['number_of_clusters'], silhouette_average)
-    silhouette_filename = os.path.join(run_parameters["results_directory"],
-                                       kn.create_timestamped_filename('silhouette_average', 'txt'))
 
-    with open(silhouette_filename, 'w') as fh:
+    with open(get_output_file_name(run_parameters, 'silhouette_average'), 'w') as fh:
         fh.write(silhouette_score_string)
 
     return
@@ -569,41 +563,75 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         run_parameters: write path (run_parameters["results_directory"]).
     """
     file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
-    df_tmp = kn.create_df_with_sample_labels(sample_names, labels)
-    df_tmp.to_csv(file_name, sep='\t', header=None)
-    run_parameters['cluster_labels_file'] = file_name
+    cluster_labels_df = pd.DataFrame(data=None, index=None, columns=['Gene_ID', 'Cluster_ID'])
+    cluster_labels_df['Gene_ID'] = sample_names
+    cluster_labels_df['Cluster_ID'] = labels
+    cluster_labels_df.to_csv(file_name, sep='\t', index=None)
+
     if 'phenotype_data_full_path' in run_parameters.keys():
         phenotype_data = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
-        phenotype_data.insert(0, 'Cluster number', 'NA')
-        phenotype_data.loc[df_tmp.index.values, 'Cluster number'] = df_tmp.values
-        pheno_file_name = os.path.join(run_parameters["results_directory"],
-                                       kn.create_timestamped_filename('phenotype_data', 'tsv'))
-        phenotype_data.to_csv(pheno_file_name, sep='\t', header=True, index=True, na_rep='NA')
+        phenotype_data.insert(0, 'Cluster_ID', 'NA')
+        phenotype_data.loc[sample_names, 'Cluster_ID'] = labels
+
+        phenotype_data.to_csv(get_output_file_name(run_parameters, 'phenotype_data'), sep='\t', header=True, index=True, na_rep='NA')
     return
 
 
-def save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat=None):
-    """ save a dataframe with the cluster average value for each feature (gene) in the spreadsheet
+def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat=None):
+    """ save the full genes by samples spreadsheet as processed or smoothed if network is provided.
+        Also save variance in separate file.
     Args:
-        spreadsheet_df: pandas dataframe
-        labels: samples labels size of spreadsheet_df columns
-        run_parameters: dict with key: results_directory (and keys for RWR if network_mat is input)
-        network_mat: adjacency matrix dimensionally compatible with spreadsheet_df for RWR
+        spreadsheet_df: the dataframe as processed
+        run_parameters: with keys for "results_directory", "method", (optional - "top_number_of_genes")
+        network_mat:    (if appropriate) normalized network adjacency matrix used in processing
+    Returns:            (writes files)
+
+    """
+    if network_mat is not None:
+        sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.as_matrix(), network_mat, run_parameters)
+        clusters_df = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=spreadsheet_df.columns.values)
+    else:
+        clusters_df = spreadsheet_df
+
+    clusters_df.to_csv(get_output_file_name(run_parameters, 'genes_by_samples_heatmap', 'viz'), sep='\t', index_label='Gene_ID')
+
+    cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
+    col_labels = []
+    for cluster_number in np.unique(labels):
+        col_labels.append('Cluster_%d'%(cluster_number))
+    cluster_ave_df.columns = col_labels
+    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_averages_by_cluster', 'viz'), sep='\t',
+                          index_label='Gene_ID')
+
+    clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
+    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t',
+                                index_label='Gene_ID')
+
+    top_n_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
+                            index=cluster_ave_df.index.values)
+    if 'top_number_of_genes' in run_parameters:
+        top_n = run_parameters['top_number_of_genes']
+    else:
+        top_n = 100
+    for sample in top_n_df.columns.values:
+        top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
+        top_n_df[sample].iloc[top_index[0:top_n]] = 1
+    top_n_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t',
+                    index_label='Gene_ID')
+    return
+
+
+def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
+    """ get the full directory / filename for writing
+    Args:
+        run_parameters: dictionary with keys: "results_directory", "method" and "correlation_measure"
+        prefix_string:  the first letters of the ouput file name
+        suffix_string:  the last letters of the output file name before '.tsv'
 
     Returns:
-        (writes the gene_cluster_average...tsv file and gene_cluster_smoothed_average...tsv if network_mat input)
+        output_file_name:   full file and directory name suitable for file writing
     """
-    clusters_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
-    file_name = os.path.join(run_parameters["results_directory"],
-                             kn.create_timestamped_filename('gene_cluster_average', 'tsv'))
-    clusters_df.to_csv(file_name, sep='\t')
-    if network_mat is None:
-        pass
-    else:
-        sample_smooth, nun = kn.smooth_matrix_with_rwr(clusters_df.as_matrix(), network_mat, run_parameters)
-        clusters_df = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=clusters_df.columns.values)
-        file_name = os.path.join(run_parameters["results_directory"],
-                                 kn.create_timestamped_filename('gene_cluster_smoothed_average', 'tsv'))
-        clusters_df.to_csv(file_name, sep='\t')
+    output_file_name = os.path.join(run_parameters["results_directory"], prefix_string + '_' + run_parameters['method'])
+    output_file_name = kn.create_timestamped_filename(output_file_name) + '_' + suffix_string + '.' + type_suffix
 
-    return
+    return output_file_name
