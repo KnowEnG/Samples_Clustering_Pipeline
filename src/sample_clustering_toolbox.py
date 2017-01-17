@@ -607,16 +607,14 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t',
                                 index_label='Gene_ID')
 
-    top_n_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
+    top_number_of_genes_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
                             index=cluster_ave_df.index.values)
-    if 'top_number_of_genes' in run_parameters:
-        top_n = run_parameters['top_number_of_genes']
-    else:
-        top_n = 100
-    for sample in top_n_df.columns.values:
+
+    top_number_of_genes = run_parameters['top_number_of_genes']
+    for sample in top_number_of_genes_df.columns.values:
         top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
-        top_n_df[sample].iloc[top_index[0:top_n]] = 1
-    top_n_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t',
+        top_number_of_genes_df[sample].iloc[top_index[0:top_number_of_genes]] = 1
+    top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t',
                     index_label='Gene_ID')
     return
 
