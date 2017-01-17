@@ -25,6 +25,6 @@ nmf_penalty_parameter:      1400
 
 top_number_of_genes:        100
 
-processing_method:          parl_loc    # available methods: serial, parl_loc, dist_comp
+processing_method:          parallel    # available methods: serial, parallel, dist_comp
                                       # available clusters: AWS, CS Cluster
 
