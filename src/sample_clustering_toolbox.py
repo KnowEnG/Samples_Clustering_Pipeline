@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
-import knpackage.distributed_computing_utils as dstutil
 
 
 def run_nmf(run_parameters):
@@ -47,38 +46,11 @@ def run_cc_nmf(run_parameters):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
-    if run_parameters['processing_method'] == 'parl_loc':
+    if run_parameters['processing_method'] == 'parallel':
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters["number_of_bootstraps"]
 
         find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
-    elif run_parameters['processing_method'] == 'dist_comp':
-        print("Start distributing jobs......")
-
-        # determine number of compute nodes to use
-        number_of_comptue_nodes = dstutil.determine_number_of_compute_nodes(run_parameters['cluster_ip_address'],
-                                                                            run_parameters['number_of_bootstraps'])
-        print("Number of compute nodes = {}".format(number_of_comptue_nodes))
-        # create clusters
-        cluster_list = dstutil.generate_compute_clusters(
-            run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
-            find_and_save_nmf_clusters_parallel,
-            [run_nmf_clusters_worker,
-             save_a_clustering_to_tmp,
-             dstutil.determine_parallelism_locally])
-
-        # calculates number of jobs assigned to each compute node
-        number_of_jobs_each_node = dstutil.determine_job_number_on_each_compute_node(
-            run_parameters['number_of_bootstraps'],
-            len(cluster_list))
-
-        # defines the number of arguments pass to worker function
-        func_args = [spreadsheet_mat, run_parameters]
-
-        # parallel submitting jobs
-        dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
-
-        print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 'serial':
         find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
     else:
@@ -153,11 +125,8 @@ def update_tmp_directory(run_parameters, tmp_dir):
         run_parameters: an updated run_parameters
 
     '''
-    if (run_parameters['processing_method'] == 'dist_comp'):
-        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
-    else:
-        run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+    run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+
     return run_parameters
 
 
@@ -192,40 +161,13 @@ def run_cc_net_nmf(run_parameters):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
 
-    if run_parameters['processing_method'] == 'parl_loc':
+    if run_parameters['processing_method'] == 'parallel':
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters['number_of_bootstraps']
         print("Number of bootstrap {}".format(number_of_loops))
         find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
                                                 number_of_loops)
         print("Finish parallel computing locally......")
-    elif run_parameters['processing_method'] == 'dist_comp':
-        print("Start distributing jobs......")
-
-        # determine number of compute nodes to use
-        number_of_comptue_nodes = dstutil.determine_number_of_compute_nodes(run_parameters['cluster_ip_address'],
-                                                                            run_parameters['number_of_bootstraps'])
-        print("Number of compute nodes = {}".format(number_of_comptue_nodes))
-        # create clusters
-        cluster_list = dstutil.generate_compute_clusters(
-            run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
-            find_and_save_net_nmf_clusters_parallel,
-            [run_net_nmf_clusters_worker,
-             save_a_clustering_to_tmp,
-             dstutil.determine_parallelism_locally])
-
-        # calculates number of jobs assigned to each compute node
-        number_of_jobs_each_node = dstutil.determine_job_number_on_each_compute_node(
-            run_parameters['number_of_bootstraps'],
-            len(cluster_list))
-
-        # defines the number of arguments pass to worker function
-        func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
-
-        # parallel submitting jobs
-        dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
-
-        print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 'serial':
         find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
     else:
@@ -438,11 +380,7 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
     Returns:
         indicator_matrix: input summed with "temp_p*" files in run_parameters["tmp_directory"].
     """
-    if run_parameters['processing_method'] == 'dist_comp':
-        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
-                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
-    else:
-        tmp_dir = run_parameters["tmp_directory"]
+    tmp_dir = run_parameters["tmp_directory"]
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
         if tmp_f[0:6] == 'temp_p':
@@ -463,11 +401,7 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
     Returns:
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
-    if run_parameters['processing_method'] == 'dist_comp':
-        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
-                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
-    else:
-        tmp_dir = run_parameters["tmp_directory"]
+    tmp_dir = run_parameters["tmp_directory"]
 
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
