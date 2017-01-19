@@ -570,7 +570,7 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         phenotype_df.insert(0, 'Cluster_ID', 'NA')
         phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = cluster_labels_df.values
 
-        phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data'), sep='\t',
+        phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data', 'viz'), sep='\t',
                             header=True, index=True, na_rep='NA')
     return
 
