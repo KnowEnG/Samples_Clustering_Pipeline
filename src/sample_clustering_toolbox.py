@@ -542,13 +542,13 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
     """
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
-    out_df.to_csv(get_output_file_name(run_parameters, 'consensus_data'), sep='\t')
+    out_df.to_csv(get_output_file_name(run_parameters, 'consensus_matrix', 'viz'), sep='\t')
 
     silhouette_average = silhouette_score(consensus_matrix, labels)
     silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
         run_parameters['number_of_clusters'], silhouette_average)
 
-    with open(get_output_file_name(run_parameters, 'silhouette_average'), 'w') as fh:
+    with open(get_output_file_name(run_parameters, 'silhouette_average', 'viz'), 'w') as fh:
         fh.write(silhouette_score_string)
 
     return
@@ -562,18 +562,16 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         labels: cluster number assignments.
         run_parameters: write path (run_parameters["results_directory"]).
     """
-    file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
-    cluster_labels_df = pd.DataFrame(data=None, index=None, columns=['Gene_ID', 'Cluster_ID'])
-    cluster_labels_df['Gene_ID'] = sample_names
-    cluster_labels_df['Cluster_ID'] = labels
-    cluster_labels_df.to_csv(file_name, sep='\t', index=None)
+    cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
+    cluster_labels_df.to_csv(get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz'), sep='\t', header=None)
 
     if 'phenotype_data_full_path' in run_parameters.keys():
-        phenotype_data = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
-        phenotype_data.insert(0, 'Cluster_ID', 'NA')
-        phenotype_data.loc[sample_names, 'Cluster_ID'] = labels
+        phenotype_df = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
+        phenotype_df.insert(0, 'Cluster_ID', 'NA')
+        phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = cluster_labels_df.values
 
-        phenotype_data.to_csv(get_output_file_name(run_parameters, 'phenotype_data'), sep='\t', header=True, index=True, na_rep='NA')
+        phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data'), sep='\t',
+                            header=True, index=True, na_rep='NA')
     return
 
 
@@ -593,19 +591,17 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     else:
         clusters_df = spreadsheet_df
 
-    clusters_df.to_csv(get_output_file_name(run_parameters, 'genes_by_samples_heatmap', 'viz'), sep='\t', index_label='Gene_ID')
+    clusters_df.to_csv(get_output_file_name(run_parameters, 'genes_by_samples_heatmap', 'viz'), sep='\t')
 
     cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
     col_labels = []
     for cluster_number in np.unique(labels):
         col_labels.append('Cluster_%d'%(cluster_number))
     cluster_ave_df.columns = col_labels
-    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_averages_by_cluster', 'viz'), sep='\t',
-                          index_label='Gene_ID')
+    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_average_per_cluster', 'viz'), sep='\t')
 
     clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
-    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t',
-                                index_label='Gene_ID')
+    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t')
 
     top_number_of_genes_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
                             index=cluster_ave_df.index.values)
@@ -614,8 +610,7 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     for sample in top_number_of_genes_df.columns.values:
         top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
         top_number_of_genes_df[sample].iloc[top_index[0:top_number_of_genes]] = 1
-    top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t',
-                    index_label='Gene_ID')
+    top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t')
     return
 
 
