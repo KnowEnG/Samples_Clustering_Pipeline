@@ -11,10 +11,6 @@ cols_sampling_fraction:     0.8            	# 0.8 means 80% of columns
 number_of_clusters:         3
 number_of_bootstraps:       4
 
-rwr_max_iterations:         100
-rwr_restart_probability:    0.7
-rwr_convergence_tolerence:  0.0001         	# Vn+1 = alpha * N * Vn + (1-alpha) * Vo
-
 nmf_conv_check_freq:        50
 nmf_max_invariance:         200
 nmf_max_iterations:         10000
