@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
-import knpackage.distributed_computing_utils as dstutil
 
 
 def run_nmf(run_parameters):
@@ -28,7 +27,7 @@ def run_nmf(run_parameters):
 
     sample_names = spreadsheet_df.columns
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     return
 
@@ -47,38 +46,11 @@ def run_cc_nmf(run_parameters):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
-    if run_parameters['processing_method'] == 'parl_loc':
+    if run_parameters['processing_method'] == 'parallel':
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters["number_of_bootstraps"]
 
         find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
-    elif run_parameters['processing_method'] == 'dist_comp':
-        print("Start distributing jobs......")
-
-        # determine number of compute nodes to use
-        number_of_comptue_nodes = dstutil.determine_number_of_compute_nodes(run_parameters['cluster_ip_address'],
-                                                                            run_parameters['number_of_bootstraps'])
-        print("Number of compute nodes = {}".format(number_of_comptue_nodes))
-        # create clusters
-        cluster_list = dstutil.generate_compute_clusters(
-            run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
-            find_and_save_nmf_clusters_parallel,
-            [run_nmf_clusters_worker,
-             save_a_clustering_to_tmp,
-             dstutil.determine_parallelism_locally])
-
-        # calculates number of jobs assigned to each compute node
-        number_of_jobs_each_node = dstutil.determine_job_number_on_each_compute_node(
-            run_parameters['number_of_bootstraps'],
-            len(cluster_list))
-
-        # defines the number of arguments pass to worker function
-        func_args = [spreadsheet_mat, run_parameters]
-
-        # parallel submitting jobs
-        dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
-
-        print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 'serial':
         find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
     else:
@@ -92,7 +64,7 @@ def run_cc_nmf(run_parameters):
     sample_names = spreadsheet_df.columns
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
@@ -137,7 +109,7 @@ def run_net_nmf(run_parameters):
     labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
     return
 
@@ -153,11 +125,8 @@ def update_tmp_directory(run_parameters, tmp_dir):
         run_parameters: an updated run_parameters
 
     '''
-    if (run_parameters['processing_method'] == 'dist_comp'):
-        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
-    else:
-        run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+    run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+
     return run_parameters
 
 
@@ -192,40 +161,13 @@ def run_cc_net_nmf(run_parameters):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
 
-    if run_parameters['processing_method'] == 'parl_loc':
+    if run_parameters['processing_method'] == 'parallel':
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters['number_of_bootstraps']
         print("Number of bootstrap {}".format(number_of_loops))
         find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
                                                 number_of_loops)
         print("Finish parallel computing locally......")
-    elif run_parameters['processing_method'] == 'dist_comp':
-        print("Start distributing jobs......")
-
-        # determine number of compute nodes to use
-        number_of_comptue_nodes = dstutil.determine_number_of_compute_nodes(run_parameters['cluster_ip_address'],
-                                                                            run_parameters['number_of_bootstraps'])
-        print("Number of compute nodes = {}".format(number_of_comptue_nodes))
-        # create clusters
-        cluster_list = dstutil.generate_compute_clusters(
-            run_parameters['cluster_ip_address'][0:number_of_comptue_nodes],
-            find_and_save_net_nmf_clusters_parallel,
-            [run_net_nmf_clusters_worker,
-             save_a_clustering_to_tmp,
-             dstutil.determine_parallelism_locally])
-
-        # calculates number of jobs assigned to each compute node
-        number_of_jobs_each_node = dstutil.determine_job_number_on_each_compute_node(
-            run_parameters['number_of_bootstraps'],
-            len(cluster_list))
-
-        # defines the number of arguments pass to worker function
-        func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
-
-        # parallel submitting jobs
-        dstutil.parallel_submitting_job_to_each_compute_node(cluster_list, number_of_jobs_each_node, *func_args)
-
-        print("Finish distributing jobs......")
     elif run_parameters['processing_method'] == 'serial':
         find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
     else:
@@ -238,7 +180,7 @@ def run_cc_net_nmf(run_parameters):
 
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
@@ -274,7 +216,6 @@ def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, 
     h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
-    #move_files(run_parameters['tmp_directory'], run_parameters['cluster_shared_volumn'])
 
 
 def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
@@ -439,11 +380,7 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
     Returns:
         indicator_matrix: input summed with "temp_p*" files in run_parameters["tmp_directory"].
     """
-    if run_parameters['processing_method'] == 'dist_comp':
-        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
-                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
-    else:
-        tmp_dir = run_parameters["tmp_directory"]
+    tmp_dir = run_parameters["tmp_directory"]
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
         if tmp_f[0:6] == 'temp_p':
@@ -464,11 +401,7 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
     Returns:
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
-    if run_parameters['processing_method'] == 'dist_comp':
-        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
-                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
-    else:
-        tmp_dir = run_parameters["tmp_directory"]
+    tmp_dir = run_parameters["tmp_directory"]
 
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
@@ -542,19 +475,14 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         labels: cluster numbers for row names.
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
     """
-    file_name = os.path.join(run_parameters["results_directory"],
-                             kn.create_timestamped_filename('consensus_data', 'df'))
-    out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=labels)
-    out_df.to_csv(file_name, sep='\t')
-    run_parameters['consensus_clustering_file'] = file_name
+    out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
+    out_df.to_csv(get_output_file_name(run_parameters, 'consensus_matrix', 'viz'), sep='\t')
 
     silhouette_average = silhouette_score(consensus_matrix, labels)
-    silhouette_score_string = 'cluster estimate = %d, silhouette score = %g' % (
+    silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
         run_parameters['number_of_clusters'], silhouette_average)
-    silhouette_filename = os.path.join(run_parameters["results_directory"],
-                                       kn.create_timestamped_filename('silhouette_average', 'txt'))
 
-    with open(silhouette_filename, 'w') as fh:
+    with open(get_output_file_name(run_parameters, 'silhouette_average', 'viz'), 'w') as fh:
         fh.write(silhouette_score_string)
 
     return
@@ -568,42 +496,69 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         labels: cluster number assignments.
         run_parameters: write path (run_parameters["results_directory"]).
     """
-    file_name = os.path.join(run_parameters["results_directory"], kn.create_timestamped_filename('labels_data', 'tsv'))
-    df_tmp = kn.create_df_with_sample_labels(sample_names, labels)
-    df_tmp.to_csv(file_name, sep='\t', header=None)
-    run_parameters['cluster_labels_file'] = file_name
+    cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
+    cluster_labels_df.to_csv(get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz'), sep='\t', header=None)
+
     if 'phenotype_data_full_path' in run_parameters.keys():
-        phenotype_data = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
-        phenotype_data.insert(0, 'Cluster number', 'NA')
-        phenotype_data.loc[df_tmp.index.values, 'Cluster number'] = df_tmp.values
-        pheno_file_name = os.path.join(run_parameters["results_directory"],
-                                       kn.create_timestamped_filename('phenotype_data', 'tsv'))
-        phenotype_data.to_csv(pheno_file_name, sep='\t', header=True, index=True, na_rep='NA')
+        phenotype_df = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
+        phenotype_df.insert(0, 'Cluster_ID', 'NA')
+        phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = cluster_labels_df.values
+
+        phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data', 'viz'), sep='\t',
+                            header=True, index=True, na_rep='NA')
     return
 
 
-def save_gene_cluster_average(spreadsheet_df, labels, run_parameters, network_mat=None):
-    """ save a dataframe with the cluster average value for each feature (gene) in the spreadsheet
+def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat=None):
+    """ save the full genes by samples spreadsheet as processed or smoothed if network is provided.
+        Also save variance in separate file.
     Args:
-        spreadsheet_df: pandas dataframe
-        labels: samples labels size of spreadsheet_df columns
-        run_parameters: dict with key: results_directory (and keys for RWR if network_mat is input)
-        network_mat: adjacency matrix dimensionally compatible with spreadsheet_df for RWR
+        spreadsheet_df: the dataframe as processed
+        run_parameters: with keys for "results_directory", "method", (optional - "top_number_of_genes")
+        network_mat:    (if appropriate) normalized network adjacency matrix used in processing
+    Returns:            (writes files)
+
+    """
+    if network_mat is not None:
+        sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.as_matrix(), network_mat, run_parameters)
+        clusters_df = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=spreadsheet_df.columns.values)
+    else:
+        clusters_df = spreadsheet_df
+
+    clusters_df.to_csv(get_output_file_name(run_parameters, 'genes_by_samples_heatmap', 'viz'), sep='\t')
+
+    cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
+    col_labels = []
+    for cluster_number in np.unique(labels):
+        col_labels.append('Cluster_%d'%(cluster_number))
+    cluster_ave_df.columns = col_labels
+    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_average_per_cluster', 'viz'), sep='\t')
+
+    clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
+    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t')
+
+    top_number_of_genes_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
+                            index=cluster_ave_df.index.values)
+
+    top_number_of_genes = run_parameters['top_number_of_genes']
+    for sample in top_number_of_genes_df.columns.values:
+        top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
+        top_number_of_genes_df[sample].iloc[top_index[0:top_number_of_genes]] = 1
+    top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t')
+    return
+
+
+def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
+    """ get the full directory / filename for writing
+    Args:
+        run_parameters: dictionary with keys: "results_directory", "method" and "correlation_measure"
+        prefix_string:  the first letters of the ouput file name
+        suffix_string:  the last letters of the output file name before '.tsv'
 
     Returns:
-        (writes the gene_cluster_average...tsv file and gene_cluster_smoothed_average...tsv if network_mat input)
+        output_file_name:   full file and directory name suitable for file writing
     """
-    clusters_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
-    file_name = os.path.join(run_parameters["results_directory"],
-                             kn.create_timestamped_filename('gene_cluster_average', 'tsv'))
-    clusters_df.to_csv(file_name, sep='\t')
-    if network_mat is None:
-        pass
-    else:
-        sample_smooth, nun = kn.smooth_matrix_with_rwr(clusters_df.as_matrix(), network_mat, run_parameters)
-        clusters_df = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=clusters_df.columns.values)
-        file_name = os.path.join(run_parameters["results_directory"],
-                                 kn.create_timestamped_filename('gene_cluster_smoothed_average', 'tsv'))
-        clusters_df.to_csv(file_name, sep='\t')
+    output_file_name = os.path.join(run_parameters["results_directory"], prefix_string + '_' + run_parameters['method'])
+    output_file_name = kn.create_timestamped_filename(output_file_name) + '_' + suffix_string + '.' + type_suffix
 
-    return
+    return output_file_name

@@ -6,20 +6,12 @@ INPUT_DATA_DIR = ../data
 UNIT_TEST_TEMP_DIR = ./unit/tmp
 
 RMR = rm -rf
-GZIP = gzip
-GZIP_D = gzip -d
 MKDIR_P = mkdir -p
 
 # ----------------------------------------------------------------
 # Benchmarks setup Section                                       -
 # ----------------------------------------------------------------
 env_setup: create_run_dir copy_run_files
-
-decompress_input_data:
-	$(GZIP_D) $(INPUT_DATA_DIR)/networks/* $(INPUT_DATA_DIR)/spreadsheets/*
- 
-compress_input_data:
-	$(GZIP) $(INPUT_DATA_DIR)/networks/* $(INPUT_DATA_DIR)/spreadsheets/*
 
 create_run_dir:
 	$(MKDIR_P) $(RESULTS_DIR) 

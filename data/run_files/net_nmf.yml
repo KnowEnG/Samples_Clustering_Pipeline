@@ -11,19 +11,14 @@ rwr_max_iterations:         100
 rwr_convergence_tolerence:  1.0e-8
 rwr_restart_probability:    0.7       # Vn+1 = alpha * N * Vn + (1-alpha) * Vo
 
-rows_sampling_fraction:     0.8       # 0.8 means 80% of rows 
-cols_sampling_fraction:     0.8       # 0.8 means 80% of columns
-
-number_of_bootstraps:       4
-
 number_of_clusters:         3
+
 nmf_conv_check_freq:        50
 nmf_max_invariance:         200
 nmf_max_iterations:         10000
 nmf_penalty_parameter:      1400
 
+top_number_of_genes:        100
 
-processing_method:          dist_comp  # available methods: serial, parl_loc, dist_comp
+processing_method:          parallel  # available methods: serial, parallel, dist_comp
                                        # available clusters: AWS, CS Cluster
-
-

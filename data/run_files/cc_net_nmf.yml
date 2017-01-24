@@ -5,7 +5,7 @@ gg_network_name_full_path:  ../data/networks/keg_ST90_4col.edge
 spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
 phenotype_data_full_path:   ../data/spreadsheets/UCEC_phenotype.txt
 
-results_directory:           ./benchmarks
+results_directory:           ./run_dir/results
 tmp_directory:               ./run_dir/tmp
 
 rwr_max_iterations:         100
@@ -23,7 +23,8 @@ nmf_max_invariance:         200
 nmf_max_iterations:         10000
 nmf_penalty_parameter:      1400
 
+top_number_of_genes:        100
 
-processing_method:          serial    # available methods: serial, parl_loc, dist_comp
+processing_method:          parallel    # available methods: serial, parallel, dist_comp
                                       # available clusters: AWS, CS Cluster
 
