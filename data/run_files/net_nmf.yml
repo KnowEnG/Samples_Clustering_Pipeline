@@ -11,8 +11,6 @@ rwr_max_iterations:         100
 rwr_convergence_tolerence:  1.0e-8
 rwr_restart_probability:    0.7       # Vn+1 = alpha * N * Vn + (1-alpha) * Vo
 
-number_of_bootstraps:       4
-
 number_of_clusters:         3
 
 nmf_conv_check_freq:        50
