@@ -19,17 +19,12 @@ Note: all of the clustering methods mentioned above use the non-negative matrix 
 * * * 
 ## How to run this pipeline with Our data
 * * * 
-###1. Get Access to KnowEnG-Research Repo:
-Email omarsobh@illinois.edu infrastructure team (IST) lead to:
-
-* __Access__ KnowEnG-Research github repo
-
-###2. Clone the Samples_Clustering_Pipeline Repo
+###1. Clone the Samples_Clustering_Pipeline Repo
 ```
  git clone https://github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git
 ```
  
-###3. Install the following (Ubuntu or Linux)
+###2. Install the following (Ubuntu or Linux)
   ```
  apt-get install -y python3-pip
  apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
@@ -43,24 +38,24 @@ Email omarsobh@illinois.edu infrastructure team (IST) lead to:
  pip3 install knpackage
 ```
 
-###4. Change directory to Samples_Clustering_Pipeline
+###3. Change directory to Samples_Clustering_Pipeline
 
 ```
 cd Samples_Clustering_Pipeline
 ```
 
-###5. Change directory to test
+###4. Change directory to test
 
 ```
 cd test
 ```
  
-###6. Create a local directory "run_dir" and place all the run files in it
+###5. Create a local directory "run_dir" and place all the run files in it
 ```
 make env_setup
 ```
 
-###7. Use one of the following "make" commands to select and run a clustering option:
+###6. Use one of the following "make" commands to select and run a clustering option:
 
 
 | **Command**         | **Option**                                       | 
@@ -75,7 +70,7 @@ make env_setup
 ## How to run this pipeline with Your data
 * * * 
 
-__***Follow steps 1-4 above then do the following:***__
+__***Follow steps 1-3 above then do the following:***__
 
 ### * Create your run directory
 
