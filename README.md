@@ -161,9 +161,9 @@ phenotype_data_name = UCEC_phenotype.txt
 
  | **gene name** |**sample name 1**|...|**sample name n**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
- | gene 1|int|...|int|
+ | gene 1|float|...|float|
  |...|...|...|...|
- | gene m|int|...|int|
+ | gene m|float|...|float|
 
 * Output files of all four methods save samples by samples heatmap with name consensus_matrix_{method}_{timestamp}_viz.tsv.</br>
 
