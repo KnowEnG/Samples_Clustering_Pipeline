@@ -4,6 +4,9 @@ spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data
 results_directory:          ./run_dir/results
 tmp_directory:              ./run_dir/tmp
 
+rows_sampling_fraction:     0.8                 # 0.8 means 80% of rows
+cols_sampling_fraction:     0.8                 # 0.8 means 80% of columns
+
 number_of_clusters:         3
 number_of_bootstraps:       4
 

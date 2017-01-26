@@ -35,7 +35,7 @@ top_number_of_genes:        100
 # multi node machine: set the processing_method value to be dist_comp 
 processing_method: serial
 
-#phenotype_data_full_path: ../data/spreadsheets/UCECppheno_table.txt
+#phenotype_data_full_path: ../data/spreadsheets/UCEC_phenotype.txt
 
 # AWS configuration
 cluster_ip_address:
