@@ -161,9 +161,9 @@ phenotype_data_name = UCEC_phenotype.txt
 
  | **gene name** |**sample name 1**|...|**sample name n**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
- | gene 1|float|...|float|
+ | gene 1|int|...|int|
  |...|...|...|...|
- | gene m|float|...|float|
+ | gene m|int|...|int|
 
 * Output files of all four methods save samples by samples heatmap with name consensus_matrix_{method}_{timestamp}_viz.tsv.</br>
 
@@ -191,7 +191,7 @@ phenotype_data_name = UCEC_phenotype.txt
  
 * Output files of all four methods save spreadsheet with top ranked genes per sample with name top_genes_per_cluster_{method}_{timestamp}_download.tsv.</br>
 
- | **gene name** |**sample name 1**|...|**sample name n**|
+ | **gene name** |**cluster name 1**|...|**cluster name k**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
  | gene 1|1/0|...|1/0|
  |...|...|...|...|
