@@ -124,7 +124,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 | method                    | nmf or cc_nmf or net_nmf or cc_net_nmf  | Choose clustering method |
 | gg_network_name_full_path | directory+gg_network_name |Path and file name of the 4 col network file |
 | spreadsheet_name_full_path | directory+spreadsheet_name|  Path and file name of user supplied gene sets |
-| phenotype_data_full_path | directory+phenotype_data_full_path| Path and file name of user supplied phenotype data |
+| phenotype_data_full_path | directory+phenotype_data_name| Path and file name of user supplied phenotype data |
 | results_directory | directory | Directory to save the output files |
 | tmp_directory | directory | Directory to save the intermediate files |
 | rwr_max_iterations | 100| Maximum number of iterations without convergence in random walk with restart |
@@ -132,7 +132,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 | rwr_restart_probability | 0.7 | alpha in `V_(n+1) = alpha * N * Vn + (1-alpha) * Vo`|
 | rows_sampling_fraction| 0.8| Select 80% of spreadsheet rows|
 | cols_sampling_fraction| 0.8| Select 80% of spreadsheet columns|
-| number_of_bootstraps| 4 | Number of bootstraps |
+| number_of_bootstraps| 4 | Number of random samplings |
 | number_of_clusters| 3 | Estimated number of clusters |
 | nmf_conv_check_freq| 50 | Check convergence at given frequency |
 | nmf_max_invariance| 200 | Maximum number of invariance |
@@ -143,7 +143,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 
 gg_network_name = STRING_experimental_gene_gene.edge</br>
 spreadsheet_name = ProGENI_rwr20_STExp_GDSC_500.rname.gxc.tsv</br>
-phenotype_data_full_path = UCEC_phenotype.txt
+phenotype_data_name = UCEC_phenotype.txt
 
 * * * 
 ## Description of Output files saved in results directory
@@ -153,7 +153,9 @@ phenotype_data_full_path = UCEC_phenotype.txt
 
  | **gene name** |**variance**|
  | :--------------------: |:--------------------:|
- | string|float|
+ | gene 1|float|
+ |...|...|
+ | gene m| float|
 
 * Output files of all four methods save genes by samples heatmap with name genes_by_samples_heatmp_{method}_{timestamp}_viz.tsv.</br>
 
@@ -173,7 +175,7 @@ phenotype_data_full_path = UCEC_phenotype.txt
  
 * Output files of all four methods save gene scores by cluster with name genes_averages_by_cluster_{method}_{timestamp}_viz.tsv.</br>
 
- | **gene name** |**cluster name 1**|...|**cluster name n**|
+ | **gene name** |**cluster name 1**|...|**cluster name k**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
  | gene 1|float|...|float|
  |...|...|...|...|
@@ -183,7 +185,9 @@ phenotype_data_full_path = UCEC_phenotype.txt
 
  | **sample name** |**cluster**|
  | :--------------------: |:--------------------:|
- | string|int|
+ | sample 1|int|
+ |...|...|
+ |sample n|int|
  
 * Output files of all four methods save spreadsheet with top ranked genes per sample with name top_genes_per_cluster_{method}_{timestamp}_download.tsv.</br>
 
