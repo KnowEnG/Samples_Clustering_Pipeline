@@ -30,6 +30,47 @@ def run_nmf(run_parameters):
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
 
+def run_net_nmf(run_parameters):
+    """ wrapper: call sequence to perform network based stratification and write results.
+
+    Args:
+        run_parameters: parameter set dictionary.
+    """
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
+    network_df = kn.get_network_df(run_parameters['gg_network_name_full_path'])
+
+    node_1_names, node_2_names = kn.extract_network_node_names(network_df)
+    unique_gene_names = kn.find_unique_node_names(node_1_names, node_2_names)
+    genes_lookup_table = kn.create_node_names_dict(unique_gene_names)
+
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_1')
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
+
+    network_df = kn.symmetrize_df(network_df)
+    network_mat = kn.convert_network_df_to_sparse(
+        network_df, len(unique_gene_names), len(unique_gene_names))
+
+    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
+    lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
+
+    spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
+    spreadsheet_mat = spreadsheet_df.as_matrix()
+    sample_names = spreadsheet_df.columns
+
+    sample_smooth, iterations = kn.smooth_matrix_with_rwr(
+        spreadsheet_mat, network_mat, run_parameters)
+    sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
+    h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_pos, lap_diag, run_parameters)
+
+    linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
+    sample_perm = np.arange(0, spreadsheet_mat.shape[1])
+    linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
+    labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
+
+    save_final_samples_clustering(sample_names, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
+
+
 def run_cc_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization with
         consensus clustering and write results.
@@ -73,67 +114,6 @@ def run_cc_nmf(run_parameters):
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     kn.remove_dir(run_parameters["tmp_directory"])
-
-
-def run_net_nmf(run_parameters):
-    """ wrapper: call sequence to perform network based stratification and write results.
-
-    Args:
-        run_parameters: parameter set dictionary.
-    """
-    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
-    network_df = kn.get_network_df(run_parameters['gg_network_name_full_path'])
-
-    node_1_names, node_2_names = kn.extract_network_node_names(network_df)
-    unique_gene_names = kn.find_unique_node_names(node_1_names, node_2_names)
-    genes_lookup_table = kn.create_node_names_dict(unique_gene_names)
-
-    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_1')
-    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
-
-    network_df = kn.symmetrize_df(network_df)
-    network_mat = kn.convert_network_df_to_sparse(
-        network_df, len(unique_gene_names), len(unique_gene_names))
-
-    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
-    lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
-
-    spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
-    spreadsheet_mat = spreadsheet_df.as_matrix()
-    sample_names = spreadsheet_df.columns
-
-    sample_smooth, iterations = kn.smooth_matrix_with_rwr(
-        spreadsheet_mat, network_mat, run_parameters)
-    sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
-    h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_pos, lap_diag, run_parameters)
-
-    linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
-    sample_perm = np.arange(0, spreadsheet_mat.shape[1])
-    linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
-
-    save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
-
-
-def update_tmp_directory(run_parameters, tmp_dir):
-    ''' Update tmp_directory value in rum_parameters dictionary
-
-    Args:
-        run_parameters: run_parameters as the dictionary config
-        tmp_dir: temporary directory prefix subjected to different functions
-
-    Returns:
-        run_parameters: an updated run_parameters
-
-    '''
-    if (run_parameters['processing_method'] == 'distribute'):
-        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
-        run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
-    else:
-        run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
-
-    return run_parameters
 
 
 def run_cc_net_nmf(run_parameters):
@@ -533,3 +513,24 @@ def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_s
     output_file_name = kn.create_timestamped_filename(output_file_name) + '_' + suffix_string + '.' + type_suffix
 
     return output_file_name
+
+
+def update_tmp_directory(run_parameters, tmp_dir):
+    ''' Update tmp_directory value in rum_parameters dictionary
+
+    Args:
+        run_parameters: run_parameters as the dictionary config
+        tmp_dir: temporary directory prefix subjected to different functions
+
+    Returns:
+        run_parameters: an updated run_parameters
+
+    '''
+    if (run_parameters['processing_method'] == 'distribute'):
+        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
+        run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
+    else:
+        run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+
+    return run_parameters
+
