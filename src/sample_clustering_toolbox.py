@@ -32,45 +32,6 @@ def run_nmf(run_parameters):
     return
 
 
-def run_cc_nmf(run_parameters):
-    """ wrapper: call sequence to perform non-negative matrix factorization with
-        consensus clustering and write results.
-
-    Args:
-        run_parameters: parameter set dictionary.
-    """
-    tmp_dir = 'tmp_cc_nmf'
-    run_parameters = update_tmp_directory(run_parameters, tmp_dir)
-
-    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
-    spreadsheet_mat = spreadsheet_df.as_matrix()
-    spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
-
-    if run_parameters['processing_method'] == 'parallel':
-        # Number of processes to be executed in parallel
-        number_of_loops = run_parameters["number_of_bootstraps"]
-
-        find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
-    elif run_parameters['processing_method'] == 'serial':
-        find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
-    else:
-        raise ValueError('processing_method contains bad value.')
-
-    linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
-    indicator_matrix = linkage_matrix.copy()
-    consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    labels = kn.perform_kmeans(consensus_matrix, run_parameters['number_of_clusters'])
-
-    sample_names = spreadsheet_df.columns
-    save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
-    save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
-
-    kn.remove_dir(run_parameters["tmp_directory"])
-
-    return
-
-
 def run_net_nmf(run_parameters):
     """ wrapper: call sequence to perform network based stratification and write results.
 
@@ -114,20 +75,43 @@ def run_net_nmf(run_parameters):
     return
 
 
-def update_tmp_directory(run_parameters, tmp_dir):
-    ''' Update tmp_directory value in rum_parameters dictionary
+def run_cc_nmf(run_parameters):
+    """ wrapper: call sequence to perform non-negative matrix factorization with
+        consensus clustering and write results.
 
     Args:
-        run_parameters: run_parameters as the dictionary config
-        tmp_dir: temporary directory prefix subjected to different functions
+        run_parameters: parameter set dictionary.
+    """
+    tmp_dir = 'tmp_cc_nmf'
+    run_parameters = update_tmp_directory(run_parameters, tmp_dir)
 
-    Returns:
-        run_parameters: an updated run_parameters
+    spreadsheet_df = kn.get_spreadsheet_df(run_parameters['spreadsheet_name_full_path'])
+    spreadsheet_mat = spreadsheet_df.as_matrix()
+    spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
-    '''
-    run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+    if run_parameters['processing_method'] == 'parallel':
+        # Number of processes to be executed in parallel
+        number_of_loops = run_parameters["number_of_bootstraps"]
 
-    return run_parameters
+        find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
+    elif run_parameters['processing_method'] == 'serial':
+        find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
+    else:
+        raise ValueError('processing_method contains bad value.')
+
+    linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
+    indicator_matrix = linkage_matrix.copy()
+    consensus_matrix = form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix)
+    labels = kn.perform_kmeans(consensus_matrix, run_parameters['number_of_clusters'])
+
+    sample_names = spreadsheet_df.columns
+    save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
+    save_final_samples_clustering(sample_names, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
+
+    kn.remove_dir(run_parameters["tmp_directory"])
+
+    return
 
 
 def run_cc_net_nmf(run_parameters):
@@ -562,3 +546,19 @@ def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_s
     output_file_name = kn.create_timestamped_filename(output_file_name) + '_' + suffix_string + '.' + type_suffix
 
     return output_file_name
+
+
+def update_tmp_directory(run_parameters, tmp_dir):
+    ''' Update tmp_directory value in rum_parameters dictionary
+
+    Args:
+        run_parameters: run_parameters as the dictionary config
+        tmp_dir: temporary directory prefix subjected to different functions
+
+    Returns:
+        run_parameters: an updated run_parameters
+
+    '''
+    run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+
+    return run_parameters
