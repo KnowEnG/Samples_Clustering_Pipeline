@@ -264,6 +264,34 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
 
+def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, sequence_number):
+    """ save one h_matrix and one permutation in temorary files with sequence_number appended names.
+
+    Args:
+        h_matrix: k x permutation size matrix.
+        sample_permutation: indices of h_matrix columns permutation.
+        run_parameters: parmaeters including the "tmp_directory" name.
+        sequence_number: temporary file name suffix.
+    """
+    import os
+    import knpackage.toolbox as kn
+    import numpy as np
+
+    tmp_dir = run_parameters["tmp_directory"]
+
+    time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
+    os.makedirs(tmp_dir, mode=0o755, exist_ok=True)
+
+    hname = os.path.join(tmp_dir, 'temp_h' + time_stamp)
+    pname = os.path.join(tmp_dir, 'temp_p' + time_stamp)
+
+    cluster_id = np.argmax(h_matrix, 0)
+    with open(hname, 'wb') as fh0:
+        cluster_id.dump(fh0)
+    with open(pname, 'wb') as fh1:
+        sample_permutation.dump(fh1)
+
+
 def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
     """ compute the consensus matrix from the indicator and linkage matrix inputs
         formed by the bootstrap "temp_*" files.
@@ -336,50 +364,42 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
     return linkage_matrix
 
 
-def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, sequence_number):
-    """ save one h_matrix and one permutation in temorary files with sequence_number appended names.
-
+def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat=None):
+    """ save the full genes by samples spreadsheet as processed or smoothed if network is provided.
+        Also save variance in separate file.
     Args:
-        h_matrix: k x permutation size matrix.
-        sample_permutation: indices of h_matrix columns permutation.
-        run_parameters: parmaeters including the "tmp_directory" name.
-        sequence_number: temporary file name suffix.
+        spreadsheet_df: the dataframe as processed
+        run_parameters: with keys for "results_directory", "method", (optional - "top_number_of_genes")
+        network_mat:    (if appropriate) normalized network adjacency matrix used in processing
+    Returns:            (writes files)
+
     """
-    import os
-    import knpackage.toolbox as kn
-    import numpy as np
+    if network_mat is not None:
+        sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.as_matrix(), network_mat, run_parameters)
+        clusters_df = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=spreadsheet_df.columns.values)
+    else:
+        clusters_df = spreadsheet_df
 
-    tmp_dir = run_parameters["tmp_directory"]
+    clusters_df.to_csv(get_output_file_name(run_parameters, 'genes_by_samples_heatmap', 'viz'), sep='\t')
 
-    time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
-    os.makedirs(tmp_dir, mode=0o755, exist_ok=True)
+    cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
+    col_labels = []
+    for cluster_number in np.unique(labels):
+        col_labels.append('Cluster_%d'%(cluster_number))
+    cluster_ave_df.columns = col_labels
+    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_average_per_cluster', 'viz'), sep='\t')
 
-    hname = os.path.join(tmp_dir, 'temp_h' + time_stamp)
-    pname = os.path.join(tmp_dir, 'temp_p' + time_stamp)
+    clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
+    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t')
 
-    cluster_id = np.argmax(h_matrix, 0)
-    with open(hname, 'wb') as fh0:
-        cluster_id.dump(fh0)
-    with open(pname, 'wb') as fh1:
-        sample_permutation.dump(fh1)
+    top_number_of_genes_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
+                                          index=cluster_ave_df.index.values)
 
-
-def form_consensus_matrix_graphic(consensus_matrix, k=3):
-    """ use K-means to reorder the consensus matrix for graphic display.
-
-    Args:
-        consensus_matrix: calculated consensus matrix in samples x samples order.
-        k: number of clusters estimate (inner diminsion k of factored h_matrix).
-
-    Returns:
-        cc_cm: consensus_matrix with rows and columns in K-means sort order.
-    """
-    cc_cm = consensus_matrix.copy()
-    labels = kn.perform_kmeans(consensus_matrix, k)
-    sorted_labels = np.argsort(labels)
-    cc_cm = cc_cm[sorted_labels[:, None], sorted_labels]
-
-    return cc_cm
+    top_number_of_genes = run_parameters['top_number_of_genes']
+    for sample in top_number_of_genes_df.columns.values:
+        top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
+        top_number_of_genes_df[sample].iloc[top_index[0:top_number_of_genes]] = 1
+    top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t')
 
 
 def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters):
@@ -423,44 +443,6 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
                             header=True, index=True, na_rep='NA')
 
 
-def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat=None):
-    """ save the full genes by samples spreadsheet as processed or smoothed if network is provided.
-        Also save variance in separate file.
-    Args:
-        spreadsheet_df: the dataframe as processed
-        run_parameters: with keys for "results_directory", "method", (optional - "top_number_of_genes")
-        network_mat:    (if appropriate) normalized network adjacency matrix used in processing
-    Returns:            (writes files)
-
-    """
-    if network_mat is not None:
-        sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.as_matrix(), network_mat, run_parameters)
-        clusters_df = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=spreadsheet_df.columns.values)
-    else:
-        clusters_df = spreadsheet_df
-
-    clusters_df.to_csv(get_output_file_name(run_parameters, 'genes_by_samples_heatmap', 'viz'), sep='\t')
-
-    cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
-    col_labels = []
-    for cluster_number in np.unique(labels):
-        col_labels.append('Cluster_%d'%(cluster_number))
-    cluster_ave_df.columns = col_labels
-    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_average_per_cluster', 'viz'), sep='\t')
-
-    clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
-    clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t')
-
-    top_number_of_genes_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
-                            index=cluster_ave_df.index.values)
-
-    top_number_of_genes = run_parameters['top_number_of_genes']
-    for sample in top_number_of_genes_df.columns.values:
-        top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
-        top_number_of_genes_df[sample].iloc[top_index[0:top_number_of_genes]] = 1
-    top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t')
-
-
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
     """ get the full directory / filename for writing
     Args:
@@ -494,3 +476,21 @@ def update_tmp_directory(run_parameters, tmp_dir):
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
 
     return run_parameters
+
+
+def form_consensus_matrix_graphic(consensus_matrix, k=3):
+    """ use K-means to reorder the consensus matrix for graphic display.
+
+    Args:
+        consensus_matrix: calculated consensus matrix in samples x samples order.
+        k: number of clusters estimate (inner diminsion k of factored h_matrix).
+
+    Returns:
+        cc_cm: consensus_matrix with rows and columns in K-means sort order.
+    """
+    cc_cm = consensus_matrix.copy()
+    labels = kn.perform_kmeans(consensus_matrix, k)
+    sorted_labels = np.argsort(labels)
+    cc_cm = cc_cm[sorted_labels[:, None], sorted_labels]
+
+    return cc_cm
