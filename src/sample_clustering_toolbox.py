@@ -86,19 +86,19 @@ def run_cc_nmf(run_parameters):
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
     if run_parameters['processing_method'] == 'parallel':
-        # Number of processes to be executed in parallel
         number_of_loops = run_parameters["number_of_bootstraps"]
+        find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
 
-        find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
     elif run_parameters['processing_method'] == 'serial':
-        find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
+        find_and_save_cc_nmf_clusters_serial(spreadsheet_mat, run_parameters)
+
     elif run_parameters['processing_method'] == 'distribute':
         func_args = [spreadsheet_mat, run_parameters]
-        dependency_list = [run_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
+        dependency_list = [run_cc_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
         dstutil.execute_distribute_computing_job(run_parameters['cluster_ip_address'],
                                                   run_parameters['number_of_bootstraps'],
                                                   func_args,
-                                                  find_and_save_nmf_clusters_parallel,
+                                                  find_and_save_cc_nmf_clusters_parallel,
                                                   dependency_list)
     else:
         raise ValueError('processing_method contains bad value.')
@@ -148,22 +148,19 @@ def run_cc_net_nmf(run_parameters):
     sample_names = spreadsheet_df.columns
 
     if run_parameters['processing_method'] == 'parallel':
-        # Number of processes to be executed in parallel
-        number_of_loops = run_parameters['number_of_bootstraps']
-        print("Number of bootstrap {}".format(number_of_loops))
+        find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
+                                                   run_parameters['number_of_bootstraps'])
 
-        find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
-                                                number_of_loops)
-        print("Finish parallel computing locally......")
     elif run_parameters['processing_method'] == 'serial':
-        find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+        find_and_save_cc_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+
     elif run_parameters['processing_method'] == 'distribute':
         func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
-        dependency_list = [run_net_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
+        dependency_list = [run_cc_net_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
         dstutil.execute_distribute_computing_job(run_parameters['cluster_ip_address'],
                                                   run_parameters['number_of_bootstraps'],
                                                   func_args,
-                                                  find_and_save_net_nmf_clusters_parallel,
+                                                  find_and_save_cc_net_nmf_clusters_parallel,
                                                   dependency_list)
     else:
         raise ValueError('processing_method contains bad value.')
@@ -180,38 +177,37 @@ def run_cc_net_nmf(run_parameters):
     kn.remove_dir(run_parameters["tmp_directory"])
 
 
-def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample):
-    """Worker to execute net_nmf_clusters in a single process
+def find_and_save_cc_nmf_clusters_serial(spreadsheet_mat, run_parameters):
+    """ central loop: compute components for the consensus matrix by
+        non-negative matrix factorization.
 
     Args:
-        network_mat: genes x genes symmetric matrix.
         spreadsheet_mat: genes x samples matrix.
-        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
-        lap_val: laplacian matrix component, L = lap_dag - lap_val.
-        run_parameters: dictionay of run-time parameters.
-        sample: each single loop.
-
-    Returns:
-        None
+        run_parameters: dictionary of run-time parameters.
     """
-    import knpackage.toolbox as kn
+    number_of_bootstraps = run_parameters["number_of_bootstraps"]
 
-    sample_random, sample_permutation = kn.sample_a_matrix(
-        spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
-        float(run_parameters["cols_sampling_fraction"]))
-    sample_smooth, iterations = \
-        kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
-
-    print("bootstrap {} of {}: rwr iterations = {}".format(sample + 1, run_parameters["number_of_bootstraps"],
-                                                           iterations))
-
-    sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
-    h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
-
-    save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
+    for sample in range(0, number_of_bootstraps):
+        run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
 
 
-def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
+def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops):
+    """ central loop: compute components for the consensus matrix by
+        non-negative matrix factorization.
+
+    Args:
+        spreadsheet_mat: genes x samples matrix.
+        run_parameters: dictionary of run-time parameters.
+        number_of_cpus: number of processes to be running in parallel
+    """
+    import knpackage.distributed_computing_utils as dstutil
+
+    jobs_id = range(0, number_of_loops)
+    zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
+    dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, number_of_loops)
+
+
+def find_and_save_cc_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -224,11 +220,11 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
     """
     number_of_bootstraps = run_parameters["number_of_bootstraps"]
     for sample in range(0, number_of_bootstraps):
-        run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
+        run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 
-def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
-                                            number_of_loops):
+def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
+                                               number_of_loops):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -244,10 +240,10 @@ def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_di
 
     jobs_id = range(0, number_of_loops)
     zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
-    dstutil.parallelize_processes_locally(run_net_nmf_clusters_worker, zipped_arguments, number_of_loops)
+    dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, number_of_loops)
 
 
-def run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
+def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     """Worker to execute nmf_clusters in a single process
 
     Args:
@@ -268,37 +264,32 @@ def run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     h_mat = kn.perform_nmf(sample_random, run_parameters)
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
-    print('bootstrap {} of {}'.format(sample + 1, run_parameters["number_of_bootstraps"]))
 
-
-def find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters):
-    """ central loop: compute components for the consensus matrix by
-        non-negative matrix factorization.
+def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample):
+    """Worker to execute net_nmf_clusters in a single process
 
     Args:
+        network_mat: genes x genes symmetric matrix.
         spreadsheet_mat: genes x samples matrix.
-        run_parameters: dictionary of run-time parameters.
+        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
+        lap_val: laplacian matrix component, L = lap_dag - lap_val.
+        run_parameters: dictionay of run-time parameters.
+        sample: each single loop.
+
+    Returns:
+        None
     """
-    number_of_bootstraps = run_parameters["number_of_bootstraps"]
+    import knpackage.toolbox as kn
 
-    for sample in range(0, number_of_bootstraps):
-        run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
+    sample_random, sample_permutation = kn.sample_a_matrix(
+        spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
+        float(run_parameters["cols_sampling_fraction"]))
+    sample_smooth, iterations = kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
 
+    sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
+    h_mat = kn.perform_net_nmf(sample_quantile_norm, lap_val, lap_dag, run_parameters)
 
-def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops):
-    """ central loop: compute components for the consensus matrix by
-        non-negative matrix factorization.
-
-    Args:
-        spreadsheet_mat: genes x samples matrix.
-        run_parameters: dictionary of run-time parameters.
-        number_of_cpus: number of processes to be running in parallel
-    """
-    import knpackage.distributed_computing_utils as dstutil
-
-    jobs_id = range(0, number_of_loops)
-    zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
-    dstutil.parallelize_processes_locally(run_nmf_clusters_worker, zipped_arguments, number_of_loops)
+    save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
 
 def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
@@ -388,7 +379,6 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
 
     tmp_dir = run_parameters["tmp_directory"]
 
-    # time_stamp = timestamp_filename('_N', str(sequence_number), run_parameters)
     time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
     os.makedirs(tmp_dir, mode=0o755, exist_ok=True)
 
@@ -526,12 +516,9 @@ def update_tmp_directory(run_parameters, tmp_dir):
         run_parameters: an updated run_parameters
 
     '''
-
     if (run_parameters['processing_method'] == 'distribute'):
-        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
     else:
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
 
     return run_parameters
-
