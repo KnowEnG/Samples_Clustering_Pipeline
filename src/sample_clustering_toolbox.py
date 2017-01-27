@@ -526,6 +526,7 @@ def update_tmp_directory(run_parameters, tmp_dir):
         run_parameters: an updated run_parameters
 
     '''
+
     if (run_parameters['processing_method'] == 'distribute'):
         # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
