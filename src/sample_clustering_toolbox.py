@@ -90,7 +90,8 @@ def run_cc_nmf(run_parameters):
         find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
 
     elif run_parameters['processing_method'] == 'serial':
-        find_and_save_cc_nmf_clusters_serial(spreadsheet_mat, run_parameters)
+        for sample in range(0, run_parameters["number_of_bootstraps"]):
+            run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
 
     elif run_parameters['processing_method'] == 'distribute':
         func_args = [spreadsheet_mat, run_parameters]
@@ -152,7 +153,8 @@ def run_cc_net_nmf(run_parameters):
                                                    run_parameters['number_of_bootstraps'])
 
     elif run_parameters['processing_method'] == 'serial':
-        find_and_save_cc_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+        for sample in range(0, run_parameters["number_of_bootstraps"]):
+            run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, sample)
 
     elif run_parameters['processing_method'] == 'distribute':
         func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
@@ -177,20 +179,6 @@ def run_cc_net_nmf(run_parameters):
     kn.remove_dir(run_parameters["tmp_directory"])
 
 
-def find_and_save_cc_nmf_clusters_serial(spreadsheet_mat, run_parameters):
-    """ central loop: compute components for the consensus matrix by
-        non-negative matrix factorization.
-
-    Args:
-        spreadsheet_mat: genes x samples matrix.
-        run_parameters: dictionary of run-time parameters.
-    """
-    number_of_bootstraps = run_parameters["number_of_bootstraps"]
-
-    for sample in range(0, number_of_bootstraps):
-        run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
-
-
 def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops):
     """ central loop: compute components for the consensus matrix by
         non-negative matrix factorization.
@@ -205,22 +193,6 @@ def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, numb
     jobs_id = range(0, number_of_loops)
     zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
     dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, number_of_loops)
-
-
-def find_and_save_cc_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters):
-    """ central loop: compute components for the consensus matrix from the input
-        network and spreadsheet matrices and save them to temp files.
-
-    Args:
-        network_mat: genes x genes symmetric matrix.
-        spreadsheet_mat: genes x samples matrix.
-        lap_dag: laplacian matrix component, L = lap_dag - lap_val.
-        lap_val: laplacian matrix component, L = lap_dag - lap_val.
-        run_parameters: dictionary of run-time parameters.
-    """
-    number_of_bootstraps = run_parameters["number_of_bootstraps"]
-    for sample in range(0, number_of_bootstraps):
-        run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 
 def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
