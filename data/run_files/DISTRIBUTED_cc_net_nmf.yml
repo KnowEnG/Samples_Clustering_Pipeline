@@ -1,11 +1,10 @@
-
 method: cc_net_nmf                    # Available methods: nmf, cc_nmf, net_nmf, cc_net_nmf
 
 gg_network_name_full_path:  ../data/networks/keg_ST90_4col.edge
 spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
-phenotype_data_full_path:   ../data/spreadsheets/UCECppheno_table.txt
+phenotype_data_full_path:   ../data/spreadsheets/UCEC_phenotype.txt
 
-results_directory:          ./benchmarks
+results_directory:          ./run_dir/results
 tmp_directory:              ./run_dir/tmp
 
 rwr_max_iterations:         100
@@ -25,7 +24,7 @@ nmf_penalty_parameter:      1400
 
 top_number_of_genes:        100
 
-processing_method:          dist_comp  # available methods: serial, parallel, dist_comp
+processing_method:          distribute # available methods: serial, parallel, distribute
                                        # available clusters: AWS, CS Cluster
 
 # ----------------------

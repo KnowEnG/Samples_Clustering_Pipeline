@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
-
+import knpackage.distributed_computing_utils as dstutil
 
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
@@ -28,8 +28,6 @@ def run_nmf(run_parameters):
     sample_names = spreadsheet_df.columns
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
-
-    return
 
 
 def run_net_nmf(run_parameters):
@@ -72,8 +70,6 @@ def run_net_nmf(run_parameters):
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
-    return
-
 
 def run_cc_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization with
@@ -96,6 +92,14 @@ def run_cc_nmf(run_parameters):
         find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
     elif run_parameters['processing_method'] == 'serial':
         find_and_save_nmf_clusters_serial(spreadsheet_mat, run_parameters)
+    elif run_parameters['processing_method'] == 'distribute':
+        func_args = [spreadsheet_mat, run_parameters]
+        dependency_list = [run_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
+        dstutil.execute_distribute_computing_job(run_parameters['cluster_ip_address'],
+                                                  run_parameters['number_of_bootstraps'],
+                                                  func_args,
+                                                  find_and_save_nmf_clusters_parallel,
+                                                  dependency_list)
     else:
         raise ValueError('processing_method contains bad value.')
 
@@ -110,8 +114,6 @@ def run_cc_nmf(run_parameters):
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
     kn.remove_dir(run_parameters["tmp_directory"])
-
-    return
 
 
 def run_cc_net_nmf(run_parameters):
@@ -149,11 +151,20 @@ def run_cc_net_nmf(run_parameters):
         # Number of processes to be executed in parallel
         number_of_loops = run_parameters['number_of_bootstraps']
         print("Number of bootstrap {}".format(number_of_loops))
+
         find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
                                                 number_of_loops)
         print("Finish parallel computing locally......")
     elif run_parameters['processing_method'] == 'serial':
         find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+    elif run_parameters['processing_method'] == 'distribute':
+        func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
+        dependency_list = [run_net_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
+        dstutil.execute_distribute_computing_job(run_parameters['cluster_ip_address'],
+                                                  run_parameters['number_of_bootstraps'],
+                                                  func_args,
+                                                  find_and_save_net_nmf_clusters_parallel,
+                                                  dependency_list)
     else:
         raise ValueError('processing_method contains bad value.')
 
@@ -167,8 +178,6 @@ def run_cc_net_nmf(run_parameters):
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
     kn.remove_dir(run_parameters["tmp_directory"])
-
-    return
 
 
 def run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample):
@@ -218,7 +227,7 @@ def find_and_save_net_nmf_clusters_serial(network_mat, spreadsheet_mat, lap_dag,
         run_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters, sample)
 
 
-def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_dag, lap_val, run_parameters,
+def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
                                             number_of_loops):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
@@ -231,33 +240,11 @@ def find_and_save_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_da
         run_parameters: dictionary of run-time parameters.
         number_of_cpus: number of processes to be running in parallel
     """
-    import multiprocessing
-    import itertools
-    import sys
-    import socket
     import knpackage.distributed_computing_utils as dstutil
 
-    try:
-        parallelism = dstutil.determine_parallelism_locally(number_of_loops)
-
-        host = socket.gethostname()
-        print("Using parallelism {} on host {}.....".format(parallelism, host))
-
-        range_list = range(0, number_of_loops)
-        p = multiprocessing.Pool(processes=parallelism)
-        p.starmap(run_net_nmf_clusters_worker,
-                  zip(itertools.repeat(network_mat),
-                      itertools.repeat(spreadsheet_mat),
-                      itertools.repeat(lap_dag),
-                      itertools.repeat(lap_val),
-                      itertools.repeat(run_parameters),
-                      range_list))
-        p.close()
-        p.join()
-
-        return "Succeeded running parallel processing on node {}.".format(host)
-    except:
-        raise OSError("Failed running parallel processing on node {}: {}".format(host, sys.exc_info()))
+    jobs_id = range(0, number_of_loops)
+    zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
+    dstutil.parallelize_processes_locally(run_net_nmf_clusters_worker, zipped_arguments, number_of_loops)
 
 
 def run_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
@@ -307,32 +294,11 @@ def find_and_save_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_
         run_parameters: dictionary of run-time parameters.
         number_of_cpus: number of processes to be running in parallel
     """
-    import multiprocessing
-    import itertools
-    import sys
-    import socket
     import knpackage.distributed_computing_utils as dstutil
 
-    try:
-        parallelism = dstutil.determine_parallelism_locally(number_of_loops)
-
-        host = socket.gethostname()
-        print("Using parallelism {} on host {}.....".format(parallelism, host))
-
-        number_of_bootstraps = run_parameters["number_of_bootstraps"]
-        range_list = range(0, number_of_bootstraps)
-
-        p = multiprocessing.Pool(processes=parallelism)
-        p.starmap(run_nmf_clusters_worker,
-                  zip(itertools.repeat(spreadsheet_mat),
-                      itertools.repeat(run_parameters),
-                      range_list))
-
-        p.close()
-        p.join()
-        return "Succeeded running parallel processing on node {}.".format(host)
-    except:
-        raise OSError("Failed running parallel processing on node {}: {}".format(host, sys.exc_info()))
+    jobs_id = range(0, number_of_loops)
+    zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
+    dstutil.parallelize_processes_locally(run_nmf_clusters_worker, zipped_arguments, number_of_loops)
 
 
 def form_consensus_matrix(run_parameters, linkage_matrix, indicator_matrix):
@@ -364,7 +330,11 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
     Returns:
         indicator_matrix: input summed with "temp_p*" files in run_parameters["tmp_directory"].
     """
-    tmp_dir = run_parameters["tmp_directory"]
+    if run_parameters['processing_method'] == 'distribute':
+        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
+                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
+    else:
+        tmp_dir = run_parameters["tmp_directory"]
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
         if tmp_f[0:6] == 'temp_p':
@@ -385,8 +355,12 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
     Returns:
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
-    tmp_dir = run_parameters["tmp_directory"]
-
+    if run_parameters['processing_method'] == 'distribute':
+        tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
+                               os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
+    else:
+        tmp_dir = run_parameters["tmp_directory"]
+        
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
         if tmp_f[0:6] == 'temp_p':
@@ -409,7 +383,6 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
         sequence_number: temporary file name suffix.
     """
     import os
-    import sys
     import knpackage.toolbox as kn
     import numpy as np
 
@@ -427,8 +400,6 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
         cluster_id.dump(fh0)
     with open(pname, 'wb') as fh1:
         sample_permutation.dump(fh1)
-
-    return
 
 
 def form_consensus_matrix_graphic(consensus_matrix, k=3):
@@ -469,8 +440,6 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     with open(get_output_file_name(run_parameters, 'silhouette_average', 'viz'), 'w') as fh:
         fh.write(silhouette_score_string)
 
-    return
-
 
 def save_final_samples_clustering(sample_names, labels, run_parameters):
     """ wtite .tsv file that assings a cluster number label to the sample_names.
@@ -490,7 +459,6 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
 
         phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data', 'viz'), sep='\t',
                             header=True, index=True, na_rep='NA')
-    return
 
 
 def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat=None):
@@ -529,7 +497,6 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
         top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
         top_number_of_genes_df[sample].iloc[top_index[0:top_number_of_genes]] = 1
     top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_per_cluster', 'download'), sep='\t')
-    return
 
 
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
@@ -559,6 +526,12 @@ def update_tmp_directory(run_parameters, tmp_dir):
         run_parameters: an updated run_parameters
 
     '''
-    run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
+
+    if (run_parameters['processing_method'] == 'distribute'):
+        # Currently hard coded to AWS's namespace, need to change it once we have a dedicated share location
+        run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
+    else:
+        run_parameters["tmp_directory"] = kn.create_dir(run_parameters["run_directory"], tmp_dir)
 
     return run_parameters
+
