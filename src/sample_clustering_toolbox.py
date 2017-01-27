@@ -85,22 +85,22 @@ def run_cc_nmf(run_parameters):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
-    if run_parameters['processing_method'] == 'parallel':
-        number_of_loops = run_parameters["number_of_bootstraps"]
-        find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
-
-    elif run_parameters['processing_method'] == 'serial':
+    if run_parameters['processing_method'] == 'serial':
         for sample in range(0, run_parameters["number_of_bootstraps"]):
             run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
+
+    elif run_parameters['processing_method'] == 'parallel':
+        number_of_loops = run_parameters["number_of_bootstraps"]
+        find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_loops)
 
     elif run_parameters['processing_method'] == 'distribute':
         func_args = [spreadsheet_mat, run_parameters]
         dependency_list = [run_cc_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
         dstutil.execute_distribute_computing_job(run_parameters['cluster_ip_address'],
-                                                  run_parameters['number_of_bootstraps'],
-                                                  func_args,
-                                                  find_and_save_cc_nmf_clusters_parallel,
-                                                  dependency_list)
+                                                 run_parameters['number_of_bootstraps'],
+                                                 func_args,
+                                                 find_and_save_cc_nmf_clusters_parallel,
+                                                 dependency_list)
     else:
         raise ValueError('processing_method contains bad value.')
 
@@ -148,22 +148,22 @@ def run_cc_net_nmf(run_parameters):
     spreadsheet_mat = spreadsheet_df.as_matrix()
     sample_names = spreadsheet_df.columns
 
-    if run_parameters['processing_method'] == 'parallel':
-        find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
-                                                   run_parameters['number_of_bootstraps'])
-
-    elif run_parameters['processing_method'] == 'serial':
+    if run_parameters['processing_method'] == 'serial':
         for sample in range(0, run_parameters["number_of_bootstraps"]):
             run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, sample)
+
+    elif run_parameters['processing_method'] == 'parallel':
+        find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters,
+                                                   run_parameters['number_of_bootstraps'])
 
     elif run_parameters['processing_method'] == 'distribute':
         func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
         dependency_list = [run_cc_net_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
         dstutil.execute_distribute_computing_job(run_parameters['cluster_ip_address'],
-                                                  run_parameters['number_of_bootstraps'],
-                                                  func_args,
-                                                  find_and_save_cc_net_nmf_clusters_parallel,
-                                                  dependency_list)
+                                                 run_parameters['number_of_bootstraps'],
+                                                 func_args,
+                                                 find_and_save_cc_net_nmf_clusters_parallel,
+                                                 dependency_list)
     else:
         raise ValueError('processing_method contains bad value.')
 
