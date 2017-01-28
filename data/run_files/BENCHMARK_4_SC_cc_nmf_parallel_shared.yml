@@ -1,0 +1,41 @@
+
+method: cc_nmf              # Available methods: nmf, cc_nmf, net_nmf, cc_net_nmf
+
+spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
+results_directory:          ./run_dir/results
+tmp_directory:              ./run_dir/tmp
+
+rows_sampling_fraction:     0.8        # 0.8 means 80% of rows
+cols_sampling_fraction:     0.8        # 0.8 means 80% of columns
+
+number_of_clusters:         3
+number_of_bootstraps:       4
+
+nmf_conv_check_freq:        50
+nmf_max_invariance:         200
+nmf_max_iterations:         10000
+nmf_penalty_parameter:      1400
+
+top_number_of_genes:        100
+
+processing_method:          parallel   # method values: serial, parallel, distribute
+                                       # available clusters: AWS, CS Cluster
+# ----------------------
+# Running on AWS cluster
+# ----------------------
+#cluster_shared_volumn:      /mnt/clustershare/knoweng/
+#cluster_ip_address:
+#                            - 172.31.47.99
+#                            - 172.31.41.138
+# ----------------------
+# Running on CS cluster
+# ----------------------
+# cluster_shared_volumn:    /mnt/clustershare/knoweng/ -- place holder to be updated by Jing
+#                           - 192.17.176.156
+#                           - 192.17.176.151
+#                           - 192.17.176.158
+#                           - 192.17.176.161
+#                           - 192.17.176.152
+#                           - 192.17.176.150
+#                           - 128.174.244.71
+# ----------------------
