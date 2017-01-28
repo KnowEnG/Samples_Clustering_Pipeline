@@ -229,6 +229,7 @@ def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     """
     import knpackage.toolbox as kn
 
+    np.random.seed(sample)
     sample_random, sample_permutation = kn.sample_a_matrix(
         spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
         float(run_parameters["cols_sampling_fraction"]))
@@ -253,6 +254,7 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
     """
     import knpackage.toolbox as kn
 
+    np.random.seed(sample)
     sample_random, sample_permutation = kn.sample_a_matrix(
         spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
         float(run_parameters["cols_sampling_fraction"]))
