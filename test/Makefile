@@ -26,16 +26,16 @@ clean_dir_recursively:
 # Large Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
 run_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf.yml 
+	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf.yml 
 
 run_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file net_nmf.yml
+	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file net_nmf.yml
 
 run_cc_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_nmf.yml 
+	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_nmf.yml 
 
 run_cc_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf.yml
+	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf.yml
 
 run_all_methods: run_nmf run_net_nmf run_cc_nmf run_cc_net_nmf
 
@@ -49,7 +49,7 @@ unit_tests:
 	cd unit; make all_unit_tests
 	
 run_benchmark_test:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file PARALLEL_cc_net_nmf.yml	
+	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file PARALLEL_cc_net_nmf.yml	
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -
