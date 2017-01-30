@@ -173,14 +173,6 @@ phenotype_data_name = UCEC_phenotype.txt
  |...|...|...|...|
  | sample n|float|...|float|
  
-* Output files of all four methods save gene scores by cluster with name genes_averages_by_cluster_{method}_{timestamp}_viz.tsv.</br>
-
- |  |**cluster 1**|...|**cluster k**|
- | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
- | gene 1|float|...|float|
- |...|...|...|...|
- | gene m|float|...|float|
- 
 * Output files of all four methods save patients to cluster map with name samples_labeled_by_cluster_{method}_{timestamp}_viz.tsv.</br>
 
  |    |**cluster**|
@@ -188,6 +180,14 @@ phenotype_data_name = UCEC_phenotype.txt
  | sample 1 | int|
  |...|...|
  |sample n|int|
+ 
+* Output files of all four methods save gene scores by cluster with name genes_averages_by_cluster_{method}_{timestamp}_viz.tsv.</br>
+
+ |  |**cluster 1**|...|**cluster k**|
+ | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
+ | gene 1|float|...|float|
+ |...|...|...|...|
+ | gene m|float|...|float|
  
 * Output files of all four methods save spreadsheet with top ranked genes per sample with name top_genes_by_cluster_{method}_{timestamp}_download.tsv.</br>
 
