@@ -129,7 +129,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 | tmp_directory | directory | Directory to save the intermediate files |
 | rwr_max_iterations | 100| Maximum number of iterations without convergence in random walk with restart |
 | rwr_convergence_tolerence | 1.0e-8 | Frobenius norm tolerence of spreadsheet vector in random walk|
-| rwr_restart_probability | 0.7 | alpha in `V_(n+1) = alpha * N * Vn + (1-alpha)*Vo`|
+| rwr_restart_probability | 0.7 | alpha in `V_(n+1) = alpha * N * Vn + (1-alpha) * Vo` |
 | rows_sampling_fraction| 0.8| Select 80% of spreadsheet rows|
 | cols_sampling_fraction| 0.8| Select 80% of spreadsheet columns|
 | number_of_bootstraps| 4 | Number of random samplings |
