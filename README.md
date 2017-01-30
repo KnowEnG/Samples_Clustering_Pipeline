@@ -183,8 +183,9 @@ phenotype_data_name = UCEC_phenotype.txt
  
 * Output files of all four methods save patients to cluster map with name samples_labeled_by_cluster_{method}_{timestamp}_viz.tsv.</br>
 
+ |    |    |
  | :--------------------: |:--------------------:|
- | sample 1|int|
+ | sample 1 | int|
  |...|...|
  |sample n|int|
  
