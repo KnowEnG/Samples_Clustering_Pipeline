@@ -62,7 +62,7 @@ unit_tests:
 	cd unit; make all_unit_tests
 	
 run_benchmark_test:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file PARALLEL_cc_net_nmf.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -

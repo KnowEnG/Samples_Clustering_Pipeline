@@ -447,8 +447,8 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
     cluster_labels_df.to_csv(get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz'), sep='\t', header=None)
 
-    if 'phenotype_data_full_path' in run_parameters.keys():
-        phenotype_df = pd.read_csv(run_parameters['phenotype_data_full_path'], index_col=0, header=0, sep='\t')
+    if 'phenotype_name_full_path' in run_parameters.keys():
+        phenotype_df = pd.read_csv(run_parameters['phenotype_name_full_path'], index_col=0, header=0, sep='\t')
         phenotype_df.insert(0, 'Cluster_ID', 'NA')
         phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = cluster_labels_df.values
 
