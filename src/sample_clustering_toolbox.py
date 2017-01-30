@@ -373,8 +373,11 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
         spreadsheet_df: the dataframe as processed
         run_parameters: with keys for "results_directory", "method", (optional - "top_number_of_genes")
         network_mat:    (if appropriate) normalized network adjacency matrix used in processing
-    Returns:            (writes files)
 
+    Output:
+        genes_by_samples_heatmp_{method}_{timestamp}_viz.tsv:    spreadsheet as processed
+        genes_averages_per_cluster_{method}_{timestamp}_viz.tsv: average values of genes in each cluster
+        top_genes_per_cluster_{method}_{timestamp}_download.tsv: one if gene is in top "n" for that cluster, else zero
     """
     if network_mat is not None:
         sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.as_matrix(), network_mat, run_parameters)
@@ -413,6 +416,10 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         sample_names: data identifiers for column names.
         labels: cluster numbers for row names.
         run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
+
+    Output:
+        consensus_matrix_{method}_{timestamp}_viz.tsv:   samples x samples consensus matrix.
+        silhouette_average_{method}_{timestamp}_viz.tsv: number of clusters and silhouette score as one line of text.
     """
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
     out_df.to_csv(get_output_file_name(run_parameters, 'consensus_matrix', 'viz'), sep='\t')
@@ -432,6 +439,10 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         sample_names: (unique) data identifiers.
         labels: cluster number assignments.
         run_parameters: write path (run_parameters["results_directory"]).
+
+    Output:
+        sample_labels_by_cluster_{method}_{timestamp}_viz.tsv: sample_name, cluster_labels_assignment.
+        phenotype_data_{method}_{timestamp}_viz.tsv:           existing phenotype file plus cluster_labels_assignment.
     """
     cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
     cluster_labels_df.to_csv(get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz'), sep='\t', header=None)
