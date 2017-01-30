@@ -121,7 +121,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 
 | **Key**                   | **Value** | **Comments** |
 | ------------------------- | --------- | ------------ |
-| method                    | nmf or cc_nmf or net_nmf or cc_net_nmf  | Choose clustering method |
+| method                    | **nmf**, **cc_nmf**, **net_nmf** or **cc_net_nmf**  | Choose clustering method |
 | gg_network_name_full_path | directory+gg_network_name |Path and file name of the 4 col network file |
 | spreadsheet_name_full_path | directory+spreadsheet_name|  Path and file name of user supplied gene sets |
 | phenotype_data_full_path | directory+phenotype_data_name| Path and file name of user supplied phenotype data |
