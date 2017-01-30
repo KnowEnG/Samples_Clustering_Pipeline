@@ -27,28 +27,28 @@ clean_dir_recursively:
 # Large Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
 run_nmf:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1_SC_nmf.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1_SC_nmf.yml
 
 run_net_nmf:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_2_SC_net_nmf.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_2_SC_net_nmf.yml
 
 run_cc_nmf_serial:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_3_SC_cc_nmf_serial.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_3_SC_cc_nmf_serial.yml
 
 run_cc_nmf_parallel_shared:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_4_SC_cc_nmf_parallel_shared.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_4_SC_cc_nmf_parallel_shared.yml
 
 run_cc_nmf_parallel_distributed:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_5_SC_cc_nmf_parallel_distributed.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_5_SC_cc_nmf_parallel_distributed.yml
 
 run_cc_net_nmf_serial:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_6_SC_cc_net_nmf_serial.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_6_SC_cc_net_nmf_serial.yml
 
 run_cc_net_nmf_parallel_shared:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
 
 run_cc_net_nmf_parallel_distributed:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_8_SC_cc_net_nmf_parallel_distributed.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_8_SC_cc_net_nmf_parallel_distributed.yml
 
 run_all_methods: run_nmf run_net_nmf run_cc_nmf_parallel_shared run_cc_net_nmf_parallel_shared
 
@@ -62,7 +62,7 @@ unit_tests:
 	cd unit; make all_unit_tests
 	
 run_benchmark_test:
-	time python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file PARALLEL_cc_net_nmf.yml	
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file PARALLEL_cc_net_nmf.yml
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -
