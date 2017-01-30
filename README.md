@@ -151,7 +151,7 @@ phenotype_data_name = UCEC_phenotype.txt
 
 * Output files of all four methods save genes by sample heatmap variances per row with name genes_variance_{method}_{timestamp}_viz.tsv.</br>
 
- | **gene name** |**variance**|
+ |  |**variance**|
  | :--------------------: |:--------------------:|
  | gene 1|float|
  |...|...|
@@ -159,7 +159,7 @@ phenotype_data_name = UCEC_phenotype.txt
 
 * Output files of all four methods save genes by samples heatmap with name genes_by_samples_heatmp_{method}_{timestamp}_viz.tsv.</br>
 
- | **gene name** |**sample name 1**|...|**sample name n**|
+ |  |**sample name 1**|...|**sample name n**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
  | gene 1|float|...|float|
  |...|...|...|...|
@@ -167,7 +167,7 @@ phenotype_data_name = UCEC_phenotype.txt
 
 * Output files of all four methods save samples by samples heatmap with name consensus_matrix_{method}_{timestamp}_viz.tsv.</br>
 
- | **Sample name** |**sample name 1**|...|**sample name n**|
+ |  |**sample name 1**|...|**sample name n**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
  | sample name 1|float|...|float|
  |...|...|...|...|
@@ -175,23 +175,30 @@ phenotype_data_name = UCEC_phenotype.txt
  
 * Output files of all four methods save gene scores by cluster with name genes_averages_by_cluster_{method}_{timestamp}_viz.tsv.</br>
 
- | **gene name** |**cluster name 1**|...|**cluster name k**|
+ |  |**cluster 1**|...|**cluster k**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
  | gene 1|float|...|float|
  |...|...|...|...|
  | gene m|float|...|float|
  
-* Output files of all four methods save patients to cluster map with name sample_labels_by_cluster_{method}_{timestamp}_viz.tsv.</br>
+* Output files of all four methods save patients to cluster map with name samples_labeled_by_cluster_{method}_{timestamp}_viz.tsv.</br>
 
- | **sample name** |**cluster**|
  | :--------------------: |:--------------------:|
  | sample 1|int|
  |...|...|
  |sample n|int|
  
-* Output files of all four methods save spreadsheet with top ranked genes per sample with name top_genes_per_cluster_{method}_{timestamp}_download.tsv.</br>
+ * Output files of all four methods save patients to cluster map with name phenotypes_labeled_by_cluster_{method}_{timestamp}_viz.tsv.</br>
 
- | **gene name** |**cluster name 1**|...|**cluster name k**|
+ | **sample id** |**cluster**|**phenotype 1**|...|**phenotype k**|
+ | :--------------------: |:--------------------:|:--------------------:|:--------------------:|:--------------------:|
+ | sample 1|int|mixed type|...|mixed type|
+ |...|...|...|...|...|
+ | sample n|int|mixed type|...|mixed type|
+ 
+* Output files of all four methods save spreadsheet with top ranked genes per sample with name top_genes_by_cluster_{method}_{timestamp}_download.tsv.</br>
+
+ |  |**cluster 1**|...|**cluster k**|
  | :--------------------: |:--------------------:|:--------------------:|:--------------------:|
  | gene 1|1/0|...|1/0|
  |...|...|...|...|
