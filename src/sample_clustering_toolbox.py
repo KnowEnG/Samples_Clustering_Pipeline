@@ -376,7 +376,7 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
 
     Output:
         genes_by_samples_heatmp_{method}_{timestamp}_viz.tsv:    spreadsheet as processed
-        genes_averages_per_cluster_{method}_{timestamp}_viz.tsv: average values of genes in each cluster
+        genes_averages_by_cluster_{method}_{timestamp}_viz.tsv: average values of genes in each cluster
         top_genes_per_cluster_{method}_{timestamp}_download.tsv: one if gene is in top "n" for that cluster, else zero
     """
     if network_mat is not None:
@@ -392,7 +392,7 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     for cluster_number in np.unique(labels):
         col_labels.append('Cluster_%d'%(cluster_number))
     cluster_ave_df.columns = col_labels
-    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_average_per_cluster', 'viz'), sep='\t')
+    cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_averages_by_cluster', 'viz'), sep='\t')
 
     clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
     clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t')
