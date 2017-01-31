@@ -22,22 +22,35 @@ copy_run_files:
 clean_dir_recursively:
 	$(RMR) $(RUN_DIR)
 
+
 # ----------------------------------------------------------------
 # Large Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
 run_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file nmf.yml 
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1_SC_nmf.yml
 
 run_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file net_nmf.yml
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_2_SC_net_nmf.yml
 
-run_cc_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_nmf.yml 
+run_cc_nmf_serial:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_3_SC_cc_nmf_serial.yml
 
-run_cc_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file cc_net_nmf.yml
+run_cc_nmf_parallel_shared:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_4_SC_cc_nmf_parallel_shared.yml
 
-run_all_methods: run_nmf run_net_nmf run_cc_nmf run_cc_net_nmf
+run_cc_nmf_parallel_distributed:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_5_SC_cc_nmf_parallel_distributed.yml
+
+run_cc_net_nmf_serial:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_6_SC_cc_net_nmf_serial.yml
+
+run_cc_net_nmf_parallel_shared:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
+
+run_cc_net_nmf_parallel_distributed:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_8_SC_cc_net_nmf_parallel_distributed.yml
+
+run_all_methods: run_nmf run_net_nmf run_cc_nmf_parallel_shared run_cc_net_nmf_parallel_shared
 
 # ----------------------------------------------------------------
 # - UNIT TESTS RUN SECTION                                       -
@@ -49,7 +62,7 @@ unit_tests:
 	cd unit; make all_unit_tests
 	
 run_benchmark_test:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file PARALLEL_cc_net_nmf.yml	
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -
