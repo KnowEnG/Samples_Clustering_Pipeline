@@ -26,6 +26,7 @@ def run_nmf(run_parameters):
     labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
     sample_names = spreadsheet_df.columns
+    save_consensus_clustering(linkage_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
@@ -67,6 +68,8 @@ def run_net_nmf(run_parameters):
     linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
     labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
+    sample_names = spreadsheet_df.columns
+    save_consensus_clustering(linkage_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
