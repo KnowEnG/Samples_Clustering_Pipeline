@@ -198,6 +198,12 @@ phenotype_data_name = UCEC_phenotype.txt
  |...|...|...|...|
  | **gene m**|1/0|...|1/0|
   
+* All four methods save **silhouette number of clusters** and **corresponding silhouette score** with name silhouette_average\_{method}\_{timestamp}\_viz.tsv.</br>
+ ```
+ File Example: 
+ silhouette number of clusters = 3, corresponding silhouette score = 1
+ ```
+
 * Output files of all four methods save patients to cluster map with name **phenotypes_labeled_by_cluster_{method}_{timestamp}_viz.tsv**.</br>
 
  | **sample id** |**cluster**|**phenotype 1**|...|**phenotype k**|

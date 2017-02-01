@@ -26,6 +26,7 @@ def run_nmf(run_parameters):
     labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
     sample_names = spreadsheet_df.columns
+    save_consensus_clustering(linkage_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
 
@@ -67,6 +68,8 @@ def run_net_nmf(run_parameters):
     linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
     labels = kn.perform_kmeans(linkage_matrix, run_parameters['number_of_clusters'])
 
+    sample_names = spreadsheet_df.columns
+    save_consensus_clustering(linkage_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
 
@@ -231,8 +234,8 @@ def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
 
     np.random.seed(sample)
     sample_random, sample_permutation = kn.sample_a_matrix(
-        spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
-        float(run_parameters["cols_sampling_fraction"]))
+        spreadsheet_mat, run_parameters["rows_sampling_fraction"],
+        run_parameters["cols_sampling_fraction"])
 
     h_mat = kn.perform_nmf(sample_random, run_parameters)
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
@@ -256,8 +259,8 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
 
     np.random.seed(sample)
     sample_random, sample_permutation = kn.sample_a_matrix(
-        spreadsheet_mat, float(run_parameters["rows_sampling_fraction"]),
-        float(run_parameters["cols_sampling_fraction"]))
+        spreadsheet_mat, run_parameters["rows_sampling_fraction"],
+        run_parameters["cols_sampling_fraction"])
     sample_smooth, iterations = kn.smooth_matrix_with_rwr(sample_random, network_mat, run_parameters)
 
     sample_quantile_norm = kn.get_quantile_norm_matrix(sample_smooth)
@@ -284,8 +287,8 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
     time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
     os.makedirs(tmp_dir, mode=0o755, exist_ok=True)
 
-    hname = os.path.join(tmp_dir, 'temp_h' + time_stamp)
-    pname = os.path.join(tmp_dir, 'temp_p' + time_stamp)
+    hname = os.path.join(tmp_dir, 'tmp_h_%d'%(sequence_number))
+    pname = os.path.join(tmp_dir, 'tmp_p_%d'%(sequence_number))
 
     cluster_id = np.argmax(h_matrix, 0)
     with open(hname, 'wb') as fh0:
@@ -330,7 +333,7 @@ def get_indicator_matrix(run_parameters, indicator_matrix):
         tmp_dir = run_parameters["tmp_directory"]
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
-        if tmp_f[0:6] == 'temp_p':
+        if tmp_f[0:6] == 'tmp_p_':
             pname = os.path.join(tmp_dir, tmp_f)
             sample_permutation = np.load(pname)
             indicator_matrix = kn.update_indicator_matrix(sample_permutation, indicator_matrix)
@@ -356,10 +359,10 @@ def get_linkage_matrix(run_parameters, linkage_matrix):
         
     dir_list = os.listdir(tmp_dir)
     for tmp_f in dir_list:
-        if tmp_f[0:6] == 'temp_p':
+        if tmp_f[0:6] == 'tmp_p_':
             pname = os.path.join(tmp_dir, tmp_f)
             sample_permutation = np.load(pname)
-            hname = os.path.join(tmp_dir, tmp_f[0:5] + 'h' + tmp_f[6:len(tmp_f)])
+            hname = os.path.join(tmp_dir, 'tmp_h_' + tmp_f[6:len(tmp_f)])
             h_mat = np.load(hname)
             linkage_matrix = kn.update_linkage_matrix(h_mat, sample_permutation, linkage_matrix)
 
