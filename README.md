@@ -26,16 +26,17 @@ Note: all of the clustering methods mentioned above use the non-negative matrix 
  
 ###2. Install the following (Ubuntu or Linux)
   ```
- apt-get install -y python3-pip
- apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
- pip3 install numpy==1.11.1
- pip3 install pandas==0.18.1
- pip3 install scipy==0.18.0
- pip3 install scikit-learn==0.17.1
- apt-get install -y libfreetype6-dev libxft-dev
- pip3 install matplotlib==1.4.2
  pip3 install pyyaml
  pip3 install knpackage
+ pip3 install scipy==0.18.0
+ pip3 install numpy==1.11.1
+ pip3 install pandas==0.18.1
+ pip3 install matplotlib==1.4.2
+ pip3 install scikit-learn==0.17.1
+ 
+ apt-get install -y python3-pip
+ apt-get install -y libfreetype6-dev libxft-dev
+ apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
 ```
 
 ###3. Change directory to Samples_Clustering_Pipeline
@@ -197,6 +198,13 @@ phenotype_data_name = UCEC_phenotype.txt
  |...|...|...|...|
  | **gene m**|1/0|...|1/0|
   
+* Output files of all consensus clustering methods save a silhouette score file name 
+**silhouette_average{method}_{timestamp}_viz.tsv**.</br>
+
+ |**silhouette number of clusters**|**corresponding silhouette score**|
+ |:--------------------:|:--------------------:|
+  
+
 * Output files of all four methods save patients to cluster map with name **phenotypes_labeled_by_cluster_{method}_{timestamp}_viz.tsv**.</br>
 
  | **sample id** |**cluster**|**phenotype 1**|...|**phenotype k**|
