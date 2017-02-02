@@ -197,7 +197,8 @@ def get_test_paramters_dictionary():
         'run_directory': './tmp',
         'processing_method': 'serial',
         'processing_method_1': 'serial',
-        'processing_method_2': 'parallel'
+        'processing_method_2': 'parallel',
+        'top_number_of_genes': 10
         }
 
     return test_parameters
