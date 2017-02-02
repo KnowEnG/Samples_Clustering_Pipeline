@@ -27,7 +27,7 @@ class TestRun_nmf_clusters_worker(TestCase):
         spreadsheet_mat = tstdata.get_wide_3_cluster_spreadsheet(cluster_rows)
 
         for sample in range(0, int(self.run_parameters['number_of_bootstraps'])):
-            sctbx.run_nmf_clusters_worker(spreadsheet_mat, self.run_parameters, sample)
+            sctbx.run_cc_nmf_clusters_worker(spreadsheet_mat, self.run_parameters, sample)
 
         linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
         indicator_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
