@@ -448,15 +448,14 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     cluster_labels_df.to_csv(get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz'), sep='\t', header=None)
 
     if 'phenotype_name_full_path' in run_parameters.keys():
-        try:
-            phenotype_df = pd.read_csv(run_parameters['phenotype_name_full_path'], index_col=0, header=0, sep='\t')
-            phenotype_df.insert(0, 'Cluster_ID', 'NA')
-            phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = cluster_labels_df.values
+        phenotype_df = pd.read_csv(run_parameters['phenotype_name_full_path'], index_col=0, header=0, sep='\t')
+        phenotype_df.insert(0, 'Cluster_ID', 'NA')
+        names_drop_list = list(set(sample_names) - (set(sample_names) & set(phenotype_df.index.values)))
+        cluster_labels_df = cluster_labels_df.drop(names_drop_list)
+        phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = np.reshape(cluster_labels_df.values,(1, -1))
 
-            phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data', 'viz'), sep='\t',
+        phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data', 'viz'), sep='\t',
                             header=True, index=True, na_rep='NA')
-        except Exception:
-            pass
 
 
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
