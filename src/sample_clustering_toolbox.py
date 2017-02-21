@@ -56,7 +56,6 @@ def run_net_nmf(run_parameters):
 
     spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
     spreadsheet_mat = spreadsheet_df.as_matrix()
-    sample_names = spreadsheet_df.columns
 
     sample_smooth, iterations = kn.smooth_matrix_with_rwr(
         spreadsheet_mat, network_mat, run_parameters)
@@ -193,7 +192,8 @@ def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters):
 
     jobs_id = range(0, run_parameters['number_of_bootstraps'])
     zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
-    dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, run_parameters['number_of_bootstraps'])
+    parallelism = dstutil.determine_parallelism_locally(run_parameters['number_of_bootstraps'], run_parameters['parallelism'])
+    dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
 def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters):
@@ -212,7 +212,8 @@ def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap
 
     jobs_id = range(0, run_parameters['number_of_bootstraps'])
     zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
-    dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, run_parameters['number_of_bootstraps'])
+    parallelism = dstutil.determine_parallelism_locally(run_parameters['number_of_bootstraps'], run_parameters['parallelism'])
+    dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
 def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
@@ -281,7 +282,6 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
 
     tmp_dir = run_parameters["tmp_directory"]
 
-    time_stamp = kn.create_timestamped_filename('_N' + str(sequence_number), name_extension=None, precision=1e12)
     os.makedirs(tmp_dir, mode=0o755, exist_ok=True)
 
     hname = os.path.join(tmp_dir, 'tmp_h_%d'%(sequence_number))
