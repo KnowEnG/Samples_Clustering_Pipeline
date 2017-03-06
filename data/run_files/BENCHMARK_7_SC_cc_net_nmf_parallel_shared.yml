@@ -28,6 +28,8 @@ top_number_of_genes:        100
 
 processing_method:          parallel   # available methods: serial, parallel, distribute
                                        # available clusters: AWS, CS Cluster
+parallelism:                4          # user defined parallelism
+
 # ----------------------
 # Running on AWS cluster
 # ----------------------
