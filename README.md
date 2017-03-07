@@ -62,9 +62,11 @@ make env_setup
 | **Command**         | **Option**                                       | 
 |:------------------- |:------------------------------------------------ | 
 | make run_nmf        | Clustering                                       |
-| make run_cc_nmf     | Consensus Clustering                             |
 | make run_net_nmf     | Clustering with network regularization           |
-| make run_cc_net_nmf | Consensus Clustering with network regularization |
+| make run_cc_nmf_serial     | Consensus Clustering                             |
+| make run_cc_nmf_parallel_shared     | Consensus Clustering                             |
+| make run_cc_net_nmf_serial | Consensus Clustering with network regularization |
+| make run_cc_net_nmf_parallel_shared | Consensus Clustering with network regularization |
 
  
 * * * 
