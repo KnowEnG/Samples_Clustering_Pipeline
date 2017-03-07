@@ -143,6 +143,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 | nmf_penalty_parameter| 1400 | Penalty parameter |
 | top_number_of_genes| 100 | Number of top genes selected |
 | processing_method| serial or parallel or distribute | Choose processing method |
+| parallelism| number of cores to use in parallel processing | Set number of cores for speed or memory |
 
 gg_network_name = STRING_experimental_gene_gene.edge</br>
 spreadsheet_name = ProGENI_rwr20_STExp_GDSC_500.rname.gxc.tsv</br>
