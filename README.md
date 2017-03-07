@@ -21,7 +21,7 @@ Note: all of the clustering methods mentioned above use the non-negative matrix 
 * * * 
 ###1. Clone the Samples_Clustering_Pipeline Repo
 ```
- git clone https://github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git
+ git clone https://github.com/KnowEnG/Samples_Clustering_Pipeline.git
 ```
  
 ###2. Install the following (Ubuntu or Linux)
