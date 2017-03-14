@@ -128,6 +128,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 | gg_network_name_full_path | directory+gg_network_name |Path and file name of the 4 col network file |
 | spreadsheet_name_full_path | directory+spreadsheet_name|  Path and file name of user supplied gene sets |
 | phenotype_data_full_path | directory+phenotype_data_name| Path and file name of user supplied phenotype data |
+| threshold | 10 | cluster eval - catagorical vs continuous cut off level |
 | results_directory | directory | Directory to save the output files |
 | tmp_directory | directory | Directory to save the intermediate files |
 | rwr_max_iterations | 100| Maximum number of iterations without convergence in random walk with restart |
