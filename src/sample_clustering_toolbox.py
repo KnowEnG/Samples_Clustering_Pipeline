@@ -8,6 +8,8 @@ from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
 import knpackage.distributed_computing_utils as dstutil
 
+import clustering_eval_toolbox as cluster_eval
+
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
 
@@ -419,16 +421,12 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         phenotypes_labeled_by_cluster_{method}_{timestamp}_viz.tsv
     """
     cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
-    cluster_labels_df.to_csv(get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz'), sep='\t', header=None)
+    cluster_mapping_full_path = get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz')
+    cluster_labels_df.to_csv(cluster_mapping_full_path, sep='\t', header=None)
 
     if 'phenotype_name_full_path' in run_parameters.keys():
-        phenotype_df = pd.read_csv(run_parameters['phenotype_name_full_path'], index_col=0, header=0, sep='\t')
-        phenotype_df.insert(0, 'Cluster_ID', 'NA')
-        phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = cluster_labels_df.values
-
-        phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data', 'viz'), sep='\t',
-                            header=True, index=True, na_rep='NA')
-
+        run_parameters['cluster_mapping_full_path'] = cluster_mapping_full_path
+        cluster_eval.clustering_evaluation(run_parameters)
 
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
     """ get the full directory / filename for writing
