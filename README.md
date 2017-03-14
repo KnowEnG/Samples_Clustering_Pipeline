@@ -16,6 +16,16 @@ There are four clustering methods that one can choose from:
 
 Note: all of the clustering methods mentioned above use the non-negative matrix factorization (nmf) as the main clustering algorithm.
 
+
+If a pheotype data file is include pipeline **evaluates** the clustering result of KnowEnG's Samples Clustering Pipeline.
+
+There are two evaluation methods:
+
+| **Method**                                      | **Trait Type**                          |
+| ------------------------------------------------ | ------------------------------------- |
+| one-way ANOVA(f_oneway)                               | Continuous                                | 
+| one-way chi square test(chisquare)                                     | Categorical          |
+
 * * * 
 ## How to run this pipeline with Our data
 * * * 
