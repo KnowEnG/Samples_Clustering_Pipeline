@@ -215,3 +215,13 @@ phenotype_data_name = UCEC_phenotype.txt
  | **sample 1**|int|mixed type|...|mixed type|
  |...|...|...|...|...|
  | **sample n**|int|mixed type|...|mixed type|
+ 
+ 
+ * The clustering evaluation output file has the name 
+ **clustering_evaluation_result_{timestamp}.tsv**.</br>
+
+ |  |**Measure**|**Trait_length_after_dropna**| **Sample_number_after_dropna**|**chi/fval**|**pval**|
+ | :--------------------: |:--------------------:|:--------------------:|:--------:|:-------:|:--------------------:|
+ | **sample 1**|f_oneway|int(more than threshold)|int|float|float|
+ |...|...|...|...|...|...|
+ | **sample m**|chisquare|int(less than threshold)|int|float|float|
