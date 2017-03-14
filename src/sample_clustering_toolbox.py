@@ -91,7 +91,7 @@ def run_cc_nmf(run_parameters):
             run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
 
     elif processing_method == 'parallel':
-        find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters)
+        find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_bootstraps)
 
     elif processing_method == 'distribute':
         func_args = [spreadsheet_mat, run_parameters]
@@ -145,7 +145,7 @@ def run_cc_net_nmf(run_parameters):
             run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, sample)
 
     elif processing_method == 'parallel':
-        find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+        find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_bootstraps)
 
     elif processing_method == 'distribute':
         func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
@@ -168,7 +168,7 @@ def run_cc_net_nmf(run_parameters):
     kn.remove_dir(run_parameters["tmp_directory"])
 
 
-def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters):
+def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, local_parallelism):
     """ central loop: compute components for the consensus matrix by
         non-negative matrix factorization.
 
@@ -179,16 +179,13 @@ def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters):
     """
     import knpackage.distributed_computing_utils as dstutil
 
-    number_of_bootstraps = run_parameters['number_of_bootstraps']
-
-    jobs_id = range(0, number_of_bootstraps)
+    jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
-    # dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, number_of_bootstraps)
-    parallelism = dstutil.determine_parallelism_locally(run_parameters['number_of_bootstraps'], run_parameters['parallelism'])
+    parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
     dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
-def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters):
+def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, local_parallelism):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -202,12 +199,9 @@ def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap
     """
     import knpackage.distributed_computing_utils as dstutil
 
-    number_of_bootstraps = run_parameters['number_of_bootstraps']
-
-    jobs_id = range(0, number_of_bootstraps)
+    jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
-    # dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, number_of_bootstraps)
-    parallelism = dstutil.determine_parallelism_locally(run_parameters['number_of_bootstraps'], run_parameters['parallelism'])
+    parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
     dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
@@ -224,7 +218,8 @@ def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
 
     """
     import knpackage.toolbox as kn
-    
+    import numpy as np
+
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
     cols_sampling_fraction = run_parameters["cols_sampling_fraction"]
@@ -249,6 +244,7 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
         None
     """
     import knpackage.toolbox as kn
+    import numpy as np
 
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
