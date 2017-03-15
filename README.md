@@ -17,7 +17,7 @@ There are four clustering methods that one can choose from:
 Note: all of the clustering methods mentioned above use the non-negative matrix factorization (nmf) as the main clustering algorithm.
 
 
-If a pheotype data file is include this pipeline **evaluates** the clustering result.
+If a pheotype data file is included this pipeline **evaluates** the clustering result.
 
 There are two evaluation methods:
 
