@@ -183,7 +183,10 @@ def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, loca
 
     jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
-    parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+    if 'parallelism' in run_parameters:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+    else:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism)
     dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
@@ -203,7 +206,10 @@ def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap
 
     jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
-    parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+    if 'parallelism' in run_parameters:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+    else:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism)
     dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
