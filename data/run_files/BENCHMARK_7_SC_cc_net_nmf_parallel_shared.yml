@@ -1,8 +1,8 @@
-
 method: cc_net_nmf          # Available methods: nmf, cc_nmf, net_nmf, cc_net_nmf
 
 spreadsheet_name_full_path: ../data/spreadsheets/tcga_ucec_somatic_mutation_data.df
 phenotype_name_full_path:   ../data/spreadsheets/UCEC_phenotype.txt
+threshold: 10
 
 gg_network_name_full_path:  ../data/networks/keg_ST90_4col.edge
 

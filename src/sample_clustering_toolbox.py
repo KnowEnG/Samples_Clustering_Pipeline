@@ -8,6 +8,8 @@ from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
 import knpackage.distributed_computing_utils as dstutil
 
+import clustering_eval_toolbox as cluster_eval
+
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
 
@@ -91,7 +93,7 @@ def run_cc_nmf(run_parameters):
             run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample)
 
     elif processing_method == 'parallel':
-        find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters)
+        find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_bootstraps)
 
     elif processing_method == 'distribute':
         func_args = [spreadsheet_mat, run_parameters]
@@ -145,7 +147,7 @@ def run_cc_net_nmf(run_parameters):
             run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, sample)
 
     elif processing_method == 'parallel':
-        find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters)
+        find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_bootstraps)
 
     elif processing_method == 'distribute':
         func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
@@ -168,7 +170,7 @@ def run_cc_net_nmf(run_parameters):
     kn.remove_dir(run_parameters["tmp_directory"])
 
 
-def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters):
+def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, local_parallelism):
     """ central loop: compute components for the consensus matrix by
         non-negative matrix factorization.
 
@@ -179,16 +181,16 @@ def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters):
     """
     import knpackage.distributed_computing_utils as dstutil
 
-    number_of_bootstraps = run_parameters['number_of_bootstraps']
-
-    jobs_id = range(0, number_of_bootstraps)
+    jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
-    # dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, number_of_bootstraps)
-    parallelism = dstutil.determine_parallelism_locally(run_parameters['number_of_bootstraps'], run_parameters['parallelism'])
+    if 'parallelism' in run_parameters:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+    else:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism)
     dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
-def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters):
+def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, local_parallelism):
     """ central loop: compute components for the consensus matrix from the input
         network and spreadsheet matrices and save them to temp files.
 
@@ -202,12 +204,12 @@ def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap
     """
     import knpackage.distributed_computing_utils as dstutil
 
-    number_of_bootstraps = run_parameters['number_of_bootstraps']
-
-    jobs_id = range(0, number_of_bootstraps)
+    jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
-    # dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, number_of_bootstraps)
-    parallelism = dstutil.determine_parallelism_locally(run_parameters['number_of_bootstraps'], run_parameters['parallelism'])
+    if 'parallelism' in run_parameters:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+    else:
+        parallelism = dstutil.determine_parallelism_locally(local_parallelism)
     dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
@@ -224,7 +226,8 @@ def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
 
     """
     import knpackage.toolbox as kn
-    
+    import numpy as np
+
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
     cols_sampling_fraction = run_parameters["cols_sampling_fraction"]
@@ -249,6 +252,7 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
         None
     """
     import knpackage.toolbox as kn
+    import numpy as np
 
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
@@ -419,16 +423,12 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         phenotypes_labeled_by_cluster_{method}_{timestamp}_viz.tsv
     """
     cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
-    cluster_labels_df.to_csv(get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz'), sep='\t', header=None)
+    cluster_mapping_full_path = get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz')
+    cluster_labels_df.to_csv(cluster_mapping_full_path, sep='\t', header=None)
 
     if 'phenotype_name_full_path' in run_parameters.keys():
-        phenotype_df = pd.read_csv(run_parameters['phenotype_name_full_path'], index_col=0, header=0, sep='\t')
-        phenotype_df.insert(0, 'Cluster_ID', 'NA')
-        phenotype_df.loc[cluster_labels_df.index.values, 'Cluster_ID'] = cluster_labels_df.values
-
-        phenotype_df.to_csv(get_output_file_name(run_parameters, 'phenotype_data', 'viz'), sep='\t',
-                            header=True, index=True, na_rep='NA')
-
+        run_parameters['cluster_mapping_full_path'] = cluster_mapping_full_path
+        cluster_eval.clustering_evaluation(run_parameters)
 
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
     """ get the full directory / filename for writing

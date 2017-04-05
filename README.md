@@ -16,6 +16,16 @@ There are four clustering methods that one can choose from:
 
 Note: all of the clustering methods mentioned above use the non-negative matrix factorization (nmf) as the main clustering algorithm.
 
+
+If a pheotype data file is included this pipeline **evaluates** the clustering result.
+
+There are two evaluation methods:
+
+| **Method**                                      | **Trait Type**                          |
+| ------------------------------------------------ | ------------------------------------- |
+| one-way ANOVA(f_oneway)                               | Continuous                                | 
+| one-way chi square test(chisquare)                                     | Categorical          |
+
 * * * 
 ## How to run this pipeline with Our data
 * * * 
@@ -62,9 +72,11 @@ make env_setup
 | **Command**         | **Option**                                       | 
 |:------------------- |:------------------------------------------------ | 
 | make run_nmf        | Clustering                                       |
-| make run_cc_nmf     | Consensus Clustering                             |
 | make run_net_nmf     | Clustering with network regularization           |
-| make run_cc_net_nmf | Consensus Clustering with network regularization |
+| make run_cc_nmf_serial     | Consensus Clustering                             |
+| make run_cc_nmf_parallel_shared     | Consensus Clustering                             |
+| make run_cc_net_nmf_serial | Consensus Clustering with network regularization |
+| make run_cc_net_nmf_parallel_shared | Consensus Clustering with network regularization |
 
  
 * * * 
@@ -126,6 +138,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 | gg_network_name_full_path | directory+gg_network_name |Path and file name of the 4 col network file |
 | spreadsheet_name_full_path | directory+spreadsheet_name|  Path and file name of user supplied gene sets |
 | phenotype_data_full_path | directory+phenotype_data_name| Path and file name of user supplied phenotype data |
+| threshold | 10 | cluster eval - catagorical vs continuous cut off level |
 | results_directory | directory | Directory to save the output files |
 | tmp_directory | directory | Directory to save the intermediate files |
 | rwr_max_iterations | 100| Maximum number of iterations without convergence in random walk with restart |
@@ -141,6 +154,7 @@ set the data file targets to the files you want to run, and the parameters as ap
 | nmf_penalty_parameter| 1400 | Penalty parameter |
 | top_number_of_genes| 100 | Number of top genes selected |
 | processing_method| serial or parallel or distribute | Choose processing method |
+| parallelism| number of cores to use in parallel processing | Set number of cores for speed or memory |
 
 gg_network_name = STRING_experimental_gene_gene.edge</br>
 spreadsheet_name = ProGENI_rwr20_STExp_GDSC_500.rname.gxc.tsv</br>
@@ -211,3 +225,13 @@ phenotype_data_name = UCEC_phenotype.txt
  | **sample 1**|int|mixed type|...|mixed type|
  |...|...|...|...|...|
  | **sample n**|int|mixed type|...|mixed type|
+ 
+ 
+ * The clustering evaluation output file has the name 
+ **clustering_evaluation_result_{timestamp}.tsv**.</br>
+
+ |  |**Measure**|**Trait_length_after_dropna**| **Sample_number_after_dropna**|**chi/fval**|**pval**|
+ | :--------------------: |:--------------------:|:--------------------:|:--------:|:-------:|:--------------------:|
+ | **sample 1**|f_oneway|int(more than threshold)|int|float|float|
+ |...|...|...|...|...|...|
+ | **sample m**|chisquare|int(less than threshold)|int|float|float|
