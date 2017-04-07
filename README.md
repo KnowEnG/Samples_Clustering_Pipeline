@@ -105,7 +105,7 @@ __***Follow steps 1-3 above then do the following:***__
  
 ### * Create run_paramters file  (YAML Format)
  ``` 
- Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files TEMPLATE_cc_net_cluster_nmf.yml
+ Look for examples of run_parameters in the Sample_Clustering_Pipeline/data/run_files zTEMPLATE_cc_net_nmf.yml
  ```
 ### * Modify run_paramters file  (YAML Format)
 Change processing_method to one of: serial, parallel depending on your machine.
@@ -125,7 +125,7 @@ set the data file targets to the files you want to run, and the parameters as ap
    
   * Run
    ```
-  python3 ../src/samples_clustering.py -run_directory ./ -run_file TEMPLATE_cc_net_cluster_nmf.yml
+  python3 ../src/samples_clustering.py -run_directory ./run_dir -run_file zTEMPLATE_cc_net_nmf.yml
    ```
 
 * * * 
