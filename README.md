@@ -29,12 +29,12 @@ There are two evaluation methods:
 * * * 
 ## How to run this pipeline with Our data
 * * * 
-###1. Clone the Samples_Clustering_Pipeline Repo
+### 1. Clone the Samples_Clustering_Pipeline Repo
 ```
  git clone https://github.com/KnowEnG-Research/Samples_Clustering_Pipeline.git
 ```
  
-###2. Install the following (Ubuntu or Linux)
+### 2. Install the following (Ubuntu or Linux)
   ```
  pip3 install pyyaml
  pip3 install knpackage
@@ -49,24 +49,24 @@ There are two evaluation methods:
  apt-get install -y libblas-dev liblapack-dev libatlas-base-dev gfortran
 ```
 
-###3. Change directory to Samples_Clustering_Pipeline
+### 3. Change directory to Samples_Clustering_Pipeline
 
 ```
 cd Samples_Clustering_Pipeline
 ```
 
-###4. Change directory to test
+### 4. Change directory to test
 
 ```
 cd test
 ```
  
-###5. Create a local directory "run_dir" and place all the run files in it
+### 5. Create a local directory "run_dir" and place all the run files in it
 ```
 make env_setup
 ```
 
-###6. Use one of the following "make" commands to select and run a clustering option:
+### 6. Use one of the following "make" commands to select and run a clustering option:
 
 
 | **Command**         | **Option**                                       | 
