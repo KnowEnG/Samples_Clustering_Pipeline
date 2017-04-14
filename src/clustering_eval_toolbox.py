@@ -56,7 +56,7 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
         cur_df = cluster_phenotype_df[['Cluster_ID', column]].dropna(axis=0)
         if cur_df.empty:
             fail_df[column] \
-            = [np.nan, 0, 0, np.nan, np.nan, 'FAIL', 'Input phenotype is empty']
+            = [np.nan, 0, 0, np.nan, 1, 'FAIL', 'Input phenotype is empty']
         if not cur_df.empty:
             if cur_df[column].dtype == object:
                 cur_df_lowercase = cur_df.apply(lambda x: x.astype(str).str.lower())
@@ -65,14 +65,14 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
 
             num_uniq_value = len(cur_df_lowercase[column].unique())
             num_total = len(cur_df_lowercase[column])
-            
+
             if num_uniq_value == 1:
                 fail_df[column] \
-                = [np.nan, 1, num_total, np.nan, np.nan, 'FAIL', 'Number of unique trait is one']
+                = [np.nan, 1, num_total, np.nan, 1, 'FAIL', 'Number of unique trait is one']
                 continue
             if cur_df_lowercase[column].dtype == object and num_uniq_value > threshold:
                 fail_df[column] \
-                = [np.nan, num_uniq_value, num_total, np.nan, np.nan, \
+                = [np.nan, num_uniq_value, num_total, np.nan, 1, \
                 'FAIL', 'Number of unique categorical trait is not below threshold']
                 continue
             if num_uniq_value > threshold:
