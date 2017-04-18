@@ -48,7 +48,6 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
     fail_df = pd.DataFrame(index=['Measure', 'Trait_length_after_dropna', \
         'Sample_number_after_dropna', 'chi/fval', 'pval', 'SUCCESS/FAIL', 'Comments'])
 
-    print(cluster_phenotype_df.shape)
 
     for column in cluster_phenotype_df:
         if column == 'Cluster_ID':
@@ -93,7 +92,8 @@ def f_oneway(phenotype_df):
     uniq_trait = np.unique(phenotype_df.values[:, 1].reshape(-1))
     uniq_cluster = np.unique(phenotype_df.values[:, 0])
     if len(uniq_cluster) == 1:
-        return ['f_oneway', len(uniq_trait), phenotype_df.shape[0], np.nan, np.nan]
+        comment = 'The number of clusters is one'
+        return ['f_oneway', len(uniq_trait), phenotype_df.shape[0], np.nan, np.nan, 'FAIL', comment]
 
     groups = []
     uniq_cm_vals = sorted(set(phenotype_df.values[:, 0]))
