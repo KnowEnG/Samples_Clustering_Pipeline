@@ -93,7 +93,7 @@ def f_oneway(phenotype_df):
     uniq_cluster = np.unique(phenotype_df.values[:, 0])
     if len(uniq_cluster) == 1:
         comment = 'The number of clusters is one'
-        return ['f_oneway', len(uniq_trait), phenotype_df.shape[0], np.nan, np.nan, 'FAIL', comment]
+        return ['f_oneway', len(uniq_trait), phenotype_df.shape[0], np.nan, 1, 'FAIL', comment]
 
     groups = []
     uniq_cm_vals = sorted(set(phenotype_df.values[:, 0]))
