@@ -46,7 +46,8 @@ def run_net_nmf(run_parameters):
     gg_network_name_full_path = run_parameters['gg_network_name_full_path']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
-    network_mat, unique_gene_names = kn.get_sparse_network_matrix(gg_network_name_full_path)
+    network_mat, unique_gene_names = get_plain_sparse_network_matrix(gg_network_name_full_path)
+    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)    # ____________________________<0><0>-------------$
     lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
@@ -133,7 +134,8 @@ def run_cc_net_nmf(run_parameters):
     gg_network_name_full_path = run_parameters['gg_network_name_full_path']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
-    network_mat, unique_gene_names = kn.get_sparse_network_matrix(gg_network_name_full_path)
+    network_mat, unique_gene_names = get_plain_sparse_network_matrix(gg_network_name_full_path)
+    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)    # ____________________________<0><0>-------------$
     lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
@@ -481,3 +483,29 @@ def form_consensus_matrix_graphic(consensus_matrix, k=3):
     cc_cm = cc_cm[sorted_labels[:, None], sorted_labels]
 
     return cc_cm
+
+def get_plain_sparse_network_matrix(gg_network_name_full_path):
+    """ create sparse matrix based on the input gene gene network data
+
+    Args:
+        gg_network_name_full_path: file path to gene gene network data
+
+    Returns:
+        network_mat: a normalized sparse matrix
+        unique_gene_names: a list of unique gene names
+    """
+    network_df = kn.get_network_df(gg_network_name_full_path)
+    node_1_names, node_2_names = kn.extract_network_node_names(network_df)
+    unique_gene_names = kn.find_unique_node_names(node_1_names, node_2_names)
+
+    unique_gene_names = sorted(unique_gene_names)
+
+    genes_lookup_table = kn.create_node_names_dict(unique_gene_names)
+
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_1')
+    network_df = kn.map_node_names_to_index(network_df, genes_lookup_table, 'node_2')
+
+    network_df = kn.symmetrize_df(network_df)
+    network_mat_sparse = kn.convert_network_df_to_sparse(network_df, len(unique_gene_names), len(unique_gene_names))
+
+    return network_mat_sparse, unique_gene_names
