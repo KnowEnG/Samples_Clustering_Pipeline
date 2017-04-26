@@ -47,7 +47,7 @@ def run_net_nmf(run_parameters):
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
     network_mat, unique_gene_names = get_plain_sparse_network_matrix(gg_network_name_full_path)
-    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)    # ____________________________<0><0>-------------$
+    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
     lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
@@ -135,7 +135,7 @@ def run_cc_net_nmf(run_parameters):
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
     network_mat, unique_gene_names = get_plain_sparse_network_matrix(gg_network_name_full_path)
-    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)    # ____________________________<0><0>-------------$
+    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
     lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
 
     spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
