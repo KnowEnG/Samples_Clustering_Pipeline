@@ -45,28 +45,41 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
     from collections import defaultdict
 
     output_dict = defaultdict(list)
+    fail_df = pd.DataFrame(index=['Measure', 'Trait_length_after_dropna', \
+        'Sample_number_after_dropna', 'chi/fval', 'pval', 'SUCCESS/FAIL', 'Comments'])
+
 
     for column in cluster_phenotype_df:
         if column == 'Cluster_ID':
             continue
         cur_df = cluster_phenotype_df[['Cluster_ID', column]].dropna(axis=0)
-
+        if cur_df.empty:
+            fail_df[column] \
+            = [np.nan, 0, 0, np.nan, 1, 'FAIL', 'Input phenotype is empty']
         if not cur_df.empty:
             if cur_df[column].dtype == object:
                 cur_df_lowercase = cur_df.apply(lambda x: x.astype(str).str.lower())
             else:
                 cur_df_lowercase = cur_df
+
             num_uniq_value = len(cur_df_lowercase[column].unique())
+            num_total = len(cur_df_lowercase[column])
+
             if num_uniq_value == 1:
+                fail_df[column] \
+                = [np.nan, 1, num_total, np.nan, 1, 'FAIL', 'Number of unique trait is one']
                 continue
             if cur_df_lowercase[column].dtype == object and num_uniq_value > threshold:
+                fail_df[column] \
+                = [np.nan, num_uniq_value, num_total, np.nan, 1, \
+                'FAIL', 'Number of unique categorical trait is not below threshold']
                 continue
             if num_uniq_value > threshold:
                 classification = ColumnType.CONTINUOUS
             else:
                 classification = ColumnType.CATEGORICAL
             output_dict[classification].append(cur_df_lowercase)
-    return output_dict
+    return output_dict, fail_df
 
 
 def f_oneway(phenotype_df):
@@ -79,7 +92,8 @@ def f_oneway(phenotype_df):
     uniq_trait = np.unique(phenotype_df.values[:, 1].reshape(-1))
     uniq_cluster = np.unique(phenotype_df.values[:, 0])
     if len(uniq_cluster) == 1:
-        return ['f_oneway', len(uniq_trait), phenotype_df.shape[0], np.nan, np.nan]
+        comment = 'The number of clusters is one'
+        return ['f_oneway', len(uniq_trait), phenotype_df.shape[0], np.nan, 1, 'FAIL', comment]
 
     groups = []
     uniq_cm_vals = sorted(set(phenotype_df.values[:, 0]))
@@ -90,7 +104,7 @@ def f_oneway(phenotype_df):
             phenotype_df.loc[phenotype_df['Cluster_ID'] == i, phenotype_name].values.tolist())
 
     fval, pval = stats.f_oneway(*groups)
-    ret = ['f_oneway', len(uniq_trait), phenotype_df.shape[0], fval, pval]
+    ret = ['f_oneway', len(uniq_trait), phenotype_df.shape[0], fval, pval, 'SUCCESS', np.nan]
     return ret
 
 
@@ -117,7 +131,7 @@ def chisquare(phenotype_df):
         cont_table[clus, trt] += 1
 
     chi, pval, dof, expected = stats.chi2_contingency(cont_table)
-    ret = ['chisquare', num_phenotype, phenotype_df.shape[0], chi, pval]
+    ret = ['chisquare', num_phenotype, phenotype_df.shape[0], chi, pval, 'SUCCESS', np.nan]
     return ret
 
 
@@ -126,10 +140,10 @@ def clustering_evaluation(run_parameters):
     Save the results to tsv file.
     """
     cluster_phenotype_df = combine_phenotype_data_and_clustering(run_parameters)
-    output_dict = run_post_processing_phenotype_clustering_data(cluster_phenotype_df, run_parameters['threshold'])
+    output_dict, fail_df = run_post_processing_phenotype_clustering_data(cluster_phenotype_df, run_parameters['threshold'])
 
-    result_df = pd.DataFrame(
-        index=['Measure', 'Trait_length_after_dropna', 'Sample_number_after_dropna', 'chi/fval', 'pval'])
+    result_df = pd.DataFrame(index=['Measure', 'Trait_length_after_dropna', \
+        'Sample_number_after_dropna', 'chi/fval', 'pval', 'SUCCESS/FAIL', 'Comments'])
 
     for key, df_list in output_dict.items():
         if key == ColumnType.CATEGORICAL:
@@ -143,5 +157,6 @@ def clustering_evaluation(run_parameters):
 
     file_name = kn.create_timestamped_filename("clustering_evaluation_result", "tsv")
     file_path = os.path.join(run_parameters["results_directory"], file_name)
+    result_df = pd.concat([result_df, fail_df], axis=1)
     result_df.T.to_csv(file_path, header=True, index=True, sep='\t', na_rep='NA')
 
