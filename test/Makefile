@@ -53,6 +53,12 @@ run_cc_net_nmf_parallel_distributed:
 run_all_methods: run_nmf run_net_nmf run_cc_nmf_parallel_shared run_cc_net_nmf_parallel_shared
 
 # ----------------------------------------------------------------
+# - VERIFICATION TESTS RUN SECTION                               -
+# ----------------------------------------------------------------
+verification_tests:
+	python3 ./integration/verify_benchmarks.py
+
+# ----------------------------------------------------------------
 # - UNIT TESTS RUN SECTION                                       -
 # ----------------------------------------------------------------
 unit_test_setup:
