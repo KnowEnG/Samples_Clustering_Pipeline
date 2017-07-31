@@ -1,0 +1,15 @@
+
+method: nmf                 # Available methods: nmf, cc_nmf, net_nmf, cc_net_nmf
+
+spreadsheet_name_full_path: ../data/spreadsheets/CCLE_Expression_ensembl.df.gz
+threshold: 10
+
+results_directory:           ./run_dir/results
+tmp_directory:               ./run_dir/tmp
+
+number_of_clusters:         2
+nmf_conv_check_freq:        50
+nmf_max_invariance:         200
+nmf_max_iterations:         10000
+
+top_number_of_genes:        100
