@@ -404,6 +404,11 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
     out_df.to_csv(get_output_file_name(run_parameters, 'consensus_matrix', 'viz'), sep='\t')
 
+    if number_of_labels < 2 or number_of_labels > number_of_samples-1:
+       silhouette_average = 1.0
+    else:
+       silhouette_average = silhouette_score(consensus_matrix, labels)
+
     silhouette_average = silhouette_score(consensus_matrix, labels)
     silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
         run_parameters['number_of_clusters'], silhouette_average)
