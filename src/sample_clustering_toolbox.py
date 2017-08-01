@@ -409,7 +409,6 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     else:
        silhouette_average = silhouette_score(consensus_matrix, labels)
 
-    silhouette_average = silhouette_score(consensus_matrix, labels)
     silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
         run_parameters['number_of_clusters'], silhouette_average)
 
