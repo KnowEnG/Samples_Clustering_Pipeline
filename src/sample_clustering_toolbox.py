@@ -404,7 +404,7 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
     out_df.to_csv(get_output_file_name(run_parameters, 'consensus_matrix', 'viz'), sep='\t')
 
-    n_labels = len(labels)
+    n_labels = len(set(labels))
     n_samples= len(sample_names)
 
     if (n_labels < 2) or (n_labels > n_samples-1):
