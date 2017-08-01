@@ -413,7 +413,7 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
        silhouette_average = silhouette_score(consensus_matrix, labels)
 
     silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
-                               n_lables, silhouette_average)
+                               n_labels, silhouette_average)
 
     with open(get_output_file_name(run_parameters, 'silhouette_average', 'viz'), 'w') as fh:
         fh.write(silhouette_score_string)
