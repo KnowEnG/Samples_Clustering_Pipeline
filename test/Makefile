@@ -29,6 +29,9 @@ clean_dir_recursively:
 run_nmf:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1_SC_nmf.yml
 
+run_nmf_1a:
+	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1a_SC_nmf.yml
+
 run_net_nmf:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_2_SC_net_nmf.yml
 
