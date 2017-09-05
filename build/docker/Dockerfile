@@ -1,5 +1,5 @@
 FROM knowengdev/base_image:07_11_2017
-MAINTAINER Nahil Sobh <sobh@illinois.edu>
+MAINTAINER Dan Lanier <lanier4@illinois.edu>
 
 ENV SRC_LOC /home
 
