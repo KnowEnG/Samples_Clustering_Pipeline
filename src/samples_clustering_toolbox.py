@@ -4,11 +4,11 @@
 import os
 import numpy as np
 import pandas as pd
-from sklearn.metrics import silhouette_score
 import knpackage.toolbox as kn
 import knpackage.distributed_computing_utils as dstutil
-
 import clustering_eval_toolbox as cluster_eval
+
+from   sklearn.metrics import silhouette_score
 
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
@@ -181,7 +181,6 @@ def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, loca
         run_parameters: dictionary of run-time parameters.
         number_of_cpus: number of processes to be running in parallel
     """
-    import knpackage.distributed_computing_utils as dstutil
 
     jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
@@ -204,7 +203,6 @@ def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap
         run_parameters: dictionary of run-time parameters.
         number_of_cpus: number of processes to be running in parallel
     """
-    import knpackage.distributed_computing_utils as dstutil
 
     jobs_id = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
@@ -227,8 +225,6 @@ def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
         None
 
     """
-    import knpackage.toolbox as kn
-    import numpy as np
 
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
@@ -253,8 +249,6 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
     Returns:
         None
     """
-    import knpackage.toolbox as kn
-    import numpy as np
 
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
@@ -277,8 +271,6 @@ def save_a_clustering_to_tmp(h_matrix, sample_permutation, run_parameters, seque
         run_parameters: parmaeters including the "tmp_directory" name.
         sequence_number: temporary file name suffix.
     """
-    import os
-    import numpy as np
 
     tmp_dir = run_parameters["tmp_directory"]
 
