@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import knpackage.toolbox as kn
 import knpackage.distributed_computing_utils as dstutil
+
 import clustering_eval_toolbox as cluster_eval
 
 from   sklearn.metrics import silhouette_score
@@ -16,21 +17,25 @@ def run_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
-    number_of_clusters = run_parameters['number_of_clusters']
+
+    number_of_clusters         = run_parameters['number_of_clusters']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
-    spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
+    spreadsheet_df  = kn.get_spreadsheet_df(spreadsheet_name_full_path)
+
     spreadsheet_mat = spreadsheet_df.as_matrix()
     spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
-    h_mat = kn.perform_nmf(spreadsheet_mat, run_parameters)
+    h_mat           = kn.perform_nmf(spreadsheet_mat, run_parameters)
 
-    linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
-    sample_perm = np.arange(0, spreadsheet_mat.shape[1])
-    linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
+    linkage_matrix  = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
+    sample_perm     = np.arange(0, spreadsheet_mat.shape[1])
+    linkage_matrix  = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
+
     labels = kn.perform_kmeans(linkage_matrix, number_of_clusters)
 
-    sample_names = spreadsheet_df.columns
+    sample_names    = spreadsheet_df.columns
+
     save_consensus_clustering(linkage_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters)
@@ -42,27 +47,30 @@ def run_net_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
-    number_of_clusters = run_parameters['number_of_clusters']
-    gg_network_name_full_path = run_parameters['gg_network_name_full_path']
+
+    number_of_clusters         = run_parameters['number_of_clusters']
+    gg_network_name_full_path  = run_parameters['gg_network_name_full_path']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
     network_mat, unique_gene_names = kn.get_sparse_network_matrix(gg_network_name_full_path)
-    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
-    lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
+    network_mat                    = kn.normalize_sparse_mat_by_diagonal(network_mat)
+    lap_diag, lap_pos              = kn.form_network_laplacian_matrix(network_mat)
 
-    spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
-    spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
-    sample_names = spreadsheet_df.columns
+    spreadsheet_df  = kn.get_spreadsheet_df(spreadsheet_name_full_path)
+    spreadsheet_df  = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
+
+    sample_names    = spreadsheet_df.columns
+
     spreadsheet_mat = spreadsheet_df.as_matrix()
-
     spreadsheet_mat, iterations = kn.smooth_matrix_with_rwr(spreadsheet_mat, network_mat, run_parameters)
-    spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
+    spreadsheet_mat             = kn.get_quantile_norm_matrix(spreadsheet_mat)
+
     h_mat = kn.perform_net_nmf(spreadsheet_mat, lap_pos, lap_diag, run_parameters)
 
     linkage_matrix = np.zeros((spreadsheet_mat.shape[1], spreadsheet_mat.shape[1]))
-    sample_perm = np.arange(0, spreadsheet_mat.shape[1])
+    sample_perm    = np.arange(0, spreadsheet_mat.shape[1])
     linkage_matrix = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
-    labels = kn.perform_kmeans(linkage_matrix, number_of_clusters)
+    labels         = kn.perform_kmeans(linkage_matrix, number_of_clusters)
 
     save_consensus_clustering(linkage_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
@@ -76,17 +84,20 @@ def run_cc_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
+
     tmp_dir = 'tmp_cc_nmf'
     run_parameters = update_tmp_directory(run_parameters, tmp_dir)
 
-    processing_method = run_parameters['processing_method']
-    number_of_bootstraps = run_parameters['number_of_bootstraps']
-    number_of_clusters = run_parameters['number_of_clusters']
+    processing_method          = run_parameters['processing_method']
+    number_of_bootstraps       = run_parameters['number_of_bootstraps']
+    number_of_clusters         = run_parameters['number_of_clusters']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
-    spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
-    spreadsheet_mat = spreadsheet_df.as_matrix()
-    spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
+    spreadsheet_df    = kn.get_spreadsheet_df(spreadsheet_name_full_path)
+
+    spreadsheet_mat   = spreadsheet_df.as_matrix()
+    spreadsheet_mat   = kn.get_quantile_norm_matrix(spreadsheet_mat)
+
     number_of_samples = spreadsheet_mat.shape[1]
 
     if processing_method == 'serial':
@@ -125,24 +136,26 @@ def run_cc_net_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
+
     tmp_dir = 'tmp_cc_net_nmf'
     run_parameters = update_tmp_directory(run_parameters, tmp_dir)
 
-    processing_method = run_parameters['processing_method']
-    number_of_bootstraps = run_parameters['number_of_bootstraps']
-    number_of_clusters = run_parameters['number_of_clusters']
-    gg_network_name_full_path = run_parameters['gg_network_name_full_path']
+    processing_method          = run_parameters['processing_method']
+    number_of_bootstraps       = run_parameters['number_of_bootstraps']
+    number_of_clusters         = run_parameters['number_of_clusters']
+    gg_network_name_full_path  = run_parameters['gg_network_name_full_path']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
     network_mat, unique_gene_names = kn.get_sparse_network_matrix(gg_network_name_full_path)
-    network_mat = kn.normalize_sparse_mat_by_diagonal(network_mat)
-    lap_diag, lap_pos = kn.form_network_laplacian_matrix(network_mat)
+    network_mat                    = kn.normalize_sparse_mat_by_diagonal(network_mat)
+    lap_diag, lap_pos              = kn.form_network_laplacian_matrix(network_mat)
 
-    spreadsheet_df = kn.get_spreadsheet_df(spreadsheet_name_full_path)
-    spreadsheet_df = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
-    spreadsheet_mat = spreadsheet_df.as_matrix()
+    spreadsheet_df                 = kn.get_spreadsheet_df(spreadsheet_name_full_path)
+    spreadsheet_df                 = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
+
+    spreadsheet_mat   = spreadsheet_df.as_matrix()
     number_of_samples = spreadsheet_mat.shape[1]
-    sample_names = spreadsheet_df.columns
+    sample_names      = spreadsheet_df.columns
 
     if processing_method == 'serial':
         for sample in range(0, number_of_bootstraps):
@@ -163,7 +176,7 @@ def run_cc_net_nmf(run_parameters):
         raise ValueError('processing_method contains bad value.')
 
     consensus_matrix = form_consensus_matrix(run_parameters, number_of_samples)
-    labels = kn.perform_kmeans(consensus_matrix, number_of_clusters)
+    labels           = kn.perform_kmeans(consensus_matrix, number_of_clusters)
 
     save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
     save_final_samples_clustering(sample_names, labels, run_parameters)
@@ -182,12 +195,15 @@ def find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, loca
         number_of_cpus: number of processes to be running in parallel
     """
 
-    jobs_id = range(0, local_parallelism)
+    jobs_id          = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(spreadsheet_mat, run_parameters, jobs_id)
+
     if 'parallelism' in run_parameters:
         parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+
     else:
         parallelism = dstutil.determine_parallelism_locally(local_parallelism)
+
     dstutil.parallelize_processes_locally(run_cc_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
@@ -204,12 +220,15 @@ def find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap
         number_of_cpus: number of processes to be running in parallel
     """
 
-    jobs_id = range(0, local_parallelism)
+    jobs_id          = range(0, local_parallelism)
     zipped_arguments = dstutil.zip_parameters(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, jobs_id)
+
     if 'parallelism' in run_parameters:
         parallelism = dstutil.determine_parallelism_locally(local_parallelism, run_parameters['parallelism'])
+
     else:
         parallelism = dstutil.determine_parallelism_locally(local_parallelism)
+
     dstutil.parallelize_processes_locally(run_cc_net_nmf_clusters_worker, zipped_arguments, parallelism)
 
 
@@ -229,9 +248,12 @@ def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
     cols_sampling_fraction = run_parameters["cols_sampling_fraction"]
-    spreadsheet_mat, sample_permutation = kn.sample_a_matrix(spreadsheet_mat,
-                                                             rows_sampling_fraction, cols_sampling_fraction)
+    spreadsheet_mat, sample_permutation = kn.sample_a_matrix( spreadsheet_mat
+                                                            , rows_sampling_fraction
+                                                            , cols_sampling_fraction )
+
     h_mat = kn.perform_nmf(spreadsheet_mat, run_parameters)
+
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
 
 
@@ -253,10 +275,13 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
     cols_sampling_fraction = run_parameters["cols_sampling_fraction"]
-    spreadsheet_mat, sample_permutation = kn.sample_a_matrix(spreadsheet_mat, rows_sampling_fraction, cols_sampling_fraction)
+    spreadsheet_mat, sample_permutation = kn.sample_a_matrix( spreadsheet_mat
+                                                            , rows_sampling_fraction
+                                                            , cols_sampling_fraction )
     
     spreadsheet_mat, iterations = kn.smooth_matrix_with_rwr(spreadsheet_mat, network_mat, run_parameters)
-    spreadsheet_mat = kn.get_quantile_norm_matrix(spreadsheet_mat)
+    spreadsheet_mat             = kn.get_quantile_norm_matrix(spreadsheet_mat)
+ 
     h_mat = kn.perform_net_nmf(spreadsheet_mat, lap_val, lap_dag, run_parameters)
 
     save_a_clustering_to_tmp(h_mat, sample_permutation, run_parameters, sample)
@@ -298,11 +323,12 @@ def form_consensus_matrix(run_parameters, number_of_samples):
     Returns:
         consensus_matrix: (sum of linkage matrices) / (sum of indicator matrices).
     """
-    linkage_matrix = np.zeros((number_of_samples, number_of_samples))
+
+    linkage_matrix   = np.zeros((number_of_samples, number_of_samples))
     indicator_matrix = linkage_matrix.copy()
 
     linkage_matrix, indicator_matrix = get_linkage_matrix(run_parameters, linkage_matrix, indicator_matrix)
-    consensus_matrix = linkage_matrix / np.maximum(indicator_matrix, 1)
+    consensus_matrix                 = linkage_matrix / np.maximum(indicator_matrix, 1)
 
     return consensus_matrix
 
@@ -317,22 +343,25 @@ def get_linkage_matrix(run_parameters, linkage_matrix, indicator_matrix):
     Returns:
         linkage_matrix: summed with "temp_h*" files in run_parameters["tmp_directory"].
     """
+
     if run_parameters['processing_method'] == 'distribute':
         tmp_dir = os.path.join(run_parameters['cluster_shared_volumn'],
                                os.path.basename(os.path.normpath(run_parameters['tmp_directory'])))
+
     else:
         tmp_dir = run_parameters["tmp_directory"]
         
     dir_list = os.listdir(tmp_dir)
+
     for tmp_f in dir_list:
         if tmp_f[0:6] == 'tmp_p_':
             pname = os.path.join(tmp_dir, tmp_f)
             hname = os.path.join(tmp_dir, 'tmp_h_' + tmp_f[6:len(tmp_f)])
 
             sample_permutation = np.load(pname)
-            h_mat = np.load(hname)
+            h_mat              = np.load(hname)
 
-            linkage_matrix = kn.update_linkage_matrix(h_mat, sample_permutation, linkage_matrix)
+            linkage_matrix   = kn.update_linkage_matrix(h_mat, sample_permutation, linkage_matrix)
             indicator_matrix = kn.update_indicator_matrix(sample_permutation, indicator_matrix)
 
     return linkage_matrix, indicator_matrix
@@ -351,31 +380,37 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
         genes_averages_by_cluster_{method}_{timestamp}_viz.tsv
         top_genes_by_cluster_{method}_{timestamp}_download.tsv
     """
+
+    top_number_of_genes = run_parameters['top_number_of_genes']
+
     if network_mat is not None:
         sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.as_matrix(), network_mat, run_parameters)
-        clusters_df = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=spreadsheet_df.columns.values)
+        clusters_df        = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=spreadsheet_df.columns.values)
+
     else:
         clusters_df = spreadsheet_df
 
     clusters_df.to_csv(get_output_file_name(run_parameters, 'genes_by_samples_heatmap', 'viz'), sep='\t')
 
     cluster_ave_df = pd.DataFrame({i: spreadsheet_df.iloc[:, labels == i].mean(axis=1) for i in np.unique(labels)})
+
     col_labels = []
     for cluster_number in np.unique(labels):
         col_labels.append('Cluster_%d'%(cluster_number))
+
     cluster_ave_df.columns = col_labels
     cluster_ave_df.to_csv(get_output_file_name(run_parameters, 'genes_averages_by_cluster', 'viz'), sep='\t')
 
-    clusters_variance_df = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
+    clusters_variance_df   = pd.DataFrame(clusters_df.var(axis=1), columns=['variance'])
     clusters_variance_df.to_csv(get_output_file_name(run_parameters, 'genes_variance', 'viz'), sep='\t')
 
     top_number_of_genes_df = pd.DataFrame(data=np.zeros((cluster_ave_df.shape)), columns=cluster_ave_df.columns,
                                           index=cluster_ave_df.index.values)
 
-    top_number_of_genes = run_parameters['top_number_of_genes']
     for sample in top_number_of_genes_df.columns.values:
         top_index = np.argsort(cluster_ave_df[sample].values)[::-1]
         top_number_of_genes_df[sample].iloc[top_index[0:top_number_of_genes]] = 1
+
     top_number_of_genes_df.to_csv(get_output_file_name(run_parameters, 'top_genes_by_cluster', 'download'), sep='\t')
 
 
@@ -393,11 +428,12 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
         consensus_matrix_{method}_{timestamp}_viz.tsv
         silhouette_average_{method}_{timestamp}_viz.tsv
     """
+
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
     out_df.to_csv(get_output_file_name(run_parameters, 'consensus_matrix', 'viz'), sep='\t')
 
-    n_labels = len(set(labels))
-    n_samples= len(sample_names)
+    n_labels  = len( set(labels)  )
+    n_samples = len( sample_names )
 
     if (n_labels < 2) or (n_labels > n_samples-1):
        silhouette_average = 1.0
@@ -423,7 +459,8 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
         samples_labeled_by_cluster_{method}_{timestamp}_viz.tsv
         phenotypes_labeled_by_cluster_{method}_{timestamp}_viz.tsv
     """
-    cluster_labels_df = kn.create_df_with_sample_labels(sample_names, labels)
+
+    cluster_labels_df         = kn.create_df_with_sample_labels(sample_names, labels)
     cluster_mapping_full_path = get_output_file_name(run_parameters, 'samples_label_by_cluster', 'viz')
     cluster_labels_df.to_csv(cluster_mapping_full_path, sep='\t', header=None)
 
@@ -441,6 +478,7 @@ def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_s
     Returns:
         output_file_name:   full file and directory name suitable for file writing
     """
+
     output_file_name = os.path.join(run_parameters["results_directory"], prefix_string + '_' + run_parameters['method'])
     output_file_name = kn.create_timestamped_filename(output_file_name) + '_' + suffix_string + '.' + type_suffix
 
@@ -448,7 +486,7 @@ def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_s
 
 
 def update_tmp_directory(run_parameters, tmp_dir):
-    ''' Update tmp_directory value in rum_parameters dictionary
+    """ Update tmp_directory value in rum_parameters dictionary
 
     Args:
         run_parameters: run_parameters as the dictionary config
@@ -456,8 +494,8 @@ def update_tmp_directory(run_parameters, tmp_dir):
 
     Returns:
         run_parameters: an updated run_parameters
+    """
 
-    '''
     if (run_parameters['processing_method'] == 'distribute'):
         run_parameters["tmp_directory"] = kn.create_dir(run_parameters['cluster_shared_volumn'], tmp_dir)
     else:
@@ -476,9 +514,10 @@ def form_consensus_matrix_graphic(consensus_matrix, k=3):
     Returns:
         cc_cm: consensus_matrix with rows and columns in K-means sort order.
     """
-    cc_cm = consensus_matrix.copy()
-    labels = kn.perform_kmeans(consensus_matrix, k)
+
+    cc_cm         = consensus_matrix.copy()
+    labels        = kn.perform_kmeans(consensus_matrix, k)
     sorted_labels = np.argsort(labels)
-    cc_cm = cc_cm[sorted_labels[:, None], sorted_labels]
+    cc_cm         = cc_cm[sorted_labels[:, None], sorted_labels]
 
     return cc_cm
