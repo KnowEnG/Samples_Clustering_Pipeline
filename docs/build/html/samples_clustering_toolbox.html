@@ -1,0 +1,328 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>samples_clustering_toolbox module &#8212; samples_clustering_pipeline 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-samples_clustering_toolbox">
+<span id="samples-clustering-toolbox-module"></span><h1>samples_clustering_toolbox module<a class="headerlink" href="#module-samples_clustering_toolbox" title="Permalink to this headline">¶</a></h1>
+<p>&#64;author: The KnowEnG dev team</p>
+<dl class="function">
+<dt id="samples_clustering_toolbox.find_and_save_cc_net_nmf_clusters_parallel">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">find_and_save_cc_net_nmf_clusters_parallel</code><span class="sig-paren">(</span><em>network_mat</em>, <em>spreadsheet_mat</em>, <em>lap_diag</em>, <em>lap_pos</em>, <em>run_parameters</em>, <em>local_parallelism</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#find_and_save_cc_net_nmf_clusters_parallel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.find_and_save_cc_net_nmf_clusters_parallel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>central loop: compute components for the consensus matrix from the input</dt>
+<dd>network and spreadsheet matrices and save them to temp files.</dd>
+<dt>Args:</dt>
+<dd>network_mat: genes x genes symmetric matrix.
+spreadsheet_mat: genes x samples matrix.
+lap_dag: laplacian matrix component, L = lap_dag - lap_val.
+lap_val: laplacian matrix component, L = lap_dag - lap_val.
+run_parameters: dictionary of run-time parameters.
+number_of_cpus: number of processes to be running in parallel</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.find_and_save_cc_nmf_clusters_parallel">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">find_and_save_cc_nmf_clusters_parallel</code><span class="sig-paren">(</span><em>spreadsheet_mat</em>, <em>run_parameters</em>, <em>local_parallelism</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#find_and_save_cc_nmf_clusters_parallel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.find_and_save_cc_nmf_clusters_parallel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>central loop: compute components for the consensus matrix by</dt>
+<dd>non-negative matrix factorization.</dd>
+<dt>Args:</dt>
+<dd>spreadsheet_mat: genes x samples matrix.
+run_parameters: dictionary of run-time parameters.
+number_of_cpus: number of processes to be running in parallel</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.form_consensus_matrix">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">form_consensus_matrix</code><span class="sig-paren">(</span><em>run_parameters</em>, <em>number_of_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#form_consensus_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.form_consensus_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>compute the consensus matrix from the indicator and linkage matrix inputs</dt>
+<dd>formed by the bootstrap “temp_*” files.</dd>
+<dt>Args:</dt>
+<dd>run_parameters: parameter set dictionary with “tmp_directory” key.
+linkage_matrix: linkage matrix from initialization or previous call.
+indicator_matrix: indicator matrix from initialization or previous call.</dd>
+<dt>Returns:</dt>
+<dd>consensus_matrix: (sum of linkage matrices) / (sum of indicator matrices).</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.form_consensus_matrix_graphic">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">form_consensus_matrix_graphic</code><span class="sig-paren">(</span><em>consensus_matrix</em>, <em>k=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#form_consensus_matrix_graphic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.form_consensus_matrix_graphic" title="Permalink to this definition">¶</a></dt>
+<dd><p>use K-means to reorder the consensus matrix for graphic display.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>consensus_matrix: calculated consensus matrix in samples x samples order.
+k: number of clusters estimate (inner diminsion k of factored h_matrix).</dd>
+<dt>Returns:</dt>
+<dd>cc_cm: consensus_matrix with rows and columns in K-means sort order.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.get_linkage_matrix">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">get_linkage_matrix</code><span class="sig-paren">(</span><em>run_parameters</em>, <em>linkage_matrix</em>, <em>indicator_matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#get_linkage_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.get_linkage_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>read bootstrap temp_h* and temp_p* files, compute and add the linkage_matrix.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>run_parameters: parameter set dictionary.
+linkage_matrix: connectivity matrix from initialization or previous call.</dd>
+<dt>Returns:</dt>
+<dd>linkage_matrix: summed with “temp_h*” files in run_parameters[“tmp_directory”].</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.get_output_file_name">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">get_output_file_name</code><span class="sig-paren">(</span><em>run_parameters</em>, <em>prefix_string</em>, <em>suffix_string=''</em>, <em>type_suffix='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#get_output_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.get_output_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the full directory / filename for writing
+Args:</p>
+<blockquote>
+<div>run_parameters: dictionary with keys: “results_directory”, “method” and “correlation_measure”
+prefix_string:  the first letters of the ouput file name
+suffix_string:  the last letters of the output file name before ‘.tsv’</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>output_file_name:   full file and directory name suitable for file writing</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.run_cc_net_nmf">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">run_cc_net_nmf</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#run_cc_net_nmf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.run_cc_net_nmf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>wrapper: call sequence to perform network based stratification with consensus clustering</dt>
+<dd>and write results.</dd>
+<dt>Args:</dt>
+<dd>run_parameters: parameter set dictionary.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.run_cc_net_nmf_clusters_worker">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">run_cc_net_nmf_clusters_worker</code><span class="sig-paren">(</span><em>network_mat</em>, <em>spreadsheet_mat</em>, <em>lap_dag</em>, <em>lap_val</em>, <em>run_parameters</em>, <em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#run_cc_net_nmf_clusters_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.run_cc_net_nmf_clusters_worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Worker to execute net_nmf_clusters in a single process</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>network_mat: genes x genes symmetric matrix.
+spreadsheet_mat: genes x samples matrix.
+lap_dag: laplacian matrix component, L = lap_dag - lap_val.
+lap_val: laplacian matrix component, L = lap_dag - lap_val.
+run_parameters: dictionay of run-time parameters.
+sample: each single loop.</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.run_cc_nmf">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">run_cc_nmf</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#run_cc_nmf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.run_cc_nmf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>wrapper: call sequence to perform non-negative matrix factorization with</dt>
+<dd>consensus clustering and write results.</dd>
+<dt>Args:</dt>
+<dd>run_parameters: parameter set dictionary.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.run_cc_nmf_clusters_worker">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">run_cc_nmf_clusters_worker</code><span class="sig-paren">(</span><em>spreadsheet_mat</em>, <em>run_parameters</em>, <em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#run_cc_nmf_clusters_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.run_cc_nmf_clusters_worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Worker to execute nmf_clusters in a single process</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>spreadsheet_mat: genes x samples matrix.
+run_parameters: dictionary of run-time parameters.
+sample: each loops.</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.run_net_nmf">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">run_net_nmf</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#run_net_nmf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.run_net_nmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>wrapper: call sequence to perform network based stratification and write results.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>run_parameters: parameter set dictionary.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.run_nmf">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">run_nmf</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#run_nmf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.run_nmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>wrapper: call sequence to perform non-negative matrix factorization and write results.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>run_parameters: parameter set dictionary.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.save_a_clustering_to_tmp">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">save_a_clustering_to_tmp</code><span class="sig-paren">(</span><em>h_matrix</em>, <em>sample_permutation</em>, <em>run_parameters</em>, <em>sequence_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#save_a_clustering_to_tmp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.save_a_clustering_to_tmp" title="Permalink to this definition">¶</a></dt>
+<dd><p>save one h_matrix and one permutation in temorary files with sequence_number appended names.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>h_matrix: k x permutation size matrix.
+sample_permutation: indices of h_matrix columns permutation.
+run_parameters: parmaeters including the “tmp_directory” name.
+sequence_number: temporary file name suffix.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.save_consensus_clustering">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">save_consensus_clustering</code><span class="sig-paren">(</span><em>consensus_matrix</em>, <em>sample_names</em>, <em>labels</em>, <em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#save_consensus_clustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.save_consensus_clustering" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>write the consensus matrix as a dataframe with sample_names column lablels</dt>
+<dd>and cluster labels as row labels.</dd>
+<dt>Args:</dt>
+<dd>consensus_matrix: sample_names x sample_names numerical matrix.
+sample_names: data identifiers for column names.
+labels: cluster numbers for row names.
+run_parameters: path to write to consensus_data file (run_parameters[“results_directory”]).</dd>
+<dt>Output:</dt>
+<dd>consensus_matrix_{method}_{timestamp}_viz.tsv
+silhouette_average_{method}_{timestamp}_viz.tsv</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.save_final_samples_clustering">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">save_final_samples_clustering</code><span class="sig-paren">(</span><em>sample_names</em>, <em>labels</em>, <em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#save_final_samples_clustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.save_final_samples_clustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>wtite .tsv file that assings a cluster number label to the sample_names.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>sample_names: (unique) data identifiers.
+labels: cluster number assignments.
+run_parameters: write path (run_parameters[“results_directory”]).</dd>
+<dt>Output:</dt>
+<dd>samples_labeled_by_cluster_{method}_{timestamp}_viz.tsv
+phenotypes_labeled_by_cluster_{method}_{timestamp}_viz.tsv</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.save_spreadsheet_and_variance_heatmap">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">save_spreadsheet_and_variance_heatmap</code><span class="sig-paren">(</span><em>spreadsheet_df</em>, <em>labels</em>, <em>run_parameters</em>, <em>network_mat=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#save_spreadsheet_and_variance_heatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.save_spreadsheet_and_variance_heatmap" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>save the full genes by samples spreadsheet as processed or smoothed if network is provided.</dt>
+<dd>Also save variance in separate file.</dd>
+<dt>Args:</dt>
+<dd>spreadsheet_df: the dataframe as processed
+run_parameters: with keys for “results_directory”, “method”, (optional - “top_number_of_genes”)
+network_mat:    (if appropriate) normalized network adjacency matrix used in processing</dd>
+<dt>Output:</dt>
+<dd>genes_by_samples_heatmp_{method}_{timestamp}_viz.tsv
+genes_averages_by_cluster_{method}_{timestamp}_viz.tsv
+top_genes_by_cluster_{method}_{timestamp}_download.tsv</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="samples_clustering_toolbox.update_tmp_directory">
+<code class="descclassname">samples_clustering_toolbox.</code><code class="descname">update_tmp_directory</code><span class="sig-paren">(</span><em>run_parameters</em>, <em>tmp_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/samples_clustering_toolbox.html#update_tmp_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#samples_clustering_toolbox.update_tmp_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update tmp_directory value in rum_parameters dictionary</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>run_parameters: run_parameters as the dictionary config
+tmp_dir: temporary directory prefix subjected to different functions</dd>
+<dt>Returns:</dt>
+<dd>run_parameters: an updated run_parameters</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/samples_clustering_toolbox.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, KnowEnG_Team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/samples_clustering_toolbox.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
