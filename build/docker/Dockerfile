@@ -1,5 +1,8 @@
-FROM knowengdev/base_image:07_11_2017
-MAINTAINER Dan Lanier <lanier4@illinois.edu>
+FROM knowengdev/base_image:09_19_2017
+LABEL Xi Chen="xichen24@illinois.edu" \
+      Jing Ge="jingge2@illinois.edu" \
+      Dan Lanier="lanier4@illinois.edu" \
+      Nahil Sobh="sobh@illinois.edu"
 
 ENV SRC_LOC /home
 
