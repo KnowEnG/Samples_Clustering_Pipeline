@@ -18,6 +18,8 @@ def run_nmf(run_parameters):
         run_parameters: parameter set dictionary.
     """
 
+    np.random.seed(0)
+
     number_of_clusters         = run_parameters['number_of_clusters']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
@@ -47,6 +49,8 @@ def run_net_nmf(run_parameters):
     Args:
         run_parameters: parameter set dictionary.
     """
+
+    np.random.seed(0)
 
     number_of_clusters         = run_parameters['number_of_clusters']
     gg_network_name_full_path  = run_parameters['gg_network_name_full_path']
