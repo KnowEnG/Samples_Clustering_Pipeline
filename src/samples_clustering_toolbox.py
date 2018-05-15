@@ -100,7 +100,6 @@ def run_cc_nmf(run_parameters):
     number_of_bootstraps       = run_parameters['number_of_bootstraps']
     number_of_clusters         = run_parameters['number_of_clusters']
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
-    cluster_ip_address         = run_parameters['cluster_ip_address']
     spreadsheet_df             = kn.get_spreadsheet_df(spreadsheet_name_full_path)
 
     spreadsheet_mat            = spreadsheet_df.as_matrix()
@@ -116,8 +115,9 @@ def run_cc_nmf(run_parameters):
         find_and_save_cc_nmf_clusters_parallel(spreadsheet_mat, run_parameters, number_of_bootstraps)
 
     elif processing_method == 'distribute':
-        func_args       = [ spreadsheet_mat,            run_parameters ]
-        dependency_list = [ run_cc_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
+        func_args          = [ spreadsheet_mat,            run_parameters ]
+        dependency_list    = [ run_cc_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
+        cluster_ip_address = run_parameters['cluster_ip_address']
         dstutil.execute_distribute_computing_job( cluster_ip_address
                                                 , number_of_bootstraps
                                                 , func_args
@@ -149,14 +149,14 @@ def run_cc_net_nmf(run_parameters):
     tmp_dir                    = 'tmp_cc_net_nmf'
     run_parameters             = update_tmp_directory(run_parameters, tmp_dir)
 
-    processing_method          = run_parameters['processing_method']
-    number_of_bootstraps       = run_parameters['number_of_bootstraps']
-    number_of_clusters         = run_parameters['number_of_clusters']
-    gg_network_name_full_path  = run_parameters['gg_network_name_full_path']
+    processing_method          = run_parameters['processing_method'         ]
+    number_of_clusters         = run_parameters['number_of_clusters'        ]
+    number_of_bootstraps       = run_parameters['number_of_bootstraps'      ]
+    gg_network_name_full_path  = run_parameters['gg_network_name_full_path' ]
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
     network_mat,               \
-    unique_gene_names          = kn.get_sparse_network_matrix(gg_network_name_full_path)
+             unique_gene_names = kn.get_sparse_network_matrix(gg_network_name_full_path)
     network_mat                = kn.normalize_sparse_mat_by_diagonal(network_mat)
     lap_diag, lap_pos          = kn.form_network_laplacian_matrix(network_mat)
 
@@ -175,13 +175,14 @@ def run_cc_net_nmf(run_parameters):
             find_and_save_cc_net_nmf_clusters_parallel(network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters, number_of_bootstraps)
 
     elif processing_method == 'distribute':
-        func_args = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
-        dependency_list = [run_cc_net_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
-        dstutil.execute_distribute_computing_job(run_parameters['cluster_ip_address'],
-                                                 number_of_bootstraps,
-                                                 func_args,
-                                                 find_and_save_cc_net_nmf_clusters_parallel,
-                                                 dependency_list)
+        func_args          = [network_mat, spreadsheet_mat, lap_diag, lap_pos, run_parameters]
+        dependency_list    = [run_cc_net_nmf_clusters_worker, save_a_clustering_to_tmp, dstutil.determine_parallelism_locally]
+        cluster_ip_address = run_parameters['cluster_ip_address']
+        dstutil.execute_distribute_computing_job( cluster_ip_address
+                                                , number_of_bootstraps
+                                                , func_args
+                                                , find_and_save_cc_net_nmf_clusters_parallel
+                                                , dependency_list )
     else:
         raise ValueError('processing_method contains bad value.')
 
