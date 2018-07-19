@@ -435,42 +435,74 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
 
     Args:
         consensus_matrix: sample_names x sample_names numerical matrix.
-        sample_names: data identifiers for column names.
-        labels: cluster numbers for row names.
-        run_parameters: path to write to consensus_data file (run_parameters["results_directory"]).
+        sample_names:     data identifiers for column names.
+        labels:           cluster numbers for row names.
+        run_parameters:   path to write to consensus_data file (run_parameters["results_directory"]).
 
     Output:
         consensus_matrix_{method}_{timestamp}_viz.tsv
         silhouette_average_{method}_{timestamp}_viz.tsv
-        silhouette_samples_{method}_{timestamp}_viz.tsv
     """
 
+    file_name_mat     = get_output_file_name(run_parameters, 'consensus_matrix',             'viz')
+    file_name_all     = get_output_file_name(run_parameters, 'silhouette_overall_score',     'viz')
+    file_name_cluster = get_output_file_name(run_parameters, 'silhouette_per_cluster_score', 'viz')
+    file_name_sample  = get_output_file_name(run_parameters, 'silhouette_per_sample_score',  'viz')
+
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
-    out_df.to_csv(get_output_file_name(run_parameters, 'consensus_matrix', 'viz'), sep='\t')
+    out_df.to_csv(file_name_mat, sep='\t', float_format='%g')
 
-    n_labels  = len( set(labels)  )
-    n_samples = len( sample_names )
+    n_clusters,       \
+    overall,          \
+    per_cluster,      \
+    per_sample        = get_clustering_scores(1.0-consensus_matrix,labels) # distance matrix
 
-    if (n_labels < 2) or (n_labels > n_samples-1):
-       silhouette_average = 1.0
+    with open(file_name_all,     'w') as fh_all:
+                fh_all.write( "%d  %g\n" %(n_clusters,overall) )
+
+    with open(file_name_cluster, 'w') as fh_cluster:
+        for i in range(n_clusters):
+            fh_cluster.write( "%d  %g\n" %(i, per_cluster[i]) )
+
+    with open(file_name_sample,   'w') as fh_sample:
+        for i in range(n_clusters):
+            for item in np.sort(per_sample[labels == i]):
+                fh_sample.write( "%d  %g\n" %(i, item            ) )
+
+
+def get_clustering_scores(matrix,labels):
+    """ computes three levels silhoutte scores,overall, per_cluster, and per_sample
+
+    Args:
+        matrix: sample_names x sample_names numerical matrix.
+        labels: samples label
+
+    Output:
+        overall:         overall silhoutte score
+        per_cluster: per cluster silhoutte score
+        per_sample : per sample  silhoutte score
+    """
+
+    n_clusters = len(set(labels))
+
+    if n_clusters > 1:
+        silhouette_values = silhouette_samples(matrix, labels, metric='precomputed')
     else:
-       silhouette_average        = silhouette_score  (consensus_matrix, labels)
-       silhouette_samples_scores = silhouette_samples(consensus_matrix, labels)
+        silhouette_values = np.ones(len(labels) )
 
+    cluster_mean = np.empty([n_clusters])
+    cluster_size = np.empty([n_clusters])
 
-    silhouette_score_string = 'silhouette number of clusters = %d, corresponding silhouette score = %g' % (
-                               n_labels, silhouette_average)
+    for i in range(n_clusters):
+        cluster_values  = silhouette_values[labels == i]
+        cluster_mean[i] = cluster_values.mean()  
+        cluster_size[i] = cluster_values.shape[0]
 
-    with open(get_output_file_name(run_parameters, 'silhouette_average', 'viz'), 'w') as fh:
-        fh.write(silhouette_score_string)
+    overall      = cluster_mean.dot(cluster_size) / len(labels)
+    per_cluster  = cluster_mean
+    per_sample   = silhouette_values
 
-    silhouette_samples_df_filename             = get_output_file_name(run_parameters, 'silhouette_samples', 'viz')    
-    silhouette_samples_df                      = pd.DataFrame()
-    silhouette_samples_df["labels"           ] = labels
-    silhouette_samples_df["sample_silhouette"] = silhouette_samples_scores
-
-    silhouette_samples_df.to_csv(silhouette_samples_df_filename, sep='\t', index=False)
-
+    return n_clusters, overall, per_cluster, per_sample
 
 def save_final_samples_clustering(sample_names, labels, run_parameters):
     """ wtite .tsv file that assings a cluster number label to the sample_names.
