@@ -7,9 +7,9 @@ import pandas as pd
 import knpackage.toolbox as kn
 import knpackage.distributed_computing_utils as dstutil
 
-import clustering_eval_toolbox as cluster_eval
+import clustering_eval_toolbox as     cluster_eval
+from   sklearn.metrics         import silhouette_score, silhouette_samples
 
-from   sklearn.metrics import silhouette_score, silhouette_samples
 
 def run_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization and write results.
@@ -20,7 +20,7 @@ def run_nmf(run_parameters):
 
     np.random.seed(0)
 
-    number_of_clusters         = run_parameters['number_of_clusters']
+    number_of_clusters         = run_parameters['number_of_clusters'        ]
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
     spreadsheet_df             = kn.get_spreadsheet_df(spreadsheet_name_full_path)
@@ -52,8 +52,8 @@ def run_net_nmf(run_parameters):
 
     np.random.seed(0)
 
-    number_of_clusters         = run_parameters['number_of_clusters']
-    gg_network_name_full_path  = run_parameters['gg_network_name_full_path']
+    number_of_clusters         = run_parameters['number_of_clusters'        ]
+    gg_network_name_full_path  = run_parameters['gg_network_name_full_path' ]
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
 
     network_mat,               \
@@ -83,8 +83,6 @@ def run_net_nmf(run_parameters):
     save_spreadsheet_and_variance_heatmap(spreadsheet_df,               labels, run_parameters)
 
 
-
-
 def run_cc_nmf(run_parameters):
     """ wrapper: call sequence to perform non-negative matrix factorization with
         consensus clustering and write results.
@@ -93,13 +91,14 @@ def run_cc_nmf(run_parameters):
         run_parameters: parameter set dictionary.
     """
 
-    tmp_dir = 'tmp_cc_nmf'
-    run_parameters = update_tmp_directory(run_parameters, tmp_dir)
+    tmp_dir                    = 'tmp_cc_nmf'
+    run_parameters             = update_tmp_directory(run_parameters, tmp_dir)
 
-    processing_method          = run_parameters['processing_method']
-    number_of_bootstraps       = run_parameters['number_of_bootstraps']
-    number_of_clusters         = run_parameters['number_of_clusters']
+    processing_method          = run_parameters['processing_method'         ]
+    number_of_bootstraps       = run_parameters['number_of_bootstraps'      ]
+    number_of_clusters         = run_parameters['number_of_clusters'        ]
     spreadsheet_name_full_path = run_parameters['spreadsheet_name_full_path']
+
     spreadsheet_df             = kn.get_spreadsheet_df(spreadsheet_name_full_path)
 
     spreadsheet_mat            = spreadsheet_df.as_matrix()
@@ -260,6 +259,7 @@ def run_cc_nmf_clusters_worker(spreadsheet_mat, run_parameters, sample):
 
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
     cols_sampling_fraction = run_parameters["cols_sampling_fraction"]
+
     spreadsheet_mat,       \
     sample_permutation     = kn.sample_a_matrix( spreadsheet_mat
                                                , rows_sampling_fraction
@@ -288,6 +288,7 @@ def run_cc_net_nmf_clusters_worker(network_mat, spreadsheet_mat, lap_dag, lap_va
     np.random.seed(sample)
     rows_sampling_fraction = run_parameters["rows_sampling_fraction"]
     cols_sampling_fraction = run_parameters["cols_sampling_fraction"]
+
     spreadsheet_mat,       \
     sample_permutation     = kn.sample_a_matrix( spreadsheet_mat
                                                , rows_sampling_fraction
@@ -504,6 +505,7 @@ def get_clustering_scores(matrix,labels):
 
     return n_clusters, overall, per_cluster, per_sample
 
+
 def save_final_samples_clustering(sample_names, labels, run_parameters):
     """ wtite .tsv file that assings a cluster number label to the sample_names.
 
@@ -524,6 +526,7 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
     if 'phenotype_name_full_path' in run_parameters.keys():
         run_parameters['cluster_mapping_full_path'] = cluster_mapping_full_path
         cluster_eval.clustering_evaluation(run_parameters)
+
 
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):
     """ get the full directory / filename for writing
