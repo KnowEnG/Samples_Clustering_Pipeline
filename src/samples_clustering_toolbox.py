@@ -25,7 +25,7 @@ def run_nmf(run_parameters):
 
     spreadsheet_df             = kn.get_spreadsheet_df(spreadsheet_name_full_path)
 
-    spreadsheet_mat            = spreadsheet_df.as_matrix()
+    spreadsheet_mat            = spreadsheet_df.values
     spreadsheet_mat            = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
     h_mat                      = kn.perform_nmf(spreadsheet_mat, run_parameters)
@@ -66,7 +66,7 @@ def run_net_nmf(run_parameters):
 
     sample_names               = spreadsheet_df.columns
 
-    spreadsheet_mat            = spreadsheet_df.as_matrix()
+    spreadsheet_mat            = spreadsheet_df.values
     spreadsheet_mat,           \
     iterations                 = kn.smooth_matrix_with_rwr  (spreadsheet_mat, network_mat, run_parameters)
     spreadsheet_mat            = kn.get_quantile_norm_matrix(spreadsheet_mat)
@@ -101,7 +101,7 @@ def run_cc_nmf(run_parameters):
 
     spreadsheet_df             = kn.get_spreadsheet_df(spreadsheet_name_full_path)
 
-    spreadsheet_mat            = spreadsheet_df.as_matrix()
+    spreadsheet_mat            = spreadsheet_df.values
     spreadsheet_mat            = kn.get_quantile_norm_matrix(spreadsheet_mat)
 
     number_of_samples          = spreadsheet_mat.shape[1]
@@ -162,7 +162,7 @@ def run_cc_net_nmf(run_parameters):
     spreadsheet_df             = kn.get_spreadsheet_df(spreadsheet_name_full_path)
     spreadsheet_df             = kn.update_spreadsheet_df(spreadsheet_df, unique_gene_names)
 
-    spreadsheet_mat            = spreadsheet_df.as_matrix()
+    spreadsheet_mat            = spreadsheet_df.values
     number_of_samples          = spreadsheet_mat.shape[1]
     sample_names               = spreadsheet_df.columns
 
@@ -400,7 +400,7 @@ def save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters
     top_number_of_genes = run_parameters['top_number_of_genes']
 
     if network_mat is not None:
-        sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.as_matrix(), network_mat, run_parameters)
+        sample_smooth, nun = kn.smooth_matrix_with_rwr(spreadsheet_df.values, network_mat, run_parameters)
         clusters_df        = pd.DataFrame(sample_smooth, index=spreadsheet_df.index.values, columns=spreadsheet_df.columns.values)
 
     else:
