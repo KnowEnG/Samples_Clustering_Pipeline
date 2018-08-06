@@ -237,3 +237,7 @@ phenotype_data_name = UCEC_phenotype.txt
  | **sample 1**|f_oneway|int(more than threshold)|int|float|float|
  |...|...|...|...|...|...|
  | **sample m**|chisquare|int(less than threshold)|int|float|float|
+
+References:
+
+- Hofree, M., Shen, J. P., Carter, H., Gross, A. & Ideker, T. Network-based stratification of tumor mutations. Nat. Methods 10, 1108–1115 (2013).
