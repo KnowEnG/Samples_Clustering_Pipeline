@@ -155,7 +155,9 @@ def clustering_evaluation(run_parameters):
                 phenotype_name = item.columns.values[1]
                 result_df[phenotype_name] = f_oneway(item)
 
-    file_name = kn.create_timestamped_filename("clustering_evaluation_result", "tsv")
+    method = run_parameters['method']
+    file1  = "clustering_evaluation_result" + "_" + method
+    file_name = kn.create_timestamped_filename(file1, "tsv")
     file_path = os.path.join(run_parameters["results_directory"], file_name)
     result_df = pd.concat([result_df, fail_df], axis=1)
     result_df.T.to_csv(file_path, header=True, index=True, sep='\t', na_rep='NA')
