@@ -38,10 +38,12 @@ def run_nmf(run_parameters):
 
     sample_names               = spreadsheet_df.columns
 
-    save_consensus_clustering            (linkage_matrix, sample_names, labels, run_parameters)
-    calculate_and_save_silhouette_scores (1.0-linkage_matrix,           labels, run_parameters)
-    save_final_samples_clustering        (                sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df,               labels, run_parameters)
+    distance_matrix            = 1.0   - linkage_matrix 
+
+    save_consensus_clustering            (linkage_matrix,  sample_names, labels, run_parameters)
+    calculate_and_save_silhouette_scores (distance_matrix, sample_names, labels, run_parameters)
+    save_final_samples_clustering        (                 sample_names, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df,                labels, run_parameters)
 
 
 def run_net_nmf(run_parameters):
@@ -78,11 +80,12 @@ def run_net_nmf(run_parameters):
     sample_perm                = np.arange(0, spreadsheet_mat.shape[1])
     linkage_matrix             = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
     labels                     = kn.perform_kmeans(linkage_matrix, number_of_clusters)
+    distance_matrix            = 1.0   - linkage_matrix
 
-    save_consensus_clustering            (linkage_matrix, sample_names, labels, run_parameters)
-    calculate_and_save_silhouette_scores (1.0-linkage_matrix,           labels, run_parameters)
-    save_final_samples_clustering        (                sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df,               labels, run_parameters)
+    save_consensus_clustering            (linkage_matrix,  sample_names, labels, run_parameters)
+    calculate_and_save_silhouette_scores (distance_matrix, sample_names, labels, run_parameters)
+    save_final_samples_clustering        (                 sample_names, labels, run_parameters)
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df,                labels, run_parameters)
 
 
 def run_cc_nmf(run_parameters):
@@ -129,11 +132,11 @@ def run_cc_nmf(run_parameters):
 
     consensus_matrix = form_consensus_matrix( run_parameters,   number_of_samples  )
     labels           = kn.perform_kmeans    ( consensus_matrix, number_of_clusters )
-
-    sample_names = spreadsheet_df.columns
+    sample_names     = spreadsheet_df.columns
+    distance_matrix  = 1.0   - consensus_matrix
 
     save_consensus_clustering            (consensus_matrix, sample_names, labels, run_parameters)
-    calculate_and_save_silhouette_scores (1.0-consensus_matrix,           labels, run_parameters)
+    calculate_and_save_silhouette_scores (distance_matrix,  sample_names, labels, run_parameters)
     save_final_samples_clustering        (                  sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df,                 labels, run_parameters)
 
@@ -190,9 +193,10 @@ def run_cc_net_nmf(run_parameters):
 
     consensus_matrix = form_consensus_matrix(run_parameters, number_of_samples)
     labels           = kn.perform_kmeans(consensus_matrix, number_of_clusters)
+    distance_matrix  = 1.0   - consensus_matrix
 
     save_consensus_clustering            (consensus_matrix, sample_names, labels, run_parameters             )
-    calculate_and_save_silhouette_scores (1.0-consensus_matrix,           labels, run_parameters             )
+    calculate_and_save_silhouette_scores (distance_matrix,  sample_names, labels, run_parameters             )
     save_final_samples_clustering        (                  sample_names, labels, run_parameters             )
     save_spreadsheet_and_variance_heatmap(spreadsheet_df,                 labels, run_parameters, network_mat)
 
@@ -455,7 +459,7 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     out_df.to_csv(file_name_mat, sep='\t', float_format='%g')
 
 
-def calculate_and_save_silhouette_scores(distance_matrix, labels, run_parameters):
+def calculate_and_save_silhouette_scores(distance_matrix, sample_names, labels, run_parameters):
     """ Calculate the silhouette scores of a distance matrix [n_samples,n_samples]
 
     Args:
@@ -486,10 +490,9 @@ def calculate_and_save_silhouette_scores(distance_matrix, labels, run_parameters
         for i in range(n_clusters):
             fh_cluster.write( "%d  %g\n" %(i, per_cluster[i]) )
 
-    with open(file_name_sample,   'w') as fh_sample:
-        for i in range(n_clusters):
-            for item in np.sort(per_sample[labels == i]):
-                fh_sample.write( "%d  %g\n" %(i, item            ) )
+
+    per_sample_df = pd.DataFrame(data=per_sample, index=sample_names)
+    per_sample_df.to_csv(file_name_sample, sep='\t', header=None, float_format='%g')
 
 
 def get_clustering_scores(matrix,labels):
