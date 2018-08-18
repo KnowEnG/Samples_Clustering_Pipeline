@@ -7,7 +7,7 @@ import pandas as pd
 import knpackage.toolbox as kn
 import knpackage.distributed_computing_utils as dstutil
 
-import clustering_eval_toolbox as     cluster_eval
+import clustering_eval_toolbox as cluster_eval
 from   sklearn.metrics         import silhouette_score, silhouette_samples
 
 
@@ -39,6 +39,7 @@ def run_nmf(run_parameters):
     sample_names               = spreadsheet_df.columns
 
     save_consensus_clustering            (linkage_matrix, sample_names, labels, run_parameters)
+    calculate_and_save_silhouette_scores (1.0-linkage_matrix,           labels, run_parameters)
     save_final_samples_clustering        (                sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df,               labels, run_parameters)
 
@@ -79,6 +80,7 @@ def run_net_nmf(run_parameters):
     labels                     = kn.perform_kmeans(linkage_matrix, number_of_clusters)
 
     save_consensus_clustering            (linkage_matrix, sample_names, labels, run_parameters)
+    calculate_and_save_silhouette_scores (1.0-linkage_matrix,           labels, run_parameters)
     save_final_samples_clustering        (                sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df,               labels, run_parameters)
 
@@ -131,6 +133,7 @@ def run_cc_nmf(run_parameters):
     sample_names = spreadsheet_df.columns
 
     save_consensus_clustering            (consensus_matrix, sample_names, labels, run_parameters)
+    calculate_and_save_silhouette_scores (1.0-consensus_matrix,           labels, run_parameters)
     save_final_samples_clustering        (                  sample_names, labels, run_parameters)
     save_spreadsheet_and_variance_heatmap(spreadsheet_df,                 labels, run_parameters)
 
@@ -188,9 +191,10 @@ def run_cc_net_nmf(run_parameters):
     consensus_matrix = form_consensus_matrix(run_parameters, number_of_samples)
     labels           = kn.perform_kmeans(consensus_matrix, number_of_clusters)
 
-    save_consensus_clustering(consensus_matrix, sample_names, labels, run_parameters)
-    save_final_samples_clustering(sample_names, labels, run_parameters)
-    save_spreadsheet_and_variance_heatmap(spreadsheet_df, labels, run_parameters, network_mat)
+    save_consensus_clustering            (consensus_matrix, sample_names, labels, run_parameters             )
+    calculate_and_save_silhouette_scores (1.0-consensus_matrix,           labels, run_parameters             )
+    save_final_samples_clustering        (                  sample_names, labels, run_parameters             )
+    save_spreadsheet_and_variance_heatmap(spreadsheet_df,                 labels, run_parameters, network_mat)
 
     kn.remove_dir(run_parameters["tmp_directory"])
 
@@ -446,17 +450,34 @@ def save_consensus_clustering(consensus_matrix, sample_names, labels, run_parame
     """
 
     file_name_mat     = get_output_file_name(run_parameters, 'consensus_matrix',             'viz')
-    file_name_all     = get_output_file_name(run_parameters, 'silhouette_overall_score',     'viz')
-    file_name_cluster = get_output_file_name(run_parameters, 'silhouette_per_cluster_score', 'viz')
-    file_name_sample  = get_output_file_name(run_parameters, 'silhouette_per_sample_score',  'viz')
 
     out_df = pd.DataFrame(data=consensus_matrix, columns=sample_names, index=sample_names)
     out_df.to_csv(file_name_mat, sep='\t', float_format='%g')
 
+
+def calculate_and_save_silhouette_scores(distance_matrix, labels, run_parameters):
+    """ Calculate the silhouette scores of a distance matrix [n_samples,n_samples]
+
+    Args:
+        matrix:           sample_names x sample_names numerical matrix.
+        labels:           cluster numbers for row names.
+        run_parameters:   path to write to consensus_data file (run_parameters["results_directory"]).
+
+    Output:
+            silhouette_overall_score_{method}_{timestamp}_viz.tsv
+        silhouette_per_cluster_score_{method}_{timestamp}_viz.tsv
+         silhouette_per_sample_score_{method}_{timestamp}_viz.tsv
+    """
+
+    file_name_all     = get_output_file_name(run_parameters, 'silhouette_overall_score',     'viz')
+    file_name_cluster = get_output_file_name(run_parameters, 'silhouette_per_cluster_score', 'viz')
+    file_name_sample  = get_output_file_name(run_parameters, 'silhouette_per_sample_score',  'viz')
+
+
     n_clusters,       \
     overall,          \
     per_cluster,      \
-    per_sample        = get_clustering_scores(1.0-consensus_matrix,labels) # distance matrix
+    per_sample        = get_clustering_scores(distance_matrix,labels) # distance matrix
 
     with open(file_name_all,     'w') as fh_all:
                 fh_all.write( "%d  %g\n" %(n_clusters,overall) )

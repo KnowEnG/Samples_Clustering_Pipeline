@@ -53,7 +53,13 @@ run_cc_net_nmf_parallel_shared:
 run_cc_net_nmf_parallel_distributed:
 	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_8_SC_cc_net_nmf_parallel_distributed.yml
 
-run_all_methods: run_nmf run_net_nmf run_cc_nmf_parallel_shared run_cc_net_nmf_parallel_shared
+run_all_methods:run_nmf \
+		run_nmf_1a \
+		run_net_nmf \
+		run_cc_nmf_serial \
+		run_cc_nmf_parallel_shared \
+		run_cc_net_nmf_serial \
+		run_cc_net_nmf_parallel_shared 
 
 # ----------------------------------------------------------------
 # - VERIFICATION TESTS RUN SECTION                               -
