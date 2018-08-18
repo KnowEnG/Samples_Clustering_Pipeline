@@ -1,130 +1,121 @@
 """
-lanier4@illinois.edu
+sobh@illinois.edu
 
 """
 
-import os
 import filecmp
+import os
 import time
 
-verif_dir = '../data/verification'
-
-def verify_benchmark_1():
-
-    print('\n\tBENCHMARK_1_SC_nmf.yml')
-    print('  \t----------------------')
-
-    t0 = time.time()
-
-    os.system('python3 ../src/samples_clustering.py -run_directory ./run_dir -run_file BENCHMARK_1_SC_nmf.yml')
-    verif_file = os.path.join(verif_dir, 'samples_label_by_cluster_nmf_BENCHMARK_1.tsv')
-
-    results_dir       = '../test/run_dir/results'
-    results_prefix    = 'samples_label_by_cluster_nmf_'
-    results_file_list = os.listdir(results_dir)
-
-    verifiable_files_list = []
-    for f in results_file_list:
-        if f[0:len(results_prefix)] == results_prefix:
-            verifiable_files_list.append(os.path.join(results_dir, f))
-
-    if len(verifiable_files_list) > 0:
-        for veri_file_name in verifiable_files_list:
-            if filecmp.cmp(veri_file_name, verif_file) == True:
-                print(veri_file_name, '\n\t\t BENCHMARK_1 Verification SUCCESS', time.time() - t0)
-            else:
-                print(veri_file_name, 'Differs: BENCHMARK_1 Verification FAILS')
-    else:
-        print(verif_file, 'no file name match found')
+verification_dir = '../data/verification/'
+results_dir = '../test/run_dir/results'
 
 
-def verify_benchmark_2():
-    print('\n\tBENCHMARK_2_SC_net_nmf.yml')
-    print('  \t--------------------------')
-    t0 = time.time()
-    os.system('python3 ../src/samples_clustering.py -run_directory ./run_dir -run_file BENCHMARK_2_SC_net_nmf.yml')
+def verify_benchmark(option, BENCHMARK_name_list, BENCHMARK_YML):
+    run_command = 'python3 ../src/samples_clustering.py -run_directory ./run_dir -run_file ' + BENCHMARK_YML
+    os.system(run_command)
 
-    verif_file = os.path.join(verif_dir, 'samples_label_by_cluster_net_nmf_BENCHMARK_2.tsv')
+    All_files_in_results_dir = os.listdir(results_dir)
 
-    results_dir = '../test/run_dir/results'
-    results_prefix = 'samples_label_by_cluster_net_nmf_'
-    results_file_list = os.listdir(results_dir)
+    num_failed_tests = 0
+    num_succeed_tests = 0
+    for f in All_files_in_results_dir:
+        for BENCHMARK_name in BENCHMARK_name_list:
+            if BENCHMARK_name in f:
+                RESULT    = os.path.join(results_dir, f)
+                BENCHMARK = os.path.join(verification_dir, option, BENCHMARK_name + '.tsv')
+                if filecmp.cmp(RESULT, BENCHMARK) == True:
+                    num_succeed_tests += 1
+                    print(BENCHMARK, '______ PASS ______')
+                else:
+                    num_failed_tests += 1
+                    print(BENCHMARK, '****** FAIL ******')
+    return num_succeed_tests, num_failed_tests
 
-    verifiable_files_list = []
-    for f in results_file_list:
-        if f[0:len(results_prefix)] == results_prefix:
-            verifiable_files_list.append(os.path.join(results_dir, f))
-
-    if len(verifiable_files_list) > 0:
-        for veri_file_name in verifiable_files_list:
-            if filecmp.cmp(veri_file_name, verif_file) == True:
-                print(veri_file_name, '\n\t\t BENCHMARK_2 Verification SUCCESS', time.time() - t0)
-            else:
-                print(veri_file_name, 'Differs: BENCHMARK_2 Verification FAILS')
-    else:
-        print(verif_file, 'no file name match found')
-
-
-def verify_benchmark_4():
-    print('\n\tBENCHMARK_4_SC_cc_nmf_parallel_shared.yml')
-    print('  \t-----------------------------------------')
-    t0 = time.time()
-    os.system('python3 ../src/samples_clustering.py -run_directory ./run_dir -run_file BENCHMARK_4_SC_cc_nmf_parallel_shared.yml')
-
-    verif_file = os.path.join(verif_dir, 'samples_label_by_cluster_cc_nmf_BENCHMARK_4.tsv')
-
-    results_dir = '../test/run_dir/results'
-    results_prefix = 'samples_label_by_cluster_cc_nmf_'
-    results_file_list = os.listdir(results_dir)
-
-    verifiable_files_list = []
-    for f in results_file_list:
-        if f[0:len(results_prefix)] == results_prefix:
-            verifiable_files_list.append(os.path.join(results_dir, f))
-
-    if len(verifiable_files_list) > 0:
-        for veri_file_name in verifiable_files_list:
-            if filecmp.cmp(veri_file_name, verif_file) == True:
-                print(veri_file_name, '\n\t\t BENCHMARK_4 Verification SUCCESS', time.time() - t0)
-            else:
-                print(veri_file_name, 'Differs: BENCHMARK_4 Verification FAILS')
-    else:
-        print(verif_file, 'no file name match found')
-
-
-def verify_benchmark_7():
-    print('\n\tBENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml')
-    print('  \t---------------------------------------------')
-    t0 = time.time()
-    os.system('python3 ../src/samples_clustering.py -run_directory ./run_dir -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml')
-
-    verif_file = os.path.join(verif_dir, 'samples_label_by_cluster_cc_net_nmf_BENCHMARK_7.tsv')
-
-    results_dir = '../test/run_dir/results'
-    results_prefix = 'samples_label_by_cluster_cc_net_nmf_'
-    results_file_list = os.listdir(results_dir)
-
-    verifiable_files_list = []
-    for f in results_file_list:
-        if f[0:len(results_prefix)] == results_prefix:
-            verifiable_files_list.append(os.path.join(results_dir, f))
-
-    if len(verifiable_files_list) > 0:
-        for veri_file_name in verifiable_files_list:
-            if filecmp.cmp(veri_file_name, verif_file) == True:
-                print(veri_file_name, '\n\t\t BENCHMARK_7 Verification SUCCESS', time.time() - t0)
-            else:
-                print(veri_file_name, 'Differs: BENCHMARK_7 Verification FAILS')
-    else:
-        print(verif_file, 'no file name match found')
 
 def main():
+    BENCHMARK = {
+        'nmf': ['BENCHMARK_1_SC_nmf.yml',
+                'clustering_evaluation_result_nmf',
+                'consensus_matrix_nmf',
+                'genes_averages_by_cluster_nmf',
+                'genes_by_samples_heatmap_nmf',
+                'genes_variance_nmf',
+                'samples_label_by_cluster_nmf',
+                'silhouette_overall_score_nmf',
+                'silhouette_per_cluster_score_nmf',
+                'silhouette_per_sample_score_nmf',
+                'top_genes_by_cluster_nmf'
+        ],
+        'net_nmf': [
+                'BENCHMARK_2_SC_net_nmf.yml',
+                'clustering_evaluation_result_net_nmf',
+                'consensus_matrix_net_nmf',
+                'genes_averages_by_cluster_net_nmf',
+                'genes_by_samples_heatmap_net_nmf',
+                'genes_variance_net_nmf',
+                'samples_label_by_cluster_net_nmf',
+                'silhouette_overall_score_net_nmf',
+                'silhouette_per_cluster_score_net_nmf',
+                'silhouette_per_sample_score_net_nmf',
+                'top_genes_by_cluster_net_nmf'
+        ],
+        'cc_nmf': [
+                'BENCHMARK_4_SC_cc_nmf_parallel_shared.yml',
+                'clustering_evaluation_result_cc_nmf',
+                'consensus_matrix_cc_nmf',
+                'genes_averages_by_cluster_cc_nmf',
+                'genes_by_samples_heatmap_cc_nmf',
+                'genes_variance_cc_nmf',
+                'samples_label_by_cluster_cc_nmf',
+                'silhouette_overall_score_cc_nmf',
+                'silhouette_per_cluster_score_cc_nmf',
+                'silhouette_per_sample_score_cc_nmf',
+                'top_genes_by_cluster_cc_nmf'
+        ],
+        'cc_net_nmf': [
+                'BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml',
+                'clustering_evaluation_result_cc_net_nmf',
+                'consensus_matrix_cc_net_nmf',
+                'genes_averages_by_cluster_cc_net_nmf',
+                'genes_by_samples_heatmap_cc_net_nmf',
+                'genes_variance_cc_net_nmf',
+                'samples_label_by_cluster_cc_net_nmf',
+                'silhouette_overall_score_cc_net_nmf',
+                'silhouette_per_cluster_score_cc_net_nmf',
+                'silhouette_per_sample_score_cc_net_nmf',
+                'top_genes_by_cluster_cc_net_nmf']
+    }
     os.system('make env_setup')
-    verify_benchmark_1()
-    verify_benchmark_2()
-    verify_benchmark_4()
-    verify_benchmark_7()
-    print('\n')
+    start_time = time.time()
+
+    total_success = 0
+    total_failure = 0
+    for option in BENCHMARK.keys():
+
+        BENCHMARK_list = BENCHMARK[option]
+        BENCHMARK_YML  = BENCHMARK_list[0]
+        print()
+        print("INFO: Running test ", "./run_dir/results/" + BENCHMARK_YML)
+
+        # for BENCHMARK_name in BENCHMARK_list[1:]:
+
+        num_succeed_tests, num_failed_tests = verify_benchmark(option, BENCHMARK_list[1:], BENCHMARK_YML)
+
+        total_success += num_succeed_tests
+        total_failure += num_failed_tests
+
+        os.system('rm ./run_dir/results/*')
+
+    end_time = time.time()
+
+    print()
+    print("Ran {} tests in {}s".format(total_success + total_failure, end_time - start_time))
+    if (total_failure == 0):
+        print("OK")
+        print()
+    else:
+        print("FAILED(errors={})".format(total_failure))
 
 
 if __name__ == "__main__":
