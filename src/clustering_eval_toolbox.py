@@ -169,6 +169,7 @@ def clustering_evaluation(run_parameters):
     file_name = kn.create_timestamped_filename(file1, "tsv")
     file_path = os.path.join(run_parameters["results_directory"], file_name)
     result_df = pd.concat([result_df, fail_df], axis=1)
+    result_df.sort_index(inplace=True) 
     result_df.T.sort_index(inplace=True) 
     result_df.T.to_csv(file_path, header=True, index=True, sep='\t', na_rep='NA')
 
