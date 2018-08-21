@@ -12,7 +12,7 @@ import knpackage.toolbox as kn
 class ColumnType(Enum):
     """Two categories of phenotype traits.
     """
-    CONTINUOUS = "continuous"
+    CONTINUOUS  = "continuous"
     CATEGORICAL = "categorical"
 
 
@@ -23,12 +23,18 @@ def combine_phenotype_data_and_clustering(run_parameters):
         phenotype_df: phenotype dataframe with the first column as sample clusters.
     """
     phenotype_df = kn.get_spreadsheet_df(run_parameters['phenotype_name_full_path'])
+
     phenotype_df.insert(0, 'Cluster_ID', np.nan) # pylint: disable=no-member
+
     cluster_labels_df = pd.read_csv(
         run_parameters['cluster_mapping_full_path'], index_col=0, header=None, sep='\t')
+
     cluster_labels_df.columns = ['Cluster_ID']
+
     common_samples = kn.find_common_node_names(phenotype_df.index, cluster_labels_df.index)
+
     phenotype_df.loc[common_samples, 'Cluster_ID'] = cluster_labels_df.loc[common_samples, 'Cluster_ID'] # pylint: disable=no-member
+
     return phenotype_df
 
 
@@ -53,9 +59,11 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
         if column == 'Cluster_ID':
             continue
         cur_df = cluster_phenotype_df[['Cluster_ID', column]].dropna(axis=0)
+
         if cur_df.empty:
             fail_df[column] \
             = [np.nan, 0, 0, np.nan, 1, 'FAIL', 'Input phenotype is empty']
+
         if not cur_df.empty:
             if cur_df[column].dtype == object:
                 cur_df_lowercase = cur_df.apply(lambda x: x.astype(str).str.lower())
@@ -79,6 +87,7 @@ def run_post_processing_phenotype_clustering_data(cluster_phenotype_df, threshol
             else:
                 classification = ColumnType.CATEGORICAL
             output_dict[classification].append(cur_df_lowercase)
+
     return output_dict, fail_df
 
 
@@ -160,5 +169,8 @@ def clustering_evaluation(run_parameters):
     file_name = kn.create_timestamped_filename(file1, "tsv")
     file_path = os.path.join(run_parameters["results_directory"], file_name)
     result_df = pd.concat([result_df, fail_df], axis=1)
+    result_df.sort_index(inplace=True) 
+    result_df.T.sort_index(inplace=True) 
     result_df.T.to_csv(file_path, header=True, index=True, sep='\t', na_rep='NA')
+
 
