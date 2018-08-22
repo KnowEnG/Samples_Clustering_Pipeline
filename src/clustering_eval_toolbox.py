@@ -171,9 +171,8 @@ def clustering_evaluation(run_parameters):
     result_df = pd.concat([result_df, fail_df], axis=1)
 
     # ------------------------
-    # sort -> transponse --> sort
+    # transponse --> sort
     # ------------------------
-    result_df.sort_index(inplace=True) 
     result_df = result_df.T
     result_df.sort_index(inplace=True) 
     # ------------------------
