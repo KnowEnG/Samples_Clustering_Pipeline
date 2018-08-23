@@ -9,7 +9,7 @@ import knpackage.distributed_computing_utils as dstutil
 
 import clustering_eval_toolbox  as     cluster_eval
 from   sklearn.metrics          import silhouette_score, silhouette_samples
-from   sklearn.metrics.pairwise import euclidean_distances
+from   sklearn.metrics.pairwise import pairwise_distances
 
 
 def run_nmf(run_parameters):
@@ -39,8 +39,7 @@ def run_nmf(run_parameters):
 
     sample_names               = spreadsheet_df.columns
 
-    h_mat_T                    =  h_mat.T
-    distance_matrix            =  euclidean_distances( h_mat_T, h_mat_T)
+    distance_matrix            =  pairwise_distances( h_mat.T ) # [n_samples, n_features] 
 
     save_consensus_clustering            (linkage_matrix,  sample_names, labels, run_parameters)
     calculate_and_save_silhouette_scores (distance_matrix, sample_names, labels, run_parameters)
@@ -83,8 +82,8 @@ def run_net_nmf(run_parameters):
     linkage_matrix             = kn.update_linkage_matrix(h_mat, sample_perm, linkage_matrix)
     labels                     = kn.perform_kmeans(linkage_matrix, number_of_clusters)
 
-    h_mat_T                    =  h_mat.T
-    distance_matrix            =  euclidean_distances( h_mat_T, h_mat_T)
+    distance_matrix            =  pairwise_distances( h_mat.T ) # [n_samples, n_features]   
+
 
     save_consensus_clustering            (linkage_matrix,  sample_names, labels, run_parameters)
     calculate_and_save_silhouette_scores (distance_matrix, sample_names, labels, run_parameters)
@@ -136,8 +135,9 @@ def run_cc_nmf(run_parameters):
 
     consensus_matrix = form_consensus_matrix( run_parameters,   number_of_samples  )
     labels           = kn.perform_kmeans    ( consensus_matrix, number_of_clusters )
+    distance_matrix  = pairwise_distances   ( consensus_matrix                     ) # [n_samples, n_samples]
+
     sample_names     = spreadsheet_df.columns
-    distance_matrix  = 1.0   - consensus_matrix
 
     save_consensus_clustering            (consensus_matrix, sample_names, labels, run_parameters)
     calculate_and_save_silhouette_scores (distance_matrix,  sample_names, labels, run_parameters)
@@ -196,8 +196,8 @@ def run_cc_net_nmf(run_parameters):
         raise ValueError('processing_method contains bad value.')
 
     consensus_matrix = form_consensus_matrix(run_parameters, number_of_samples)
-    labels           = kn.perform_kmeans(consensus_matrix, number_of_clusters)
-    distance_matrix  = 1.0   - consensus_matrix
+    labels           = kn.perform_kmeans (consensus_matrix, number_of_clusters)
+    distance_matrix  = pairwise_distances(consensus_matrix                    ) # [n_samples, n_samples]
 
     save_consensus_clustering            (consensus_matrix, sample_names, labels, run_parameters             )
     calculate_and_save_silhouette_scores (distance_matrix,  sample_names, labels, run_parameters             )
