@@ -1,4 +1,4 @@
-SCRIPT = ../src/samples_clustering.py
+SCRIPT = -m knsamplesclustering.samples_clustering
 RUN_DIR = ./run_dir
 RUN_FILES = ../data/run_files
 RESULTS_DIR = $(RUN_DIR)/results
