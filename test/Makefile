@@ -4,6 +4,7 @@ RUN_FILES = ../data/run_files
 RESULTS_DIR = $(RUN_DIR)/results
 INPUT_DATA_DIR = ../data
 UNIT_TEST_TEMP_DIR = ./unit/tmp
+PYTHONPATH = ../
 
 RMR = rm -rf
 MKDIR_P = mkdir -p
@@ -27,31 +28,31 @@ clean_dir_recursively:
 # Large Benchmarks RUN Section                                   -
 # ----------------------------------------------------------------
 run_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1_SC_nmf.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1_SC_nmf.yml
 
 run_nmf_1a:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1a_SC_nmf.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_1a_SC_nmf.yml
 
 run_net_nmf:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_2_SC_net_nmf.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_2_SC_net_nmf.yml
 
 run_cc_nmf_serial:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_3_SC_cc_nmf_serial.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_3_SC_cc_nmf_serial.yml
 
 run_cc_nmf_parallel_shared:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_4_SC_cc_nmf_parallel_shared.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_4_SC_cc_nmf_parallel_shared.yml
 
 run_cc_nmf_parallel_distributed:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_5_SC_cc_nmf_parallel_distributed.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_5_SC_cc_nmf_parallel_distributed.yml
 
 run_cc_net_nmf_serial:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_6_SC_cc_net_nmf_serial.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_6_SC_cc_net_nmf_serial.yml
 
 run_cc_net_nmf_parallel_shared:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
 
 run_cc_net_nmf_parallel_distributed:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_8_SC_cc_net_nmf_parallel_distributed.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_8_SC_cc_net_nmf_parallel_distributed.yml
 
 run_some_methods:run_nmf \
 		run_net_nmf \
@@ -74,7 +75,7 @@ unit_tests:
 	cd unit; make all_unit_tests
 	
 run_benchmark_test:
-	python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
+	PYTHONPATH=${PYTHONPATH} python3 $(SCRIPT) -run_directory $(RUN_DIR) -run_file BENCHMARK_7_SC_cc_net_nmf_parallel_shared.yml
 
 # ----------------------------------------------------------------
 # - CLEAN UP SECTION                                             -

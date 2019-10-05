@@ -4,23 +4,16 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>clustering_eval_toolbox module &#8212; samples_clustering_pipeline 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
    
@@ -29,119 +22,65 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
-  <div class="section" id="module-clustering_eval_toolbox">
-<span id="clustering-eval-toolbox-module"></span><h1>clustering_eval_toolbox module<a class="headerlink" href="#module-clustering_eval_toolbox" title="Permalink to this headline">¶</a></h1>
-<p>&#64;author: The KnowEnG dev team</p>
-<dl class="class">
-<dt id="clustering_eval_toolbox.ColumnType">
-<em class="property">class </em><code class="descclassname">clustering_eval_toolbox.</code><code class="descname">ColumnType</code><a class="reference internal" href="_modules/clustering_eval_toolbox.html#ColumnType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clustering_eval_toolbox.ColumnType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
-<p>Two categories of phenotype traits.</p>
-<dl class="attribute">
-<dt id="clustering_eval_toolbox.ColumnType.CATEGORICAL">
-<code class="descname">CATEGORICAL</code><em class="property"> = 'categorical'</em><a class="headerlink" href="#clustering_eval_toolbox.ColumnType.CATEGORICAL" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="clustering_eval_toolbox.ColumnType.CONTINUOUS">
-<code class="descname">CONTINUOUS</code><em class="property"> = 'continuous'</em><a class="headerlink" href="#clustering_eval_toolbox.ColumnType.CONTINUOUS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="clustering_eval_toolbox.chisquare">
-<code class="descclassname">clustering_eval_toolbox.</code><code class="descname">chisquare</code><span class="sig-paren">(</span><em>phenotype_df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clustering_eval_toolbox.html#chisquare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clustering_eval_toolbox.chisquare" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform a chi-square test and report the results.</p>
-<dl class="docutils">
-<dt>Parameters:</dt>
-<dd>phenotype_df: dataframe with two columns with clusters and phenotype trait values.
-ret: result of the phenotype dataframe.</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="clustering_eval_toolbox.clustering_evaluation">
-<code class="descclassname">clustering_eval_toolbox.</code><code class="descname">clustering_evaluation</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clustering_eval_toolbox.html#clustering_evaluation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clustering_eval_toolbox.clustering_evaluation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run clustering evaluation on the whole dataframe of phenotype data.
-Save the results to tsv file.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="clustering_eval_toolbox.combine_phenotype_data_and_clustering">
-<code class="descclassname">clustering_eval_toolbox.</code><code class="descname">combine_phenotype_data_and_clustering</code><span class="sig-paren">(</span><em>run_parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clustering_eval_toolbox.html#combine_phenotype_data_and_clustering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clustering_eval_toolbox.combine_phenotype_data_and_clustering" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is to insert the sample clusters column into the phenotype dataframe.</p>
-<dl class="docutils">
-<dt>Returns:</dt>
-<dd>phenotype_df: phenotype dataframe with the first column as sample clusters.</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="clustering_eval_toolbox.f_oneway">
-<code class="descclassname">clustering_eval_toolbox.</code><code class="descname">f_oneway</code><span class="sig-paren">(</span><em>phenotype_df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clustering_eval_toolbox.html#f_oneway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clustering_eval_toolbox.f_oneway" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform a f_oneway test and report the results.</p>
-<dl class="docutils">
-<dt>Parameters:</dt>
-<dd>phenotype_df: dataframe with two columns with clusters and phenotype trait values.
-ret: result of the phenotype dataframe.</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="clustering_eval_toolbox.run_post_processing_phenotype_clustering_data">
-<code class="descclassname">clustering_eval_toolbox.</code><code class="descname">run_post_processing_phenotype_clustering_data</code><span class="sig-paren">(</span><em>cluster_phenotype_df</em>, <em>threshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clustering_eval_toolbox.html#run_post_processing_phenotype_clustering_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#clustering_eval_toolbox.run_post_processing_phenotype_clustering_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the clean up function of phenotype data with nans removed.</p>
-<dl class="docutils">
-<dt>Parameters:</dt>
-<dd>cluster_phenotype_df: phenotype dataframe with the first column as sample clusters.
-threshold: threshold to determine which phenotype to remove.</dd>
-<dt>Returns:</dt>
-<dd>output_dict: dictionary with keys to be categories of phenotype data and values
-to be a list of related dataframes.</dd>
-</dl>
-</dd></dl>
-
+  <div class="section" id="clustering-eval-toolbox-module">
+<h1>clustering_eval_toolbox module<a class="headerlink" href="#clustering-eval-toolbox-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">samples_clustering_pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/clustering_eval_toolbox.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
@@ -150,8 +89,8 @@ to be a list of related dataframes.</dd>
       &copy;2016, KnowEnG_Team.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="_sources/clustering_eval_toolbox.rst.txt"

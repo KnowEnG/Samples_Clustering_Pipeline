@@ -7,9 +7,9 @@ import pandas as pd
 import knpackage.toolbox as kn
 import knpackage.distributed_computing_utils as dstutil
 
-import clustering_eval_toolbox  as     cluster_eval
-from   sklearn.metrics          import silhouette_score, silhouette_samples
-from   sklearn.metrics.pairwise import pairwise_distances
+from .clustering_eval_toolbox import clustering_evaluation
+from sklearn.metrics          import silhouette_score, silhouette_samples
+from sklearn.metrics.pairwise import pairwise_distances
 
 
 def run_nmf(run_parameters):
@@ -553,7 +553,7 @@ def save_final_samples_clustering(sample_names, labels, run_parameters):
 
     if 'phenotype_name_full_path' in run_parameters.keys():
         run_parameters['cluster_mapping_full_path'] = cluster_mapping_full_path
-        cluster_eval.clustering_evaluation(run_parameters)
+        clustering_evaluation(run_parameters)
 
 
 def get_output_file_name(run_parameters, prefix_string, suffix_string='', type_suffix='tsv'):

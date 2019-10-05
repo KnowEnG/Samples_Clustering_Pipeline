@@ -4,7 +4,7 @@ import numpy as np
 import knpackage.toolbox as kn
 
 import sample_clustering_toolbox_research_module as tstdata
-import sample_clustering_toolbox as sctbx
+import knsamplesclustering.sample_clustering_toolbox as sctbx
 
 
 class TestRun_nmf_clusters_worker(TestCase):
