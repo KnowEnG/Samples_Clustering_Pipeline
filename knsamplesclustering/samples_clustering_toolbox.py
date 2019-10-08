@@ -386,8 +386,8 @@ def get_linkage_matrix(run_parameters, linkage_matrix, indicator_matrix):
             pname = os.path.join(tmp_dir, tmp_f)
             hname = os.path.join(tmp_dir, 'tmp_h_' + tmp_f[6:len(tmp_f)])
 
-            sample_permutation = np.load(pname)
-            h_mat              = np.load(hname)
+            sample_permutation = np.load(pname, allow_pickle=True)
+            h_mat              = np.load(hname, allow_pickle=True)
 
             linkage_matrix   = kn.update_linkage_matrix(h_mat, sample_permutation, linkage_matrix)
             indicator_matrix = kn.update_indicator_matrix(sample_permutation, indicator_matrix)
